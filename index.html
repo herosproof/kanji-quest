@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Kanji Quest – 漢字クエスト</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700;900&family=Kosugi+Maru&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#3a2558;--bg2:#2a1845;--panel2:#1e1235;
+  --cream:#f5eedc;--card-bg:rgba(245,238,220,0.97);--border-gold:rgba(245,158,11,0.25);
+  --purple:#9060c0;--purple-light:#c8a0e0;--purple-pale:#ede0f8;--purple-dark:#4a3870;
+  --gold:#c9a030;--gold-light:#f0d060;--gold-pale:#f8f0c0;
+  --brown:#5c2810;--text-dark:#1e1235;--text-soft:#3a2558;--text-muted:rgba(200,160,224,.75);
+  --green:#4a9040;--green-pale:#d0e8b0;--red:#c83030;--red-pale:#fee2e2;
+  --mauve:#c07888;--shadow:rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;}
+body{
+  font-family:'Fredoka','Kosugi Maru','Zen Maru Gothic',sans-serif;
+  background:var(--bg);
+  color:var(--text-dark);
+  min-height:100dvh;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+  padding:16px 12px 48px;
+  overflow-x:hidden;
+  user-select:none;-webkit-user-select:none;
+}
+/* ── Starfield — fixed, full-page ── */
+.starfield{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.starfield span{position:absolute;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s);display:flex;align-items:center;justify-content:center;font-size:var(--sz,1rem);color:var(--col,#fde68a);text-shadow:0 0 6px var(--col,#fde68a);line-height:1;}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}50%{opacity:.9;transform:scale(1) rotate(20deg)}}
+/* ── Container — responsive centred column ── */
+.container{position:relative;z-index:1;width:min(700px,95vw);display:flex;flex-direction:column;align-items:center;gap:0;}
+/* ── Screens ── */
+.screen{display:none;width:100%;}
+.screen.active{display:flex;flex-direction:column;align-items:center;gap:16px;}
+
+/* ── Title Header — matches writing.html exactly ── */
+#screen-title{padding-bottom:0;}
+.title-header{
+  width:100%;
+  background:linear-gradient(160deg,#2a1845 0%,#1e1235 60%,#150d28 100%);
+  padding:28px 20px 20px;
+  text-align:center;position:relative;
+  box-shadow:0 4px 24px rgba(124,58,237,.35);
+  border-bottom:1px solid rgba(167,139,250,.2);
+  border-radius:0 0 20px 20px;
+  margin-bottom:4px;overflow:hidden;
+  text-decoration:none;display:block;cursor:pointer;
+}
+.title-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(144,96,192,.22) 0%,transparent 70%);pointer-events:none;}
+.title-logo-img{max-height:160px;max-width:92%;object-fit:contain;display:block;margin:0 auto 8px;position:relative;z-index:1;filter:drop-shadow(0 2px 16px rgba(167,139,250,.5));}
+.title-emblem{font-size:3rem;display:block;margin-bottom:8px;position:relative;z-index:1;animation:embFloat 3s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(201,160,48,.5));}
+@keyframes embFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.title-game-name{font-family:'Press Start 2P',monospace;font-size:clamp(.8rem,3.5vw,1.1rem);color:#fff;text-shadow:0 0 24px rgba(167,139,250,.7),0 2px 4px rgba(0,0,0,.5);line-height:1.7;position:relative;z-index:1;}
+.title-sub{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:clamp(.88rem,2.5vw,1.05rem);color:var(--gold-light);font-weight:600;letter-spacing:.12em;margin-top:4px;position:relative;z-index:1;}
+.header-divider{width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto 0;opacity:.6;position:relative;z-index:1;}
+.scenario-section{width:100%;max-width:700px;margin:0;}
+.scenario-card{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:20px;box-shadow:0 4px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);padding:18px 20px 24px;cursor:pointer;position:relative;display:flex;gap:14px;align-items:center;min-height:96px;width:100%;}
+.sc-lumi{width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:10px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));animation:embFloat 3s ease-in-out infinite;}
+.sc-text{flex:1;min-width:0;}
+.sc-name{font-family:'Press Start 2P',monospace;font-size:.46rem;letter-spacing:.08em;color:var(--purple-dark);margin-bottom:3px;}
+.sc-en{font-size:.95rem;font-weight:700;color:var(--text-dark);line-height:1.5;}
+.sc-jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.8rem;color:var(--brown);margin-top:3px;line-height:1.5;}
+.sc-hint{position:absolute;bottom:8px;right:12px;display:flex;align-items:center;gap:3px;font-family:'Fredoka',sans-serif;font-size:.76rem;font-weight:700;color:var(--gold);}
+.sc-hint-tap{display:inline-block;}
+.sc-hint-arr{font-size:.92rem;display:inline-block;}
+.sc-hint.blink .sc-hint-tap{animation:tapPulse 1s ease-in-out infinite;}
+.sc-hint.blink .sc-hint-arr{animation:arrFlash .8s ease-in-out infinite;}
+@keyframes tapPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.88)}}
+@keyframes arrFlash{0%,100%{opacity:1;transform:translateX(0)}50%{opacity:.4;transform:translateX(3px)}}
+/* ── Mode toggle (ふつう ↔ Mini Quest) ── */
+.mode-toggle-section{width:100%;max-width:700px;display:flex;justify-content:center;margin-bottom:4px;}
+.mode-toggle-wrap{display:flex;align-items:center;gap:10px;background:rgba(30,18,53,.7);border:1px solid rgba(167,139,250,.2);border-radius:50px;padding:8px 18px;}
+.mode-label{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.82rem;font-weight:700;color:var(--purple-light);white-space:nowrap;transition:color .2s;}
+.mode-label.active{color:var(--gold-light);}
+.toggle-track{position:relative;width:52px;height:28px;border-radius:50px;background:rgba(144,96,192,.35);border:2px solid rgba(144,96,192,.5);cursor:pointer;transition:background .25s,border-color .25s;flex-shrink:0;}
+.toggle-track.on{background:rgba(201,160,48,.35);border-color:rgba(201,160,48,.6);}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--purple-light);box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .25s;}
+.toggle-track.on .toggle-thumb{transform:translateX(24px);background:var(--gold-light);}
+.mode-badge{font-family:'Press Start 2P',monospace;font-size:.38rem;letter-spacing:.06em;padding:3px 8px;border-radius:50px;border:1px solid var(--gold);color:var(--gold);background:rgba(201,160,48,.12);white-space:nowrap;}
+/* ── Difficulty section — writing.html grid style ── */
+.diff-section{width:100%;max-width:700px;}
+.diff-title{font-family:'Press Start 2P',monospace;font-size:clamp(.6rem,2.5vw,.85rem);color:var(--gold-light);text-shadow:0 0 16px rgba(240,208,96,.5),2px 2px 0 var(--brown);letter-spacing:.1em;margin-bottom:12px;text-align:center;line-height:1.7;}
+.diff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;width:100%;}
+.diff-card{background:var(--card-bg);border:2px solid var(--border-gold);border-radius:18px;padding:20px 10px;cursor:pointer;text-align:center;box-shadow:0 4px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);transition:transform .2s,box-shadow .2s,background .15s,border-color .15s;color:var(--text-dark);}
+.diff-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);}
+.diff-card:active{transform:translateY(2px);}
+.diff-card.easy{border-color:rgba(74,144,64,.45);}
+.diff-card.normal{border-color:rgba(201,160,48,.55);}
+.diff-card.hard{border-color:rgba(200,48,48,.45);}
+.diff-card.extreme{border-color:rgba(200,50,200,.55);background:rgba(20,8,28,.65);color:#e0a0f0;}
+.diff-card.extreme .diff-name{color:#e0a0f0;}
+.diff-card.extreme .diff-jp{color:#c070e0;}
+/* ── Selected states ── */
+.diff-card.sel{transform:translateY(3px) scale(1.04);}
+.diff-card.sel.easy{background:#b8f0a0;border:3px solid #3a9030;box-shadow:0 0 0 3px rgba(74,200,64,.35),0 6px 22px rgba(60,160,40,.55),inset 0 1px 0 rgba(255,255,255,.7);}
+.diff-card.sel.normal{background:#ffe87a;border:3px solid #c09010;box-shadow:0 0 0 3px rgba(240,200,40,.4),0 6px 22px rgba(200,160,20,.6),inset 0 1px 0 rgba(255,255,255,.7);}
+.diff-card.sel.hard{background:#ffc0c0;border:3px solid #c02020;box-shadow:0 0 0 3px rgba(220,60,60,.4),0 6px 22px rgba(200,40,40,.6),inset 0 1px 0 rgba(255,255,255,.7);}
+.diff-card.sel.extreme{background:rgba(80,0,120,.8);border:3px solid #cc44ff;box-shadow:0 0 0 3px rgba(200,50,240,.45),0 6px 24px rgba(180,0,220,.65),inset 0 1px 0 rgba(255,200,255,.15);}
+.diff-emoji{font-size:2.2rem;display:block;margin-bottom:6px;}
+.diff-name{font-family:'Fredoka',sans-serif;font-size:clamp(.85rem,2.5vw,1rem);font-weight:700;color:var(--text-dark);}
+.diff-jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.78rem;color:var(--brown);margin-top:3px;}
+@keyframes cfade{0%{opacity:.35}100%{opacity:0}}
+/* ── Buttons — matching writing.html ── */
+.btn{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(.5rem,1.8vw,.7rem);
+  background:linear-gradient(135deg,#ede0f8,#d8c8f0);
+  color:var(--text-dark);
+  border:2px solid var(--purple);
+  border-radius:14px;
+  padding:14px 28px;
+  cursor:pointer;
+  box-shadow:0 4px 0 #6840a0;
+  transition:transform .1s,box-shadow .1s;
+  letter-spacing:.05em;
+  line-height:1.5;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #6840a0;}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6840a0;}
+.btn.btn-secondary,.btn-secondary{background:linear-gradient(135deg,var(--gold-pale),var(--gold-light));border-color:var(--gold);box-shadow:0 4px 0 #a07820;color:var(--brown);}
+.btn.btn-secondary:hover,.btn-secondary:hover{box-shadow:0 6px 0 #a07820;}
+.btn.btn-secondary:active,.btn-secondary:active{box-shadow:0 1px 0 #a07820;}
+.btn-ghost,.btn-hub{
+  font-family:'Fredoka',sans-serif;font-size:.9rem;font-weight:600;
+  color:var(--text-muted);background:transparent;
+  border:1px solid rgba(167,139,250,.25);
+  border-radius:50px;padding:8px 22px;
+  cursor:pointer;transition:color .2s,border-color .2s;
+  display:inline-block;text-decoration:none;
+}
+.btn-ghost:hover,.btn-hub:hover{color:var(--gold-light);border-color:rgba(245,158,11,.4);}
+.btn-primary{background:linear-gradient(135deg,#ede0f8,#d8c8f0);color:var(--text-dark);border:2px solid var(--purple);box-shadow:0 4px 0 #6840a0;}
+.title-cta{display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;}
+.q-word.kanji{font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP','Zen Maru Gothic',serif;letter-spacing:0;font-size:clamp(3.2rem,18vw,5.6rem);line-height:1;}
+.diff-card.lvl-card .diff-count{display:block;font-family:'Press Start 2P',monospace;font-size:.4rem;color:var(--text-soft);margin-top:5px;}
+/* ── Scores ── */
+#screen-scores{gap:14px;padding:20px 0 32px;}
+.panel-h{font-family:'Press Start 2P',monospace;font-size:clamp(.68rem,3vw,.88rem);color:var(--gold-light);text-shadow:0 0 18px rgba(240,208,96,.5);text-align:center;line-height:1.8;}
+.panel-h .jp{display:block;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.85rem;color:var(--purple-light);}
+.score-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.score-tab{padding:8px 14px;border-radius:50px;border:2px solid;cursor:pointer;font-family:'Press Start 2P',monospace;font-size:.4rem;letter-spacing:.06em;}
+.score-tab.easy{border-color:#4a9040;color:#c0e090;}
+.score-tab.normal{border-color:#c9a030;color:var(--gold-light);}
+.score-tab.hard{border-color:#c83030;color:#f0a090;}
+.score-tab.extreme{border-color:#8000c0;color:#d080ff;}
+.score-tab.sel{background:rgba(255,255,255,.12);}
+.score-list{width:100%;max-width:480px;background:var(--card-bg);border:1px solid var(--border-gold);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px var(--shadow);}
+.score-item{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid rgba(144,96,192,.15);}
+.score-item:last-child{border-bottom:none;}
+.score-rank{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--purple);width:32px;}
+.score-rank.gold{color:var(--gold);}
+.score-val{font-family:'Press Start 2P',monospace;font-size:.58rem;color:var(--text-dark);margin-left:auto;}
+/* ── Play ── */
+#screen-play{position:fixed;inset:0;z-index:2;padding:0;gap:0;overflow-y:auto;}
+.hud{width:100%;background:linear-gradient(160deg,#2a1845 0%,#1e1235 100%);border:1px solid rgba(167,139,250,.2);border-radius:16px;padding:10px 16px 12px;box-shadow:0 4px 20px rgba(0,0,0,.4);margin-bottom:10px;}
+.hud-row1{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.hud-vol{display:flex;align-items:center;gap:6px;flex:1;}
+.hud-vol label{font-family:'Press Start 2P',monospace;font-size:.36rem;color:var(--text-muted);white-space:nowrap;}
+.hud-vol input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:4px;background:rgba(200,160,224,.35);outline:none;cursor:pointer;}
+.hud-vol input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold-light);}
+.hud-vol input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--gold-light);border:none;}
+#mute-btn{background:none;border:none;cursor:pointer;font-size:.95rem;line-height:1;padding:0;flex-shrink:0;}
+.hud-timer{font-family:'Press Start 2P',monospace;font-size:.66rem;color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(255,255,255,.3);}
+.hud-timer.low{color:var(--mauve);animation:pulseR .5s ease-in-out infinite;}
+.hud-wcount{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);min-width:52px;text-align:left;white-space:nowrap;}
+@keyframes pulseR{0%,100%{opacity:1}50%{opacity:.4}}
+.hud-combo{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);min-width:52px;text-align:right;}
+.hud-row2{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.hud-gauge-label{font-family:'Press Start 2P',monospace;font-size:.38rem;letter-spacing:.1em;color:var(--gold-light);}
+.hud-gauge-label .jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.6rem;color:var(--purple-light);margin-left:4px;}
+.gauge-track{height:18px;background:rgba(0,0,0,.35);border-radius:50px;overflow:hidden;border:1px solid rgba(167,139,250,.2);box-shadow:inset 0 2px 6px rgba(0,0,0,.4);position:relative;}
+.gauge-fill{height:100%;width:0%;border-radius:50px;background:linear-gradient(90deg,var(--purple-dark),var(--purple-light));transition:width .3s cubic-bezier(.34,1.56,.64,1),background .5s;}
+.gauge-fill::after{content:'';position:absolute;top:2px;left:6px;right:6px;height:38%;background:rgba(255,255,255,.28);border-radius:50px;}
+.gauge-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Press Start 2P',monospace;font-size:.42rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);z-index:2;}
+.battle{position:relative;width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:6px 14px 10px;}
+.cracks{position:absolute;inset:0;pointer-events:none;z-index:1;transition:opacity .6s;}
+.danger-vignette{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 90px 18px rgba(200,40,40,0);transition:box-shadow .22s;}
+.beatflash{position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(circle at 50% 38%,rgba(200,160,224,.12),transparent 58%);opacity:0;}
+.beatflash.on{animation:bf .5s ease-out;}
+@keyframes bf{0%{opacity:.6}100%{opacity:0}}
+.ring-arena{position:relative;z-index:3;flex-shrink:0;width:clamp(110px,26vw,145px);height:clamp(110px,26vw,145px);display:flex;align-items:center;justify-content:center;}
+.target-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:3px solid rgba(201,160,48,.55);box-shadow:0 0 20px rgba(201,160,48,.2),inset 0 0 14px rgba(201,160,48,.1);}
+.target-ring.beat{animation:tBeat .52s ease-out;}
+@keyframes tBeat{0%{box-shadow:0 0 36px rgba(201,160,48,.65),inset 0 0 22px rgba(201,160,48,.3)}100%{box-shadow:0 0 20px rgba(201,160,48,.2),inset 0 0 14px rgba(201,160,48,.1)}}
+.approach-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:4px solid var(--purple);box-shadow:0 0 16px rgba(144,96,192,.45);will-change:transform;}
+.q-media{width:clamp(60px,15vw,85px);height:clamp(60px,15vw,85px);display:flex;align-items:center;justify-content:center;font-size:clamp(2.4rem,10vw,3.4rem);z-index:2;line-height:1;}
+.q-media img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;}
+.question-panel{position:relative;z-index:3;background:var(--card-bg);border:1px solid var(--border-gold);border-radius:20px;padding:18px 14px 20px;box-shadow:0 6px 28px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.9);display:flex;flex-direction:column;align-items:center;width:100%;max-width:480px;}
+.q-word{font-family:'Fredoka',sans-serif;font-size:clamp(1.7rem,8vw,2.2rem);font-weight:700;letter-spacing:4px;color:var(--text-dark);margin-bottom:2px;}
+.q-word .blank{color:var(--red);}
+.q-meta{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-weight:700;color:var(--brown);font-size:.86rem;text-align:center;}
+.q-meta small{display:block;color:var(--text-soft);font-size:.7rem;opacity:.72;}
+.q-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:100%;margin-top:11px;}
+.q-opt{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(1.45rem,7vw,2rem);padding:16px 4px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(135deg,var(--purple-pale),#d8c8f0);color:var(--text-dark);border:2px solid rgba(144,96,192,.4);box-shadow:0 4px 0 #6840a0;transition:transform .07s,box-shadow .07s;line-height:1;}
+/* Blend options are 2 chars — slightly smaller */
+.q-opt.is-blend{font-size:clamp(1rem,5vw,1.45rem);letter-spacing:.04em;}
+.q-opt:active{transform:translateY(3px);box-shadow:0 1px 0 #6840a0;}
+.q-opt.correct{background:var(--green-pale);border-color:rgba(74,144,64,.6);box-shadow:0 4px 0 #3a7030;color:var(--brown);}
+.q-opt.wrong{background:var(--red-pale);border-color:rgba(200,48,48,.6);box-shadow:0 4px 0 #a02020;color:var(--brown);}
+.q-opt.dim{opacity:.38;}
+.judge{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:8;font-family:'Press Start 2P',monospace;font-size:clamp(.6rem,2.8vw,.85rem);pointer-events:none;opacity:0;text-shadow:0 2px 10px rgba(0,0,0,.7);}
+.judge.show{animation:judgePop .65s ease-out;}
+@keyframes judgePop{0%{opacity:0;transform:translate(-50%,-10%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-100%) scale(.9)}}
+.blast{position:absolute;z-index:5;font-size:1.4rem;pointer-events:none;}
+@keyframes blastFly{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(var(--bx),var(--by)) scale(1.6)}}
+/* ── Reset button — matches writing.html ── */
+.btn-reset-bottom{
+  background:transparent;
+  border:1px solid rgba(144,96,192,.4);
+  border-radius:50px;
+  padding:8px 22px;
+  font-family:'Fredoka',sans-serif;
+  font-size:.85rem;font-weight:700;
+  color:rgba(220,200,240,.85);
+  cursor:pointer;
+  margin-top:8px;
+}
+.btn-reset-bottom:active{background:rgba(144,96,192,.08);}
+.go-overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:26%;gap:14px;background:rgba(10,5,25,.90);}
+.go-text{font-family:'Press Start 2P',monospace;font-size:clamp(1.5rem,7.5vw,2.3rem);color:var(--gold-light);text-shadow:0 0 30px rgba(240,208,96,.7),0 4px 8px rgba(0,0,0,.5);text-align:center;line-height:1.7;}
+.go-text.pop{animation:goPop .6s cubic-bezier(.34,1.56,.64,1);}
+.go-instruction{font-family:'Press Start 2P',monospace;font-size:clamp(.62rem,3.2vw,.88rem);color:#e8dff8;text-align:center;line-height:2.1;opacity:0;transition:opacity .35s;text-shadow:0 2px 10px rgba(0,0,0,.9);pointer-events:none;}
+.go-instruction .jp{display:block;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:clamp(.9rem,4.5vw,1.15rem);color:var(--gold-light);margin-top:4px;}
+.go-instruction.show{opacity:1;}
+.time-bonus-flash{position:absolute;top:50px;right:14px;z-index:10;font-family:'Press Start 2P',monospace;font-size:.62rem;color:#7fff7f;text-shadow:0 0 12px rgba(80,255,80,.8);opacity:0;pointer-events:none;transition:opacity .15s;}
+.time-bonus-flash.show{animation:timeBonusPop .9s ease-out forwards;}
+@keyframes timeBonusPop{0%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-22px);}}
+
+@keyframes goPop{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+.go-heroes{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:min(80%,380px);z-index:21;filter:drop-shadow(0 8px 24px rgba(0,0,0,.7));}
+/* ── Result ── */
+#screen-result{justify-content:center;gap:5px;text-align:center;padding:18px 14px;}
+.result-lumi{width:min(38%,150px);aspect-ratio:1/1;height:auto;margin:0 auto 8px;display:block;object-fit:cover;border-radius:14px;}
+.result-emoji-big{font-size:2.6rem;display:block;animation:embFloat 2.5s ease-in-out infinite;}
+.result-title{font-family:'Press Start 2P',monospace;font-size:clamp(.62rem,3.2vw,.85rem);line-height:1.8;text-shadow:0 0 28px currentColor,0 3px 6px rgba(0,0,0,.5);white-space:pre-line;}
+.result-title.great{color:var(--gold-light);}
+.result-title.good{color:var(--purple-light);}
+.result-title.try{color:var(--mauve);}
+.stars-row{display:flex;gap:8px;justify-content:center;margin:6px 0;}
+.star-icon{font-size:2rem;filter:grayscale(1) opacity(.25);transition:filter .3s,transform .3s;}
+.star-icon.lit{filter:grayscale(0) drop-shadow(0 0 10px var(--gold));animation:starPop .4s ease backwards;}
+@keyframes starPop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.result-sub{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.84rem;color:var(--purple-light);max-width:310px;line-height:1.5;}
+.score-panel{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:18px;padding:11px 20px;margin:4px 0;min-width:225px;box-shadow:0 6px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);}
+.score-cap{font-family:'Press Start 2P',monospace;font-size:.4rem;letter-spacing:.14em;color:var(--text-soft);margin-bottom:4px;}
+.score-big{font-family:'Press Start 2P',monospace;font-size:clamp(1.05rem,5vw,1.45rem);color:var(--text-dark);line-height:1;}
+.score-stats{display:flex;justify-content:center;gap:12px;margin-top:7px;font-family:'Press Start 2P',monospace;font-size:.36rem;color:var(--text-soft);}
+.score-stats span b{color:var(--purple-dark);}
+.newbest{font-family:'Press Start 2P',monospace;font-size:.4rem;color:var(--gold);margin-top:4px;animation:pulseR 1s ease-in-out infinite;}
+.result-actions{display:flex;gap:10px;margin-top:7px;flex-wrap:wrap;justify-content:center;}
+.shake{animation:shake .3s ease;}
+.confirm-overlay{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:rgba(21,13,40,.78);backdrop-filter:blur(3px);}
+.confirm-overlay.show{display:flex;}
+.confirm-box{background:var(--card-bg);border:2px solid var(--border-gold);border-radius:20px;padding:24px 28px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:290px;}
+.confirm-msg{font-family:'Press Start 2P',monospace;font-size:.58rem;color:var(--text-dark);line-height:1.8;}
+.confirm-msg .jp{display:block;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.82rem;color:var(--brown);margin-top:5px;font-style:normal;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;}
+.combo-flash{position:absolute;top:8px;right:12px;z-index:9;font-family:'Press Start 2P',monospace;font-size:clamp(.68rem,3.5vw,1rem);pointer-events:none;opacity:0;text-align:right;line-height:1.5;text-shadow:0 2px 10px rgba(0,0,0,.9);white-space:nowrap;}
+.combo-flash.show{animation:comboFlash 2.5s ease-out;}
+@keyframes comboFlash{0%{opacity:0;transform:scale(.6) translateX(8px)}10%{opacity:1;transform:scale(1.12) translateX(0)}22%{transform:scale(1) translateX(0)}78%{opacity:1;transform:scale(1) translateX(0)}100%{opacity:0;transform:scale(.95) translateY(-8px)}}
+@keyframes pulseFade{0%{opacity:1}100%{opacity:0}}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
+/* ── Audio Settings Card (title screen) ── */
+.audio-settings-section{width:100%;max-width:700px;}
+.audio-settings-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(30,18,53,.7);border:1px solid rgba(167,139,250,.2);
+  border-radius:14px;padding:11px 16px;cursor:pointer;
+  transition:background .2s;
+}
+.audio-settings-toggle:hover{background:rgba(42,24,69,.85);}
+.audio-settings-toggle-label{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);letter-spacing:.08em;}
+.audio-settings-toggle-label .jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.72rem;color:var(--purple-light);margin-left:6px;font-weight:600;}
+.audio-settings-chevron{font-size:.9rem;color:var(--purple-light);transition:transform .3s;}
+.audio-settings-chevron.open{transform:rotate(180deg);}
+.audio-settings-body{
+  overflow:hidden;max-height:0;transition:max-height .35s ease,opacity .3s;
+  opacity:0;
+}
+.audio-settings-body.open{max-height:400px;opacity:1;}
+.audio-settings-inner{
+  background:rgba(20,10,38,.6);border:1px solid rgba(167,139,250,.15);
+  border-top:none;border-radius:0 0 14px 14px;
+  padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px;
+}
+.audio-row{display:flex;align-items:center;gap:10px;}
+.audio-row-label{font-family:'Press Start 2P',monospace;font-size:.38rem;color:var(--text-muted);letter-spacing:.08em;width:42px;flex-shrink:0;}
+.audio-row input[type=range]{
+  -webkit-appearance:none;appearance:none;flex:1;height:5px;
+  border-radius:4px;background:rgba(200,160,224,.3);outline:none;cursor:pointer;
+}
+.audio-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold-light);box-shadow:0 0 6px rgba(240,208,96,.5);}
+.audio-row input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold-light);border:none;}
+.audio-toggle-btn{
+  background:none;border:1.5px solid rgba(167,139,250,.4);border-radius:8px;
+  padding:5px 8px;font-size:1rem;cursor:pointer;line-height:1;
+  transition:background .15s,border-color .15s;flex-shrink:0;
+}
+.audio-toggle-btn:hover{background:rgba(144,96,192,.2);}
+.audio-toggle-btn.off{opacity:.45;filter:grayscale(.6);}
+.audio-divider{height:1px;background:rgba(167,139,250,.12);margin:2px 0;}
+/* ── Word audio button ── */
+.word-audio-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(144,96,192,.22),rgba(201,160,48,.18));
+  border:1.5px solid rgba(201,160,48,.5);border-radius:50%;
+  width:2.2rem;height:2.2rem;font-size:1.1rem;
+  cursor:pointer;vertical-align:middle;margin-left:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+  transition:transform .1s,box-shadow .1s,background .15s,opacity .2s;
+  flex-shrink:0;
+}
+.word-audio-btn:active{transform:scale(.88);box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.word-audio-btn.speaking{background:linear-gradient(135deg,rgba(74,144,64,.35),rgba(144,200,80,.25));border-color:rgba(74,200,64,.7);animation:speakPulse .5s ease-in-out infinite alternate;}
+.word-audio-btn.hidden{display:none;}
+@keyframes speakPulse{0%{box-shadow:0 0 6px rgba(74,200,64,.4)}100%{box-shadow:0 0 14px rgba(74,200,64,.8)}}
+.q-word-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin-bottom:2px;}
+.word-audio-btn{margin-left:0;}
+/* ── In-game corner toggles ── */
+.game-corner-toggles{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;padding:0 8px;margin-top:2px;
+}
+.corner-toggle-btn{
+  background:rgba(30,18,53,.75);border:1.5px solid rgba(167,139,250,.3);
+  border-radius:50px;padding:8px 16px;font-size:1.05rem;
+  cursor:pointer;line-height:1;
+  transition:background .15s,border-color .15s,opacity .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.corner-toggle-btn span.lbl{font-family:'Press Start 2P',monospace;font-size:.32rem;color:var(--text-muted);letter-spacing:.06em;}
+.corner-toggle-btn:hover{background:rgba(60,35,90,.85);}
+.corner-toggle-btn.off{opacity:.5;filter:grayscale(.5);}
+.corner-toggle-btn:active{transform:scale(.93);}
+
+/* reverse-mode reading prompt (big kana) */
+.q-word.kana-prompt{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;letter-spacing:2px;font-size:clamp(2.4rem,12vw,3.6rem);line-height:1;color:var(--purple-light);font-weight:700;}
+/* kanji options in reverse mode */
+.q-opt.kanji-opt{font-family:'Yu Mincho','Noto Serif JP','Zen Maru Gothic',serif;font-size:clamp(1.6rem,7vw,2.1rem);line-height:1.1;}
+/* example compound flash after answer */
+.example-flash{min-height:30px;margin-top:8px;text-align:center;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;}
+.example-flash.show{opacity:1;transform:translateY(0);}
+.example-flash .ex-word{font-family:'Yu Mincho','Noto Serif JP',serif;font-size:1.5rem;color:var(--gold-light);margin-right:8px;font-weight:700;}
+.example-flash .ex-read{font-size:1rem;color:var(--purple-light);margin-right:8px;}
+.example-flash .ex-gloss{font-size:.82rem;color:var(--text-muted);font-style:italic;}
+/* quiz-direction selector */
+.dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.dir-card{padding:10px 6px;border-radius:12px;border:2px solid var(--border-soft);background:var(--card-bg-soft);cursor:pointer;text-align:center;transition:border-color .15s,background .15s;}
+.dir-card.sel{border-color:var(--gold);background:rgba(240,208,96,.14);}
+.dir-card .dir-emoji{font-size:1.3rem;}
+.dir-card .dir-name{font-family:'Press Start 2P',monospace;font-size:.46rem;color:var(--gold-light);margin-top:4px;letter-spacing:.02em;}
+.dir-card .dir-jp{font-family:'Zen Maru Gothic',sans-serif;font-size:.72rem;color:var(--text-muted);margin-top:3px;}
+/* reference grid */
+.kref-section{max-width:880px;margin:18px auto 40px;padding:14px 16px 20px;background:#f3e9d2;border:2px solid #d8c49a;border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.45);}
+.kref-section .kref-toggle{background:#e7d8b4;border-color:#cdb486;color:#7a5a1e;}
+.kref-section .kref-k{color:#9a6a16;}
+.kref-section .kref-cell{background:#fbf5e6;border-color:#dcc99e;}
+.kref-section .kref-info{color:#5a4422;}
+.kref-section .kref-info .kref-rd{color:#7a4fa0;}
+.kref-section .kref-info .kref-mn,.kref-section .kref-info .kref-lv{color:#9a8460;}
+.kref-section .kref-search{background:#fbf5e6;border-color:#dcc99e;color:#4a3818;}
+.kref-section .kref-fbtn{color:#9a7a40;border-color:#cdb486;}
+.kref-section .kref-fbtn.sel{color:#7a5a1e;background:rgba(200,150,40,.18);border-color:#b89030;}
+.kref-section .kref-count{color:#8a7048;}
+.kref-toggle{display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;padding:12px;border-radius:12px;background:var(--card-bg-soft);border:1.5px solid var(--border-soft);font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);letter-spacing:.04em;}
+.kref-body{display:none;margin-top:14px;}
+.kref-body.open{display:block;}
+.kref-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.kref-search{flex:1;min-width:160px;padding:9px 13px;border-radius:10px;border:1.5px solid var(--border-soft);background:var(--card-bg-soft);color:var(--text-light);font-family:'Zen Maru Gothic',sans-serif;font-size:.9rem;}
+.kref-filter{display:flex;gap:5px;}
+.kref-fbtn{padding:7px 12px;border-radius:50px;border:1.5px solid var(--border-soft);background:transparent;color:var(--text-muted);font-family:'Press Start 2P',monospace;font-size:.44rem;cursor:pointer;}
+.kref-fbtn.sel{border-color:var(--gold);color:var(--gold-light);background:rgba(240,208,96,.12);}
+.kref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px;max-height:520px;overflow-y:auto;padding:4px;}
+.kref-cell{background:var(--card-bg-soft);border:1px solid var(--border-soft);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;}
+.kref-k{font-family:'Yu Mincho','Noto Serif JP',serif;font-size:2rem;line-height:1;color:var(--gold-light);flex-shrink:0;}
+.kref-info{font-family:'Zen Maru Gothic',sans-serif;font-size:.74rem;line-height:1.45;color:var(--text-light);}
+.kref-info .kref-rd{color:var(--purple-light);}
+.kref-info .kref-lv{font-size:.6rem;color:var(--text-muted);}
+.kref-info .kref-mn{color:var(--text-muted);font-style:italic;}
+.kref-count{text-align:center;font-family:'Zen Maru Gothic',sans-serif;font-size:.78rem;color:var(--text-muted);margin-top:8px;}
+
+</style>
+</head>
+<body>
+
+<div class="starfield" id="starfield"></div>
+
+<div class="container">
+
+<!-- TITLE -->
+<div class="screen active" id="screen-title">
+  <div class="title-header">
+    <img class="title-logo-img" id="title-logo" alt="Hero's Proof"
+         onerror="this.style.display='none'">
+    <span class="title-emblem" id="title-emblem" style="display:none">⚔️</span>
+    <div class="title-game-name" id="title-wordmark">KANJI QUEST<br>漢字クエスト</div>
+    <div class="title-sub">✦ Battle Training · トレーニングバトル ✦</div>
+    <div class="header-divider"></div>
+  </div>
+  <div class="scenario-section">
+    <div class="scenario-card" id="scenario-card" onclick="advanceScenario()">
+      <img class="sc-lumi" id="sc-lumi" alt="Lumi">
+      <div class="sc-text">
+        <div class="sc-name">Lumi / ルミ</div>
+        <div class="sc-en" id="sc-en"></div>
+        <div class="sc-jp" id="sc-jp"></div>
+      </div>
+      <div class="sc-hint blink" id="sc-hint">▼</div>
+    </div>
+  </div>
+  <div class="mode-toggle-section">
+    <div class="mode-toggle-wrap">
+      <span class="mode-label active" id="mode-label-normal">ふつう</span>
+      <div class="toggle-track" id="mode-toggle-track" onclick="toggleMode()">
+        <div class="toggle-thumb"></div>
+      </div>
+      <span class="mode-label" id="mode-label-mini">Mini Quest</span>
+      <span class="mode-badge" id="mode-badge">⏱ 10もん</span>
+    </div>
+  </div>
+  <div class="diff-section">
+    <div class="diff-title">Choose Level / レベルを選ぼう</div>
+    <div class="diff-grid">
+      <div class="diff-card easy lvl-card" data-lvl="N5" onclick="selLevel('N5')"><span class="diff-emoji">🟢</span><div class="diff-name">N5</div><div class="diff-jp">きほん</div><span class="diff-count">79字</span></div>
+      <div class="diff-card normal lvl-card" data-lvl="N4" onclick="selLevel('N4')"><span class="diff-emoji">🔵</span><div class="diff-name">N4</div><div class="diff-jp">しょきゅう</div><span class="diff-count">166字</span></div>
+      <div class="diff-card hard lvl-card" data-lvl="N3" onclick="selLevel('N3')"><span class="diff-emoji">🟣</span><div class="diff-name">N3</div><div class="diff-jp">ちゅうきゅう</div><span class="diff-count">367字</span></div>
+      <div class="diff-card extreme lvl-card sel" data-lvl="all" onclick="selLevel('all')"><span class="diff-emoji">⭐</span><div class="diff-name">N5〜N3</div><div class="diff-jp">ぜんぶ</div><span class="diff-count">612字</span></div>
+    </div>
+  </div>
+  <div class="diff-section">
+    <div class="diff-title">Quiz Mode / もんだいのタイプ</div>
+    <div class="dir-grid">
+      <div class="dir-card sel" data-dir="fwd" onclick="selDir('fwd')"><div class="dir-emoji">📖</div><div class="dir-name">READING</div><div class="dir-jp">漢字→よみ</div></div>
+      <div class="dir-card" data-dir="rev" onclick="selDir('rev')"><div class="dir-emoji">✍️</div><div class="dir-name">WRITING</div><div class="dir-jp">よみ→漢字</div></div>
+      <div class="dir-card" data-dir="mix" onclick="selDir('mix')"><div class="dir-emoji">🔀</div><div class="dir-name">MIXED</div><div class="dir-jp">ミックス</div></div>
+    </div>
+  </div>
+  <div class="diff-section">
+    <div class="diff-title">Choose Difficulty / なんいどを選ぼう</div>
+    <div class="diff-grid">
+      <div class="diff-card easy" data-diff="easy" onclick="selDiff('easy')"><span class="diff-emoji">🌱</span><div class="diff-name">EASY</div><div class="diff-jp">かんたん</div></div>
+      <div class="diff-card normal sel" data-diff="normal" onclick="selDiff('normal')"><span class="diff-emoji">⚔️</span><div class="diff-name">NORMAL</div><div class="diff-jp">ふつう</div></div>
+      <div class="diff-card hard" data-diff="hard" onclick="selDiff('hard')"><span class="diff-emoji">🔥</span><div class="diff-name">HARD</div><div class="diff-jp">むずかしい</div></div>
+      <div class="diff-card extreme" data-diff="extreme" onclick="selDiff('extreme')"><span class="diff-emoji">💀</span><div class="diff-name">EXTREME</div><div class="diff-jp">おに</div></div>
+    </div>
+  </div>
+  <!-- Audio Settings -->
+  <div class="audio-settings-section">
+    <div class="audio-settings-toggle" onclick="toggleAudioPanel()">
+      <span class="audio-settings-toggle-label">⚙️ AUDIO<span class="jp">おとの設定</span></span>
+      <span class="audio-settings-chevron" id="audio-chevron">▼</span>
+    </div>
+    <div class="audio-settings-body" id="audio-settings-body">
+      <div class="audio-settings-inner">
+        <!-- BGM row -->
+        <div class="audio-row">
+          <span class="audio-row-label">BGM</span>
+          <input type="range" id="bgm-slider" min="0" max="1" step="0.05" value="0.25" oninput="setMusicVol(+this.value)">
+          <button class="audio-toggle-btn" id="bgm-toggle-btn" onclick="toggleMusicMuteSettings()" title="BGM on/off">🎵</button>
+        </div>
+        <div class="audio-divider"></div>
+        <!-- SFX row -->
+        <div class="audio-row">
+          <span class="audio-row-label">SFX</span>
+          <input type="range" id="sfx-slider" min="0" max="1" step="0.05" value="1.0" oninput="setSfxVol(+this.value)">
+          <button class="audio-toggle-btn" id="sfx-toggle-btn" onclick="toggleSfxMuteSettings()" title="SFX on/off">🔔</button>
+        </div>
+        <div class="audio-divider"></div>
+        <!-- Voice row -->
+        <div class="audio-row">
+          <span class="audio-row-label">VOICE</span>
+          <input type="range" id="voice-slider" min="0" max="1" step="0.05" value="1.0" oninput="setVoiceVol(+this.value)">
+          <button class="audio-toggle-btn" id="voice-toggle-btn" onclick="toggleVoiceMuteSettings()" title="Voice on/off">🔊</button>
+        </div>
+        <div class="audio-divider"></div>
+        <!-- Auto-speak row -->
+        <div class="audio-row" style="justify-content:space-between;">
+          <span style="font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.78rem;color:var(--purple-light);font-weight:600;">🗣️ Auto-speak words<br><span style="font-size:.68rem;color:var(--text-muted);">単語を自動で読み上げる</span></span>
+          <button class="audio-toggle-btn" id="autospeak-toggle-btn" onclick="toggleAutoSpeak()" title="Auto-speak on/off" style="font-size:.85rem;padding:6px 12px;font-family:'Press Start 2P',monospace;font-size:.4rem;letter-spacing:.04em;color:var(--gold-light);">ON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="title-cta">
+    <button class="btn btn-primary" onclick="startGame()">▶ START BATTLE</button>
+    <button class="btn-ghost" onclick="showScores()">🏆 High Scores / ハイスコア</button>
+    <a href="https://herosproof.github.io" class="btn-hub">🏠 Home / ホーム</a>
+  </div>
+
+  <div class="kref-section">
+    <div class="kref-toggle" onclick="toggleKref()"><span id="kref-chevron">&#9660;</span> KANJI REFERENCE LIST &nbsp;·&nbsp; 漢字リスト (612)</div>
+    <div class="kref-body" id="kref-body">
+      <div class="kref-controls">
+        <input class="kref-search" id="kref-search" placeholder="Search kanji, reading, or meaning… 例: みず, water, 水" oninput="renderKref()">
+        <div class="kref-filter">
+          <button class="kref-fbtn sel" data-kf="all" onclick="setKrefFilter('all')">ALL</button>
+          <button class="kref-fbtn" data-kf="N5" onclick="setKrefFilter('N5')">N5</button>
+          <button class="kref-fbtn" data-kf="N4" onclick="setKrefFilter('N4')">N4</button>
+          <button class="kref-fbtn" data-kf="N3" onclick="setKrefFilter('N3')">N3</button>
+        </div>
+      </div>
+      <div class="kref-grid" id="kref-grid"></div>
+      <div class="kref-count" id="kref-count"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCORES -->
+<div class="screen" id="screen-scores">
+  <div class="panel-h">🏆 HIGH SCORES<span class="jp">ハイスコア</span></div>
+  <div class="score-tabs">
+    <div class="score-tab easy" data-st="easy" onclick="showScoreList('easy')">EASY</div>
+    <div class="score-tab normal sel" data-st="normal" onclick="showScoreList('normal')">NORMAL</div>
+    <div class="score-tab hard" data-st="hard" onclick="showScoreList('hard')">HARD</div>
+    <div class="score-tab extreme" data-st="extreme" onclick="showScoreList('extreme')">EXTREME</div>
+  </div>
+  <div class="score-list" id="score-list"></div>
+  <button class="btn btn-ghost" style="margin-top:10px;" onclick="showScreen('screen-title')">↩ Back / もどる</button>
+</div>
+
+<!-- PLAY -->
+<div class="screen" id="screen-play">
+  <div class="hud">
+    <div class="hud-row1">
+      <div class="hud-vol">
+        <label>VOL</label>
+        <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.4" oninput="setVol(+this.value)">
+        <button id="mute-btn" onclick="toggleMute()">🔊</button>
+      </div>
+      <div class="hud-combo" id="hud-combo"></div>
+      <div class="hud-wcount" id="hud-wcount" style="display:none"></div>
+      <div class="hud-timer" id="hud-timer">2:00</div>
+    </div>
+    <div class="hud-row2">
+      <div class="hud-gauge-label">⚔️ BATTLE GAUGE<span class="jp"> バトルゲージ</span></div>
+    </div>
+    <div class="gauge-track"><div class="gauge-fill" id="gauge-fill"></div><div class="gauge-pct" id="gauge-pct">0%</div></div>
+  </div>
+  <div class="battle" id="battle">
+    <svg class="cracks" id="cracks" viewBox="0 0 400 400" preserveAspectRatio="none">
+      <g stroke="#1a0d2e" stroke-width="2.5" fill="none" opacity="0.9" stroke-linecap="round">
+        <path d="M0,80 L70,120 L60,180 L130,210 L110,280 L190,300"/>
+        <path d="M400,60 L330,110 L350,170 L280,200 L300,260 L230,290"/>
+        <path d="M150,0 L160,60 L120,100 L150,150"/>
+        <path d="M260,0 L250,70 L290,110 L260,160"/>
+        <path d="M0,330 L80,340 L120,400"/>
+        <path d="M400,330 L320,350 L290,400"/>
+      </g>
+    </svg>
+    <div class="danger-vignette" id="vignette"></div>
+    <div class="beatflash" id="beatflash"></div>
+    <div class="judge" id="judge"></div>
+    <div class="combo-flash" id="combo-flash"></div>
+    <div class="time-bonus-flash" id="time-bonus-flash">+0.5s ⏱️</div>
+    <div class="ring-arena">
+      <div class="target-ring" id="target-ring"></div>
+      <div class="approach-ring" id="approach-ring"></div>
+      <div class="q-media" id="q-media"></div>
+    </div>
+    <div class="question-panel">
+      <div class="q-word-row">
+        <div class="q-word" id="q-word"></div>
+        <button class="word-audio-btn" id="word-audio-btn" onclick="speakWord()" title="Hear the reading / よみ方を聞く">🔊</button>
+      </div>
+      <div class="q-meta" id="q-meta"></div>
+      <div class="q-opts" id="q-opts"></div>
+      <div class="example-flash" id="example-flash"></div>
+    </div>
+    <button class="btn-reset-bottom" onclick="confirmReset()">↻ RESET / リセット</button>
+    <div class="game-corner-toggles">
+      <button class="corner-toggle-btn" id="game-bgm-btn" onclick="toggleGameBgm()" title="BGM on/off">
+        🎵<span class="lbl">BGM</span>
+      </button>
+      <button class="corner-toggle-btn" id="game-speak-btn" onclick="toggleGameSpeak()" title="Auto-speak on/off">
+        🗣️<span class="lbl">AUTO</span>
+      </button>
+    </div>
+    <div class="go-overlay" id="go-overlay">
+      <div class="go-instruction" id="go-instruction">👆 Tap the READING!<span class="jp">よみ方をタップ！</span></div>
+      <div class="go-text" id="go-text">READY?</div>
+      <img class="go-heroes" id="go-heroes" alt="Heroes" onerror="this.style.display='none'">
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="screen-result">
+  <img class="result-lumi" id="result-lumi" alt="Lumi">
+  <span class="result-emoji-big" id="result-emoji">🏆</span>
+  <div class="result-title great" id="result-title">VICTORY!</div>
+  <div class="stars-row">
+    <span class="star-icon" id="star1">⭐</span>
+    <span class="star-icon" id="star2">⭐</span>
+    <span class="star-icon" id="star3">⭐</span>
+  </div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="score-panel">
+    <div class="score-cap">Score / スコア</div>
+    <div class="score-big" id="result-score">0</div>
+    <div class="score-stats" id="result-stats"></div>
+    <div class="newbest" id="result-newbest" style="display:none;">🌟 NEW BEST!</div>
+  </div>
+  <div class="result-actions">
+    <button class="btn btn-primary" onclick="startGame()">↻ RETRY</button>
+    <button class="btn btn-secondary" onclick="goTitle()">🏠 MENU</button>
+  </div>
+</div>
+
+  <div class="confirm-overlay" id="reset-modal">
+    <div class="confirm-box">
+      <div class="confirm-msg">Reset game?<span class="jp">ゲームをリセットしますか？</span></div>
+      <div class="confirm-btns">
+        <button class="btn btn-secondary" style="font-size:.52rem;padding:12px 18px;" onclick="doReset()">Yes / はい</button>
+        <button class="btn-ghost" style="font-size:.52rem;padding:12px 18px;" onclick="hideResetModal()">No / いいえ</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<audio id="bgm" src="Lumi_Battle.mp3" preload="auto" playsinline></audio>
+
+<script>
+/* ════ ASSETS ════ */
+document.getElementById('title-logo').src='logo.png';
+document.getElementById('title-logo').onerror=function(){this.style.display='none';document.getElementById('title-emblem').style.display='block';};
+document.getElementById('sc-lumi').onerror=function(){this.style.display='none';};
+document.getElementById('sc-lumi').src='lumi.png';
+document.getElementById('go-heroes').src='heroes.png';
+// Result Lumi: tries lumi_3stars.png / lumi_2stars.png / lumi_1star.png first;
+// falls back to embedded portrait with CSS filter per star count.
+const LUMI_FILTERS={
+  3:'drop-shadow(0 8px 22px rgba(240,208,96,.6))',  // golden glow
+  2:'drop-shadow(0 8px 22px rgba(0,0,0,.5))',        // normal
+  1:'drop-shadow(0 8px 22px rgba(0,0,0,.5)) grayscale(.45) brightness(.82)' // sad
+};
+function setResultLumi(stars){
+  const el=document.getElementById('result-lumi');
+  el.style.filter=LUMI_FILTERS[stars];
+  el.onerror=function(){this.onerror=null;this.src='lumi.png';this.style.filter=LUMI_FILTERS[stars];};
+  el.src=`lumi_${stars}star${stars>1?'s':''}.png`;
+}
+
+/* ════ STORAGE ════ */
+const Store={mem:{},get(k){try{return localStorage.getItem(k);}catch(e){return this.mem[k]??null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){this.mem[k]=v;}}};
+
+/* ════ TUNING ════ */
+const BPM=113,BEAT=60/BPM,FIRST_BEAT=0.16,LOOP_END=68;
+const WIN_GAUGE=100;
+const GOOD_WIN=0.80;
+// perfWin: fraction of question window for PERFECT rating (25% = tighter for easy/normal).
+// Easy/Normal: gPerfect=5.0 → ~20 perfect answers fills gauge (~3min / ~2min timers).
+// Hard/Extreme: perfWin=0.45 (unchanged). Extreme: needs combos to win at all.
+// Wrong answer (gWrong) triggers on a bad tap; gMiss triggers on timeout (TOO SLOW).
+// 2-star: won + acc>=60%. 3-star: won + acc>=80%.
+const DIFF={
+  easy:    {Wbeats:18,time:180,gPerfect:5.0,gGood:3.5,gLate:1.5,gWrong:-1.5,gMiss:-1.0,lead:4,perfWin:0.25},
+  normal:  {Wbeats:12,time:120,gPerfect:5.0,gGood:3.2,gLate:1.2,gWrong:-2.0,gMiss:-1.5,lead:3,perfWin:0.25},
+  hard:    {Wbeats: 6,time: 90,gPerfect:3.0,gGood:2.0,gLate:0.7,gWrong:-4.5,gMiss:-3.0,lead:2,perfWin:0.45},
+  extreme: {Wbeats: 3,time: 59,gPerfect:2.5,gGood:1.4,gLate:0.2,gWrong:-9.0,gMiss:-6.0,lead:1,perfWin:0.45},
+};
+// Voice clip filenames — drop files next to HTML to enable
+const VOICE_READY='lumi_ready.mp3', VOICE_GO='lumi_go.mp3';
+
+// ── Phonics option sets ──
+const PH_SILENT_E_OPTS = ['A','E','I','O','U'];
+const PH_POLITE_OPTS   = ['AI','AY','EA','EE','IE','OA','OW','UE','UI'];
+const PH_MURMUR_OPTS   = ['AR','OR','IR','ER','EAR','WOR'];
+const PH_DIGRAPH_OPTS  = ['OO','OU','OW','OI','OY'];
+
+function phSilentE(vowel,bi){
+  return {type:'silent_e',ans:vowel,opts:shuffle([vowel,...PH_SILENT_E_OPTS.filter(v=>v!==vowel).slice(0,3)]),blankIdx:bi,blankLen:1};
+}
+function phPolite(digraph,bi){
+  return {type:'polite',ans:digraph,opts:shuffle([digraph,...PH_POLITE_OPTS.filter(v=>v!==digraph).slice(0,3)]),blankIdx:bi,blankLen:2};
+}
+function phMurmur(digraph,bi){
+  return {type:'murmur',ans:digraph,opts:shuffle([digraph,...PH_MURMUR_OPTS.filter(v=>v!==digraph).slice(0,3)]),blankIdx:bi,blankLen:2};
+}
+function phDigraph(digraph,bi){
+  return {type:'digraph',ans:digraph,opts:shuffle([digraph,...PH_DIGRAPH_OPTS.filter(v=>v!==digraph).slice(0,3)]),blankIdx:bi,blankLen:2};
+}
+
+const KANJI=[
+/* N5 */
+{k:"一",lvl:"N5",m:"one / one radical (no.1)",v:[["イチ","on","一日","いちにち","one day"],["イツ","on","同一","どういつ","identical"],["ひと","kun","一日","ひとひ","one day"]]},
+{k:"二",lvl:"N5",m:"two / two radical (no. 7)",v:[["ニ","on","十二","じゅうに","twelve"],["ジ","on","十二","じゅうに","twelve"],["ふた","kun","二人","ふたり","two persons"],["ふたたび","kun","二度","ふたたび","again"]]},
+{k:"九",lvl:"N5",m:"nine",v:[["キュウ","on","十九","じゅうきゅう","19"],["ク","on","九九","くく","multiplication table"],["ここの","kun","九日","ここのか","ninth day of the month"]]},
+{k:"七",lvl:"N5",m:"seven",v:[["シチ","on","七月","しちがつ","July"],["なな","kun","七月","なながつ","July"],["なの","kun","七日","なのか","seventh day of the month"]]},
+{k:"人",lvl:"N5",m:"person",v:[["ジン","on","国人","こくじん","indigenous person"],["ニン","on","一人","いちにん","one person"],["ひと","kun","一人","ひとり","one person"]]},
+{k:"入",lvl:"N5",m:"enter / insert",v:[["ニュウ","on","出入","しゅつにゅう","in and out"],["ジュ","on","入水","じゅすい","suicide by drowning"],["い","kun","中入","なかいり","intermission during a performance (e"]]},
+{k:"八",lvl:"N5",m:"eight / eight radical (no. 12)",v:[["ハチ","on","十八","じゅうはち","18"],["や","kun","八十","やそ","eighty"],["よう","kun","八日","ようか","eighth day of the month"]]},
+{k:"十",lvl:"N5",m:"ten",v:[["ジュウ","on","十一","じゅういち","eleven"],["ジッ","on","十本","じっぽん","ten (long cylindrical things)"],["とお","kun","十日","とおか","tenth day of the month"],["と","kun","十日","とおか","tenth day of the month"]]},
+{k:"三",lvl:"N5",m:"three",v:[["サン","on","三国","さんごく","three countries"],["ゾウ","on","四三","しぞう","one four-of-a-kind and one three-of-"],["み","kun","三人","みたり","three people"]]},
+{k:"上",lvl:"N5",m:"above / up",v:[["ジョウ","on","上長","じょうちょう","one's superior"],["ショウ","on","上人","しょうにん","holy priest"],["うえ","kun","年上","としうえ","older"],["かみ","kun","上一","かみいち","conjugation (inflection, declension)"]]},
+{k:"下",lvl:"N5",m:"below / down",v:[["カ","on","下行","かこう","descending"],["ゲ","on","下国","げこく","province of the lowest rank (ritsury"],["した","kun","下金","したがね","basic metal (in an art object)"],["しも","kun","下下","しもじも","the lower classes"]]},
+{k:"大",lvl:"N5",m:"large / big",v:[["ダイ","on","一大","いちだい","one large ..."],["タイ","on","大国","たいこく","large country"],["おお","kun","大年","おおとし","New Year's Eve"]]},
+{k:"女",lvl:"N5",m:"woman / female",v:[["ジョ","on","下女","げじょ","maid servant"],["ニョ","on","女人","にょにん","woman"],["おんな","kun","大女","おおおんな","huge woman"],["め","kun","山女","やまめ","landlocked masu salmon (Oncorhynchus"]]},
+{k:"山",lvl:"N5",m:"mountain",v:[["サン","on","下山","げさん","descending (mountain)"],["セン","on","山川","さんせん","mountains and rivers"],["やま","kun","山中","やまなか","in the mountains"]]},
+{k:"川",lvl:"N5",m:"stream / river",v:[["セン","on","山川","さんせん","mountains and rivers"],["かわ","kun","山川","やまかわ","mountains and rivers"]]},
+{k:"土",lvl:"N5",m:"soil / earth",v:[["ド","on","国土","こくど","country"],["ト","on","日土","にっと","Japan-Turkey"],["つち","kun","国土","くにつち","country"]]},
+{k:"千",lvl:"N5",m:"thousand",v:[["セン","on","一千","いっせん","1,000"],["ち","kun","千日","せんにち","one thousand days"]]},
+{k:"子",lvl:"N5",m:"child / sign of the rat",v:[["シ","on","子年","ねずみどし","year of the Rat"],["ス","on","金子","きんす","money"],["こ","kun","長子","えこ","eldest child"],["ね","kun","子年","ねずみどし","year of the Rat"]]},
+{k:"小",lvl:"N5",m:"little / small",v:[["ショウ","on","小学","しょうがく","elementary school"],["ちい","kun","小地域","しょうちいき","small area"]]},
+{k:"中",lvl:"N5",m:"in / inside",v:[["チュウ","on","国中","こくちゅう","all over the country"],["なか","kun","人中","ひとなか","society"],["うち","kun","行中","ぎょうちゅう","in the middle of a line"]]},
+{k:"五",lvl:"N5",m:"five",v:[["ゴ","on","五月","ごがつ","May"],["いつ","kun","五日","いつか","fifth day of the month"]]},
+{k:"六",lvl:"N5",m:"six",v:[["ロク","on","十六","じゅうろく","16"],["リク","on","六国","りくこく","the Six Kingdoms (of China's Warring"],["む","kun","六日","むいか","sixth day of the month"],["むい","kun","六日","むいか","sixth day of the month"]]},
+{k:"円",lvl:"N5",m:"circle / yen",v:[["エン","on","一円","いちえん","one yen"],["まる","kun","円味","まるみ","roundness"],["まど","kun","円居","まどい","small gathering"]]},
+{k:"天",lvl:"N5",m:"heavens / sky",v:[["テン","on","一天","いってん","the whole sky"],["あまつ","kun","天津","あまつ","heavenly"],["あめ","kun","天人","あめひと","heavenly being"]]},
+{k:"日",lvl:"N5",m:"day / sun",v:[["ニチ","on","日日","にちにち","every day"],["ジツ","on","一日","いちじつ","one day"],["ひ","kun","日日","ひび","every day"]]},
+{k:"月",lvl:"N5",m:"month / moon",v:[["ゲツ","on","一月","いちげつ","one month"],["ガツ","on","一月","いちがつ","January"],["つき","kun","一月","ひとつき","one month"]]},
+{k:"木",lvl:"N5",m:"tree / wood",v:[["ボク","on","一木","いちぼく","one tree"],["モク","on","木本","もくほん","tree"],["き","kun","本木","もとき","original stock"]]},
+{k:"水",lvl:"N5",m:"water",v:[["スイ","on","一水","いっすい","current (of water)"],["みず","kun","山水","やまみず","mountain and water"]]},
+{k:"火",lvl:"N5",m:"fire",v:[["カ","on","火気","かき","fire"],["ひ","kun","火先","ひさき","flames"]]},
+{k:"出",lvl:"N5",m:"exit / leave",v:[["シュツ","on","出国","しゅつごく","departure from a country"],["スイ","on","出水","しゅっすい","flood"],["で","kun","人出","ひとで","crowd"]]},
+{k:"右",lvl:"N5",m:"right",v:[["ウ","on","右上","みぎうえ","upper right"],["ユウ","on","左右","さゆう","left and right"],["みぎ","kun","右下","みぎした","lower right"]]},
+{k:"四",lvl:"N5",m:"four",v:[["シ","on","四月","しがつ","April"],["よ","kun","四時","よじ","four o'clock"],["よん","kun","十四","じゅうよん","14"]]},
+{k:"左",lvl:"N5",m:"left",v:[["サ","on","左行","さぎょう","the \"sa\" column of the Japanese syll"],["シャ","on","左官","しゃかん","plasterer"],["ひだり","kun","左下","ひだりした","lower left"]]},
+{k:"本",lvl:"N5",m:"book / present",v:[["ホン","on","本国","ほんごく","home country"],["もと","kun","本本","もともと","originally"]]},
+{k:"白",lvl:"N5",m:"white",v:[["ハク","on","上白","じょうはく","first-class rice"],["ビャク","on","白目","びゃくろう","pewter"],["しろ","kun","白人","しろうと","amateur"]]},
+{k:"万",lvl:"N5",m:"ten thousand / 10,000",v:[["マン","on","十万","じゅうまん","100,000"],["バン","on","千万","せんばん","exceedingly"],["よろず","kun","万年","よろずとせ","ten thousand years"]]},
+{k:"今",lvl:"N5",m:"now",v:[["コン","on","今月","こんげつ","this month"],["キン","on","今上","きんじょう","His Majesty the Emperor"],["いま","kun","今一","いまいち","not quite (right)"]]},
+{k:"午",lvl:"N5",m:"noon / sign of the horse",v:[["ゴ","on","午後","ごご","afternoon"],["うま","kun","午年","うまどし","year of the Horse"]]},
+{k:"友",lvl:"N5",m:"friend",v:[["ユウ","on","学友","がくゆう","school friend"],["とも","kun","友子","ともこ","friend"]]},
+{k:"父",lvl:"N5",m:"father",v:[["フ","on","父子","ふし","father and child"],["ちち","kun","父上","ちちうえ","father (esp. used in samurai familie"]]},
+{k:"北",lvl:"N5",m:"north",v:[["ホク","on","東北","とうほく","north-east"],["きた","kun","東北","ひがしきた","north-east"]]},
+{k:"半",lvl:"N5",m:"half / middle",v:[["ハン","on","下半","かはん","lower half"],["なか","kun","生半","なまなか","halfway-done"]]},
+{k:"外",lvl:"N5",m:"outside",v:[["ガイ","on","外見","がいけん","outward appearance"],["ゲ","on","言外","げんがい","unexpressed"],["そと","kun","外見","そとみ","outward appearance"],["ほか","kun","外人","ほかびと","foreigner (esp. one of European ance"]]},
+{k:"母",lvl:"N5",m:"mother",v:[["ボ","on","生母","せいぼ","one's real mother"],["はは","kun","母子","ははこ","mother and child"],["も","kun","父母","ぶも","father and mother"]]},
+{k:"休",lvl:"N5",m:"rest / day off",v:[["キュウ","on","休学","きゅうがく","temporary absence from school"],["やす","kun","春休","はるやすみ","spring break"]]},
+{k:"先",lvl:"N5",m:"before / ahead",v:[["セン","on","先月","せんげつ","last month"],["さき","kun","後先","あとさき","front and rear"]]},
+{k:"名",lvl:"N5",m:"name / noted",v:[["メイ","on","一名","いちめい","one person"],["ミョウ","on","大名","だいみょう","daimyo (Japanese feudal lord)"],["な","kun","名前","なまえ","name"]]},
+{k:"年",lvl:"N5",m:"year / counter for years",v:[["ネン","on","一年","いちねん","one year"],["とし","kun","一年","ひととし","one year"]]},
+{k:"気",lvl:"N5",m:"spirit / mind",v:[["キ","on","一気","いっき","one breath"],["ケ","on","人気","ひとけ","sign of life"],["いき","kun","外気","がいき","open air"]]},
+{k:"百",lvl:"N5",m:"hundred",v:[["ヒャク","on","百出","ひゃくしゅつ","arise in great numbers"],["ビャク","on","三百","さんびゃく","300"],["もも","kun","百年","ももとせ","century"]]},
+{k:"男",lvl:"N5",m:"male",v:[["ダン","on","男子","だんし","youth"],["ナン","on","一男","いちなん","boy"],["おとこ","kun","間男","まおとこ","married woman's secret lover"],["お","kun","間男","まおとこ","married woman's secret lover"]]},
+{k:"見",lvl:"N5",m:"see / hopes",v:[["ケン","on","一見","いっけん","look"],["み","kun","見本","みほん","sample"]]},
+{k:"車",lvl:"N5",m:"car",v:[["シャ","on","下車","げしゃ","alighting (from a train, bus, etc.)"],["くるま","kun","車代","くるまだい","carfare"]]},
+{k:"毎",lvl:"N5",m:"every",v:[["マイ","on","毎時","まいじ","every hour"],["ごと","kun","日毎","ひごと","every day"]]},
+{k:"行",lvl:"N5",m:"going / journey",v:[["コウ","on","行年","こうねん","age at one's death"],["ギョウ","on","一行","いちぎょう","(one) line"],["い","kun","一行","いちぎょう","(one) line"]]},
+{k:"西",lvl:"N5",m:"west / spain",v:[["セイ","on","西北","せいほく","north-west"],["サイ","on","西下","さいか","going west"],["にし","kun","西日","にしび","westering sun"]]},
+{k:"何",lvl:"N5",m:"what",v:[["カ","on","何時間","なんじかん","how many hours?"],["なに","kun","何何","なになに","what"],["なん","kun","何月","なんがつ","what month"]]},
+{k:"来",lvl:"N5",m:"come / due",v:[["ライ","on","外来","がいらい","foreign"],["タイ","on","出来","しゅったい","occurrence"],["き","kun","出来","でき","workmanship"],["こ","kun","高来","こうらい","your visit"]]},
+{k:"学",lvl:"N5",m:"study / learning",v:[["ガク","on","学生","がくせい","student (esp. a university student)"],["まな","kun","学舎","まなびや","school"]]},
+{k:"金",lvl:"N5",m:"gold",v:[["キン","on","後金","あときん","rest of the payment"],["コン","on","金字","こんじ","gold or gilt letters"],["かね","kun","金目","かねめ","monetary value"]]},
+{k:"雨",lvl:"N5",m:"rain",v:[["ウ","on","雨中","うちゅう","in the rain"],["あめ","kun","一雨","ひとあめ","shower"]]},
+{k:"国",lvl:"N5",m:"country",v:[["コク","on","一国","いっこく","one country"],["くに","kun","国国","くにぐに","countries"]]},
+{k:"東",lvl:"N5",m:"east",v:[["トウ","on","中東","ちゅうとう","Middle East"],["ひがし","kun","東日本","ひがしにほん","eastern Japan"]]},
+{k:"長",lvl:"N5",m:"long / leader",v:[["チョウ","on","年長","ねんちょう","senior"],["おさ","kun","人長","ひとおさ","chief kagura dancer (of kagura perfo"]]},
+{k:"前",lvl:"N5",m:"in front / before",v:[["ゼン","on","前後","ぜんご","front and rear"],["まえ","kun","出前","でまえ","home delivery (of food)"]]},
+{k:"南",lvl:"N5",m:"south",v:[["ナン","on","西南","せいなん","south-west"],["ナ","on","西南","せいなん","south-west"],["みなみ","kun","西南","にしみなみ","south-west"]]},
+{k:"後",lvl:"N5",m:"behind / back",v:[["ゴ","on","後日","ごじつ","in the future"],["コウ","on","後見","こうけん","guardianship"],["のち","kun","後後","のちのち","future"],["うしろ","kun","後指","うしろゆび","talking about (behind one's back)"]]},
+{k:"食",lvl:"N5",m:"eat / food",v:[["ショク","on","外食","がいしょく","eating out"],["ジキ","on","一食","いちじき","one meal"],["く","kun","外食","がいしょく","eating out"]]},
+{k:"校",lvl:"N5",m:"exam / school",v:[["コウ","on","下校","げこう","coming home from school"],["キョウ","on","校書","きょうしょ","collation"]]},
+{k:"時",lvl:"N5",m:"time / hour",v:[["ジ","on","三時","さんじ","3 o'clock"],["とき","kun","一時","ひととき","a (short) time"]]},
+{k:"高",lvl:"N5",m:"tall / high",v:[["コウ","on","高見","こうけん","your views"],["たか","kun","高見","たかみ","height"]]},
+{k:"間",lvl:"N5",m:"interval / space",v:[["カン","on","月間","げっかん","month-long period"],["ケン","on","一間","いっけん","one ken"],["あいだ","kun","間中","あいだじゅう","during"],["ま","kun","一間","ひとま","one room"]]},
+{k:"話",lvl:"N5",m:"tale / talk",v:[["ワ","on","間話","かんわ","quiet conversation"],["はなし","kun","話中","はなしちゅう","busy (phone)"]]},
+{k:"電",lvl:"N5",m:"electricity",v:[["デン","on","外電","がいでん","foreign telegram"]]},
+{k:"聞",lvl:"N5",m:"hear / ask",v:[["ブン","on","下聞","かぶん","enquiring beforehand"],["モン","on","見聞","けんもん","information"],["き","kun","聞書","ききがき","writing down what one hears"]]},
+{k:"語",lvl:"N5",m:"word / speech",v:[["ゴ","on","一語","いちご","one word"],["かた","kun","語部","かたりべ","(professional) storyteller"]]},
+{k:"読",lvl:"N5",m:"read",v:[["ドク","on","一読","いちどく","perusal"],["トク","on","読書","とくしょ","reading (books)"],["よ","kun","下読","したよみ","preparatory reading"]]},
+{k:"生",lvl:"N5",m:"life / genuine",v:[["セイ","on","後生","こうせい","younger people"],["ショウ","on","後生","ごしょう","afterlife"],["うまれ","kun","生日","うまれび","birthday"],["き","kun","生一本","きいっぽん","straight-forwardness"]]},
+{k:"書",lvl:"N5",m:"write",v:[["ショ","on","一書","いっしょ","one letter"],["か","kun","家書","かしょ","letter from home"]]},
+/* N4 */
+{k:"力",lvl:"N4",m:"power / strength",v:[["リョク","on","金力","きんりょく","monetary power"],["リキ","on","自力","じりき","one's own strength"],["ちから","kun","力業","ちからわざ","heavy work"]]},
+{k:"口",lvl:"N4",m:"mouth",v:[["コウ","on","開口","かいこう","opening"],["ク","on","一口","ひとくち","mouthful"],["くち","kun","一口","ひとくち","mouthful"]]},
+{k:"工",lvl:"N4",m:"craft / construction",v:[["コウ","on","工員","こういん","factory worker"],["ク","on","工学","こうがく","engineering"]]},
+{k:"夕",lvl:"N4",m:"evening",v:[["セキ","on","一夕","いっせき","one evening"],["ゆう","kun","朝夕","あさゆう","morning and evening"]]},
+{k:"手",lvl:"N4",m:"hand",v:[["シュ","on","国手","こくしゅ","skilled physician"],["ズ","on","上手","じょうず","skillful"],["て","kun","一手","いって","one move (in go, shogi, etc.)"]]},
+{k:"文",lvl:"N4",m:"sentence / literature",v:[["ブン","on","一文","いちぶん","(a) sentence"],["モン","on","一文","いちもん","something insignificant"],["ふみ","kun","文月","ふみづき","seventh month of the lunar calendar"],["あや","kun","文目","あやめ","pattern"]]},
+{k:"犬",lvl:"N4",m:"dog",v:[["ケン","on","一犬","いっけん","one dog"],["いぬ","kun","子犬","こいぬ","puppy"]]},
+{k:"正",lvl:"N4",m:"correct / justice",v:[["セイ","on","公正","こうせい","justice"],["ショウ","on","正金","しょうきん","specie"],["まさ","kun","正目","まさめ","straight grain"]]},
+{k:"田",lvl:"N4",m:"rice field / rice paddy",v:[["デン","on","上田","じょうでん","high rice field"],["た","kun","新田","あらた","new rice field"]]},
+{k:"目",lvl:"N4",m:"eye / class",v:[["モク","on","五目","ごもく","mixture of ingredients (originally f"],["ボク","on","面目","めんぼく","face"],["め","kun","一目","ひとめ","glance"]]},
+{k:"立",lvl:"N4",m:"stand up / rise",v:[["リツ","on","国立","こくりつ","national"],["リュウ","on","開立","かいりゅう","extraction of cubic root"],["た","kun","出立","しゅったつ","departure"]]},
+{k:"元",lvl:"N4",m:"beginning / former time",v:[["ゲン","on","一元","いちげん","unitary"],["ガン","on","元三","がんざん","New Year's period (January 1 to 3)"],["もと","kun","家元","いえもと","head of a school (of music, dance)"]]},
+{k:"公",lvl:"N4",m:"public / prince",v:[["コウ","on","公会","こうかい","public meeting"],["ク","on","公国","こうこく","dukedom"],["おおやけ","kun","公所","おおやけどころ","imperial court"]]},
+{k:"切",lvl:"N4",m:"cut / cutoff",v:[["セツ","on","急切","きゅうせつ","under pressure"],["サイ","on","一切","いっさい","all"],["き","kun","急切","きゅうせつ","under pressure"]]},
+{k:"少",lvl:"N4",m:"few / little",v:[["ショウ","on","少時","しょうじ","one's early days"],["すく","kun","","",""]]},
+{k:"心",lvl:"N4",m:"heart / mind",v:[["シン","on","安心","あんしん","relief"],["こころ","kun","心持","こころもち","feeling"]]},
+{k:"方",lvl:"N4",m:"direction / person",v:[["ホウ","on","後方","こうほう","behind"],["かた","kun","見方","みかた","viewpoint"]]},
+{k:"牛",lvl:"N4",m:"cow",v:[["ギュウ","on","牛車","ぎゅうしゃ","ox carriage (for Heian era nobles)"],["うし","kun","牛車","ぎゅうしゃ","ox carriage (for Heian era nobles)"]]},
+{k:"止",lvl:"N4",m:"stop / halt",v:[["シ","on","終止","しゅうし","termination"],["と","kun","止金","とめがね","clasp"]]},
+{k:"兄",lvl:"N4",m:"elder brother / big brother",v:[["ケイ","on","家兄","かけい","(my) elder brother"],["キョウ","on","兄弟","きょうだい","siblings"],["あに","kun","兄後","あにご","elder brother"]]},
+{k:"冬",lvl:"N4",m:"winter",v:[["トウ","on","今冬","こんとう","this winter"],["ふゆ","kun","真冬","まふゆ","midwinter"]]},
+{k:"古",lvl:"N4",m:"old",v:[["コ","on","古意","こい","ancient ways"],["ふる","kun","古家","ふるいえ","old house"]]},
+{k:"台",lvl:"N4",m:"pedestal / a stand",v:[["ダイ","on","一台","いちだい","one machine"],["タイ","on","家台","やたい","cart (esp. a food cart)"],["うてな","kun","","",""],["われ","kun","","",""]]},
+{k:"広",lvl:"N4",m:"wide / broad",v:[["コウ","on","広大","こうだい","vast"],["ひろ","kun","広場","ひろば","public square"]]},
+{k:"用",lvl:"N4",m:"utilize / business",v:[["ヨウ","on","外用","がいよう","external use"],["もち","kun","","",""]]},
+{k:"世",lvl:"N4",m:"generation / world",v:[["セイ","on","後世","こうせい","posterity"],["セ","on","後世","こうせい","posterity"],["よ","kun","三世","みよ","three temporal states of existence"]]},
+{k:"主",lvl:"N4",m:"lord / chief",v:[["シュ","on","会主","かいしゅ","sponsor of a meeting"],["ス","on","水主","すいふ","sailor"],["ぬし","kun","地主","じぬし","landowner"],["おも","kun","主家","おもや","main building (of a manor)"]]},
+{k:"代",lvl:"N4",m:"substitute / change",v:[["ダイ","on","一代","いちだい","generation"],["タイ","on","百代","はくたい","long era"],["よ","kun","代代","よよ","for generations"],["しろ","kun","月代","つきしろ","shaved part of the forehead"]]},
+{k:"写",lvl:"N4",m:"copy / be photographed",v:[["シャ","on","映写","えいしゃ","projection"],["ジャ","on","青写真","あおじゃしん","blueprint"],["うつ","kun","","",""]]},
+{k:"去",lvl:"N4",m:"gone / past",v:[["キョ","on","去月","きょげつ","last month"],["コ","on","去年","こぞ","last year"],["さ","kun","神去月","かみさりづき","tenth lunar month"]]},
+{k:"字",lvl:"N4",m:"character / letter",v:[["ジ","on","一字","いちじ","(one) letter"],["あざ","kun","大字","おおあざ","larger section (of village)"],["あざな","kun","","",""]]},
+{k:"早",lvl:"N4",m:"early / fast",v:[["ソウ","on","早計","そうけい","overhasty"],["サッ","on","早急","さっきゅう","immediate"],["はや","kun","早手","はやて","gale"]]},
+{k:"町",lvl:"N4",m:"town / village",v:[["チョウ","on","町家","ちょうか","townhouse (i.e. house in the middle "],["まち","kun","下町","したまち","low-lying part of a city (usu. conta"]]},
+{k:"花",lvl:"N4",m:"flower",v:[["カ","on","花木","かぼく","flowers and trees"],["ケ","on","生花","いけばな","ikebana"],["はな","kun","一花","ひとはな","one flower"]]},
+{k:"赤",lvl:"N4",m:"red",v:[["セキ","on","赤外","せきがい","infrared"],["シャク","on","赤熱","しゃくねつ","red hot"],["あか","kun","赤字","あかじ","(being in) the red"]]},
+{k:"足",lvl:"N4",m:"leg / foot",v:[["ソク","on","一足","いっそく","a pair (of shoes or socks)"],["あし","kun","一足","ひとあし","a step"]]},
+{k:"不",lvl:"N4",m:"negative / non-",v:[["フ","on","不意","ふい","sudden"],["ブ","on","不間","ぶま","clumsiness"]]},
+{k:"仕",lvl:"N4",m:"attend / doing",v:[["シ","on","仕業","しわざ","deed (esp. negative)"],["ジ","on","中仕切","なかじきり","partition"],["つか","kun","仕丁","つかえのよほろ","men pressed into forced labor (ritsu"]]},
+{k:"会",lvl:"N4",m:"meeting / meet",v:[["カイ","on","国会","こっかい","National Diet"],["エ","on","前会計","まえかいけい","paying upfront"],["あ","kun","出会","であい","meeting"]]},
+{k:"同",lvl:"N4",m:"same / agree",v:[["ドウ","on","一同","いちどう","all present"],["おな","kun","同中","おなちゅう","student at the same middle school"]]},
+{k:"多",lvl:"N4",m:"many / frequent",v:[["タ","on","多行","たぎょう","the \"ta\" column of the Japanese syll"],["おお","kun","多目","おおめ","somewhat larger (amount)"]]},
+{k:"考",lvl:"N4",m:"consider / think over",v:[["コウ","on","一考","いっこう","consideration"],["かんが","kun","","",""]]},
+{k:"肉",lvl:"N4",m:"meat",v:[["ニク","on","黒肉","くろにく","black sealing ink"],["しし","kun","肉合","ししあい","fleshiness"]]},
+{k:"自",lvl:"N4",m:"oneself",v:[["ジ","on","自国","じこく","one's own country"],["シ","on","出自","しゅつじ","origin"],["みずか","kun","","",""]]},
+{k:"色",lvl:"N4",m:"color",v:[["ショク","on","気色","きしょく","mood"],["シキ","on","気色","けしき","sign"],["いろ","kun","銀色","ぎんいろ","silver (color, colour)"]]},
+{k:"体",lvl:"N4",m:"body / substance",v:[["タイ","on","一体","いったい","(what) the heck"],["テイ","on","人体","じんてい","personal appearance"],["からだ","kun","体中","からだじゅう","all over the body"],["かたち","kun","形体","なりかたち","one's appearance"]]},
+{k:"作",lvl:"N4",m:"make / production",v:[["サク","on","後作","あとさく","second crop"],["サ","on","後作","あとさく","second crop"],["つく","kun","作物所","つくもどころ","palace workshop responsible for maki"]]},
+{k:"図",lvl:"N4",m:"map / drawing",v:[["ズ","on","下図","かず","the figure below"],["ト","on","意図","いと","intention"],["え","kun","図会","ずえ","collection of pictures"]]},
+{k:"売",lvl:"N4",m:"sell",v:[["バイ","on","公売","こうばい","public sale"],["う","kun","公売","こうばい","public sale"]]},
+{k:"弟",lvl:"N4",m:"younger brother / faithful service to elders",v:[["テイ","on","子弟","してい","children"],["ダイ","on","兄弟","きょうだい","siblings"],["おとうと","kun","弟弟子","おとうとでし","younger pupil (of the same master)"]]},
+{k:"社",lvl:"N4",m:"company / firm",v:[["シャ","on","会社","かいしゃ","company"],["やしろ","kun","大社","おおやしろ","grand shrine"]]},
+{k:"言",lvl:"N4",m:"say / word",v:[["ゲン","on","金言","きんげん","wise saying"],["ゴン","on","二言","にごん","double-dealing"],["こと","kun","二言","ふたこと","two words"]]},
+{k:"走",lvl:"N4",m:"run",v:[["ソウ","on","走行","そうこう","running (of a car, bus, etc.)"],["はし","kun","走野老","はしりどころ","Japanese belladonna (Scopolia japoni"]]},
+{k:"近",lvl:"N4",m:"near / early",v:[["キン","on","近目","きんがん","nearsightedness"],["コン","on","近流","こんる","banishment (to a nearby province)"],["ちか","kun","近目","ちかめ","nearsightedness"]]},
+{k:"空",lvl:"N4",m:"empty / sky",v:[["クウ","on","空間","くうかん","space"],["そら","kun","空言","そらごと","falsehood"],["から","kun","空手","からて","karate"]]},
+{k:"青",lvl:"N4",m:"blue / green",v:[["セイ","on","青春","せいしゅん","youth"],["ショウ","on","青少年","せいしょうねん","youth"],["あお","kun","青空","あおぞら","blue sky"]]},
+{k:"音",lvl:"N4",m:"sound / noise",v:[["オン","on","音楽","おんがく","music"],["イン","on","子音","しいん","consonant"],["おと","kun","足音","あしおと","sound of footsteps"],["ね","kun","高音","たかね","high-pitched tone"]]},
+{k:"地",lvl:"N4",m:"ground / earth",v:[["チ","on","見地","けんち","point of view"],["ジ","on","生地","きじ","cloth"]]},
+{k:"安",lvl:"N4",m:"relax / cheap",v:[["アン","on","安気","あんき","ease"],["やす","kun","安手","やすで","cheap kind"]]},
+{k:"有",lvl:"N4",m:"possess / have",v:[["ユウ","on","公有","こうゆう","public ownership"],["ウ","on","公有","こうゆう","public ownership"],["あ","kun","有体","ありてい","the unvarnished truth"]]},
+{k:"死",lvl:"N4",m:"death / die",v:[["シ","on","一死","いっし","dying"],["し","kun","一死","いっし","dying"]]},
+{k:"京",lvl:"N4",m:"capital / 10**16",v:[["キョウ","on","京地","きょうち","former capital region (i.e. Kyoto an"],["ケイ","on","京人","けいじん","citizen of the capital"],["みやこ","kun","長岡京","ながおかのみやこ","Nagaoka-kyō (capital of Japan 784-79"]]},
+{k:"夜",lvl:"N4",m:"night / evening",v:[["ヤ","on","夜行","やぎょう","the \"ya\" column of the Japanese syll"],["よ","kun","月夜","つきよ","moonlit night"],["よる","kun","夜用","よるよう","nighttime use"]]},
+{k:"妹",lvl:"N4",m:"younger sister",v:[["マイ","on","弟妹","ていまい","younger brother and sister"],["いもうと","kun","妹娘","いもうとむすめ","younger daughter"]]},
+{k:"姉",lvl:"N4",m:"elder sister",v:[["シ","on","兄姉","けいし","brother and sister"],["あね","kun","姉上","あねうえ","older sister"],["はは","kun","","",""]]},
+{k:"店",lvl:"N4",m:"store / shop",v:[["テン","on","開店","かいてん","opening a new shop"],["みせ","kun","出店","でみせ","food stand"],["たな","kun","店子","たなこ","tenant (esp. in contrast to a landlo"]]},
+{k:"明",lvl:"N4",m:"bright / light",v:[["メイ","on","開明","かいめい","civilization"],["ミョウ","on","明日","みょうにち","tomorrow"],["あ","kun","明方","あけがた","dawn"]]},
+{k:"歩",lvl:"N4",m:"walk / counter for steps",v:[["ホ","on","歩行","ほこう","walk"],["ブ","on","町歩","ちょうぶ","hectare (2.471 acres)"],["ある","kun","","",""]]},
+{k:"画",lvl:"N4",m:"brush-stroke / picture",v:[["ガ","on","画意","がい","meaning of a picture"],["カク","on","一画","いっかく","one plot (of land)"],["はかりごと","kun","","",""]]},
+{k:"知",lvl:"N4",m:"know / wisdom",v:[["チ","on","上知","じょうち","supreme wisdom"],["し","kun","小知","しょうち","superficial knowledge"]]},
+{k:"室",lvl:"N4",m:"room / apartment",v:[["シツ","on","一室","いっしつ","one room"],["むろ","kun","室町","むろまち","Muromachi (era 1392-1573, or 1333-15"]]},
+{k:"思",lvl:"N4",m:"think",v:[["シ","on","意思","いし","intention"],["おも","kun","思出","おもいで","memories"]]},
+{k:"海",lvl:"N4",m:"sea / ocean",v:[["カイ","on","海員","かいいん","sailor"],["うみ","kun","大海","おおうみ","ocean"]]},
+{k:"茶",lvl:"N4",m:"tea",v:[["チャ","on","古茶","こちゃ","last year's tea"],["サ","on","茶会","さかい","tea party"]]},
+{k:"以",lvl:"N4",m:"by means of / because",v:[["イ","on","以下","いか","not exceeding"],["もっ","kun","","",""]]},
+{k:"夏",lvl:"N4",m:"summer",v:[["カ","on","夏日","かじつ","summer day"],["ガ","on","夏学期","なつがっき","summer term (of school)"],["なつ","kun","夏山","なつやま","summery mountain"]]},
+{k:"家",lvl:"N4",m:"house / home",v:[["カ","on","家学","かがく","hereditary learning"],["ケ","on","家来","けらい","retainer"],["いえ","kun","家主","いえぬし","landlord"],["や","kun","下家","したや","small attached annex"]]},
+{k:"紙",lvl:"N4",m:"paper",v:[["シ","on","画紙","がし","drawing paper"],["かみ","kun","切紙","きりかみ","cut paper"]]},
+{k:"通",lvl:"N4",m:"traffic / pass through",v:[["ツウ","on","一通","いっつう","one copy (of a document)"],["ツ","on","一通","いっつう","one copy (of a document)"],["とお","kun","見通","みとおし","unobstructed view"]]},
+{k:"強",lvl:"N4",m:"strong",v:[["キョウ","on","強意","きょうい","emphasis"],["ゴウ","on","強力","ごうりき","herculean strength"],["つよ","kun","強気","つよき","confident"]]},
+{k:"教",lvl:"N4",m:"teach / faith",v:[["キョウ","on","家教","かきょう","tutor"],["おし","kun","道教","みちおしえ","tiger beetle (esp. the Japanese tige"]]},
+{k:"理",lvl:"N4",m:"logic / arrangement",v:[["リ","on","一理","いちり","(a) principle"],["ことわり","kun","","",""]]},
+{k:"週",lvl:"N4",m:"week",v:[["シュウ","on","一週","いっしゅう","one week"]]},
+{k:"魚",lvl:"N4",m:"fish",v:[["ギョ","on","魚肉","ぎょにく","fish meat"],["うお","kun","川魚","かわうお","river fish"],["さかな","kun","魚屋","さかなや","fish market"]]},
+{k:"鳥",lvl:"N4",m:"bird / chicken",v:[["チョウ","on","花鳥","かちょう","flowers and birds"],["とり","kun","鳥肉","とりにく","chicken meat"]]},
+{k:"黒",lvl:"N4",m:"black",v:[["コク","on","黒子","こくし","mole"],["くろ","kun","黒人","くろうと","expert"]]},
+{k:"住",lvl:"N4",m:"dwell / reside",v:[["ジュウ","on","安住","あんじゅう","living in peace"],["ヂュウ","on","","",""],["す","kun","住家","すみか","dwelling"]]},
+{k:"医",lvl:"N4",m:"doctor / medicine",v:[["イ","on","医員","いいん","medical staff"],["くすし","kun","医師","くすし","doctor"]]},
+{k:"究",lvl:"N4",m:"research / study",v:[["キュウ","on","学究","がっきゅう","scholar"],["ク","on","究理学","きゅうりがく","(Western) physics"],["きわ","kun","","",""]]},
+{k:"者",lvl:"N4",m:"someone / person",v:[["シャ","on","見者","けんしゃ","sightseer"],["もの","kun","国者","くにもの","country bumpkin"]]},
+{k:"研",lvl:"N4",m:"polish / study of",v:[["ケン","on","研学","けんがく","study"],["と","kun","","",""]]},
+{k:"場",lvl:"N4",m:"location / place",v:[["ジョウ","on","一場","いちじょう","one time (place)"],["チョウ","on","調理場","ちょうりば","kitchen"],["ば","kun","後場","ごば","afternoon session (stock exchange)"]]},
+{k:"朝",lvl:"N4",m:"morning / dynasty",v:[["チョウ","on","一朝","いっちょう","temporarily"],["あさ","kun","朝会","あさかい","morning assembly"]]},
+{k:"答",lvl:"N4",m:"solution / answer",v:[["トウ","on","口答","こうとう","oral answer"],["こた","kun","","",""]]},
+{k:"買",lvl:"N4",m:"buy",v:[["バイ","on","売買","ばいばい","trade"],["か","kun","買手","かいて","buyer"]]},
+{k:"道",lvl:"N4",m:"road-way / street",v:[["ドウ","on","一道","いちどう","one road"],["トウ","on","不道","ぶとう","inhuman"],["みち","kun","下道","したみち","non-highway road"],["いう","kun","","",""]]},
+{k:"楽",lvl:"N4",m:"music / comfort",v:[["ガク","on","楽員","がくいん","bandsman"],["ラク","on","安楽","あんらく","comfort"],["たの","kun","","",""]]},
+{k:"事",lvl:"N4",m:"matter / thing",v:[["ジ","on","一事","いちじ","one thing"],["ズ","on","水仕事","みずしごと","scrubbing and washing"],["こと","kun","事事","ことごと","everything"]]},
+{k:"使",lvl:"N4",m:"use / send on a mission",v:[["シ","on","公使","こうし","envoy"],["つか","kun","御使","おつかい","errand"]]},
+{k:"始",lvl:"N4",m:"commence / begin",v:[["シ","on","開始","かいし","start"],["はじ","kun","見始","みはじめ","seeing for the first time"]]},
+{k:"服",lvl:"N4",m:"clothing / admit",v:[["フク","on","夏服","なつふく","summer clothing"]]},
+{k:"物",lvl:"N4",m:"thing / object",v:[["ブツ","on","下物","かぶつ","drinking feast"],["モツ","on","作物","さくもつ","crop"],["もの","kun","安物","やすもの","cheap article"]]},
+{k:"屋",lvl:"N4",m:"roof / house",v:[["オク","on","屋外","おくがい","outdoors"],["や","kun","屋台","やたい","cart (esp. a food cart)"]]},
+{k:"度",lvl:"N4",m:"degrees / occurrence",v:[["ド","on","高度","こうど","altitude"],["ト","on","一度","ひとたび","once"],["たび","kun","二度","ふたたび","again"]]},
+{k:"待",lvl:"N4",m:"wait / depend on",v:[["タイ","on","特待","とくたい","special treatment"],["ま","kun","待人","まちびと","person being waited for"]]},
+{k:"持",lvl:"N4",m:"hold / have",v:[["ジ","on","住持","じゅうじ","chief priest of temple"],["も","kun","金持","かねもち","rich person"]]},
+{k:"界",lvl:"N4",m:"world / boundary",v:[["カイ","on","下界","げかい","the world"]]},
+{k:"発",lvl:"N4",m:"departure / discharge",v:[["ハツ","on","後発","こうはつ","starting late"],["ホツ","on","開発","かいほつ","development"],["た","kun","多発","たはつ","repeated occurrence"]]},
+{k:"送",lvl:"N4",m:"escort / send",v:[["ソウ","on","急送","きゅうそう","dispatch"],["おく","kun","見送人","みおくりにん","someone who has come to say farewell"]]},
+{k:"重",lvl:"N4",m:"heavy / important",v:[["ジュウ","on","九重","くじゅう","ninefold"],["チョウ","on","九重","きゅうちょう","ninefold"],["え","kun","九重","ここのえ","ninefold"],["おも","kun","重目","おもめ","slightly heavy"]]},
+{k:"起",lvl:"N4",m:"rouse / wake up",v:[["キ","on","起業","きぎょう","starting a business"],["お","kun","","",""]]},
+{k:"院",lvl:"N4",m:"inst. / institution",v:[["イン","on","院外","いんがい","outside congress"]]},
+{k:"終",lvl:"N4",m:"end / finish",v:[["シュウ","on","終業","しゅうぎょう","end of work day"],["つい","kun","","",""]]},
+{k:"習",lvl:"N4",m:"learn",v:[["シュウ","on","悪習","あくしゅう","bad habit"],["ジュ","on","近習","きんじゅ","attendant"],["なら","kun","手習","てならい","practice writing with a brush"]]},
+{k:"転",lvl:"N4",m:"revolve / turn around",v:[["テン","on","一転","いってん","one turn"],["うたた","kun","転寝","うたたね","doze"]]},
+{k:"運",lvl:"N4",m:"carry / luck",v:[["ウン","on","運気","うんき","fate"],["はこ","kun","","",""]]},
+{k:"開",lvl:"N4",m:"open / unfold",v:[["カイ","on","開会","かいかい","opening of a meeting"],["ひら","kun","","",""]]},
+{k:"集",lvl:"N4",m:"gather / meet",v:[["シュウ","on","家集","かしゅう","collected waka poems (of a single po"],["あつ","kun","","",""]]},
+{k:"飲",lvl:"N4",m:"drink / smoke",v:[["イン","on","飲食","いんしょく","food and drink"],["オン","on","飲食","おんじき","food and drink"],["の","kun","飲口","のみくち","taste (of a liquid, esp. alcoholic b"]]},
+{k:"業",lvl:"N4",m:"business / vocation",v:[["ギョウ","on","業者","ぎょうしゃ","trader"],["ゴウ","on","三業","さんごう","three activities (action, speech and"],["わざ","kun","事業","ことわざ","project"]]},
+{k:"漢",lvl:"N4",m:"sino- / china",v:[["カン","on","悪漢","あっかん","rascal"]]},
+{k:"歌",lvl:"N4",m:"song / sing",v:[["カ","on","歌会","うたかい","poetry party or competition"],["うた","kun","歌会","うたかい","poetry party or competition"]]},
+{k:"親",lvl:"N4",m:"parent / intimacy",v:[["シン","on","近親","きんしん","near relative"],["おや","kun","女親","おんなおや","mother"]]},
+{k:"病",lvl:"N4",m:"ill / sick",v:[["ビョウ","on","急病","きゅうびょう","sudden illness"],["ヘイ","on","病兵","びょうへい","sick soldier"],["やまい","kun","病気","やまいけ","feeling ill"]]},
+{k:"別",lvl:"N4",m:"separate / branch off",v:[["ベツ","on","一別","いちべつ","parting"],["わか","kun","","",""]]},
+{k:"注",lvl:"N4",m:"pour / irrigate",v:[["チュウ","on","外注","がいちゅう","outside order"],["そそ","kun","注口","そそぎぐち","spout"]]},
+{k:"洋",lvl:"N4",m:"ocean / sea",v:[["ヨウ","on","海洋","かいよう","ocean"]]},
+{k:"特",lvl:"N4",m:"special",v:[["トク","on","特使","とくし","special envoy"]]},
+{k:"意",lvl:"N4",m:"idea / mind",v:[["イ","on","意外","いがい","unexpected"]]},
+{k:"味",lvl:"N4",m:"flavor / taste",v:[["ミ","on","意味","いみ","meaning"],["あじ","kun","後味","あとあじ","aftertaste"]]},
+{k:"勉",lvl:"N4",m:"exertion / endeavour",v:[["ベン","on","勉学","べんがく","study"],["つと","kun","","",""]]},
+{k:"旅",lvl:"N4",m:"trip / travel",v:[["リョ","on","長旅","ちょうりょ","long trip"],["たび","kun","長旅","ながたび","long trip"]]},
+{k:"員",lvl:"N4",m:"employee / member",v:[["イン","on","一員","いちいん","person"]]},
+{k:"動",lvl:"N4",m:"move / motion",v:[["ドウ","on","行動","こうどう","action"],["うご","kun","","",""]]},
+{k:"悪",lvl:"N4",m:"bad / vice",v:[["アク","on","悪意","あくい","ill will"],["オ","on","悪心","おしん","nausea"],["ああ","kun","","",""],["いずくに","kun","","",""]]},
+{k:"族",lvl:"N4",m:"tribe / family",v:[["ゾク","on","一族","いちぞく","family"]]},
+{k:"着",lvl:"N4",m:"don / arrive",v:[["チャク","on","安着","あんちゃく","safe arrival"],["ジャク","on","愛着","あいじゃく","attachment (esp. to things)"],["き","kun","着心","きごころ","feeling of clothes"]]},
+{k:"野",lvl:"N4",m:"plains / field",v:[["ヤ","on","下野","げや","retirement from public office"],["ショ","on","野戦食","やせんしょく","field ration"],["の","kun","野中","のなか","in the middle of a field"]]},
+{k:"風",lvl:"N4",m:"wind / air",v:[["フウ","on","悪風","あくふう","vice"],["フ","on","悪風","あくふう","vice"],["かぜ","kun","家風","いえかぜ","family tradition"]]},
+{k:"新",lvl:"N4",m:"new",v:[["シン","on","一新","いっしん","complete change"],["あたら","kun","","",""]]},
+{k:"問",lvl:"N4",m:"question / ask",v:[["モン","on","学問","がくもん","scholarship"],["とん","kun","問屋","とんや","wholesale store"]]},
+{k:"銀",lvl:"N4",m:"silver",v:[["ギン","on","金銀","きんぎん","gold and silver"],["しろがね","kun","白銀","しろがね","silver (Ag)"]]},
+{k:"題",lvl:"N4",m:"topic / subject",v:[["ダイ","on","主題","しゅだい","subject"]]},
+{k:"館",lvl:"N4",m:"building / mansion",v:[["カン","on","開館","かいかん","opening (for that day's business; of"],["やかた","kun","夏館","なつやかた","villa arranged appropriately for sum"],["たて","kun","","",""]]},
+{k:"駅",lvl:"N4",m:"station",v:[["エキ","on","駅員","えきいん","(train) station attendant"]]},
+{k:"料",lvl:"N4",m:"fee / materials",v:[["リョウ","on","有料","ゆうりょう","fee-charging"]]},
+{k:"映",lvl:"N4",m:"reflect / reflection",v:[["エイ","on","映画","えいが","movie"],["うつ","kun","","",""]]},
+{k:"私",lvl:"N4",m:"private / i",v:[["シ","on","公私","こうし","public and private"],["わたくし","kun","私立","わたくしりつ","private (establishment)"],["わたし","kun","私共","わたしども","we"]]},
+{k:"帰",lvl:"N4",m:"homecoming / arrive at",v:[["キ","on","帰京","ききょう","returning to (one's home in) Tokyo"],["かえ","kun","","",""]]},
+{k:"春",lvl:"N4",m:"springtime / spring (season)",v:[["シュン","on","今春","こんしゅん","this spring"],["はる","kun","春先","はるさき","beginning of spring"]]},
+{k:"昼",lvl:"N4",m:"daytime / noon",v:[["チュウ","on","昼飯","ちゅうはん","lunch"],["ひる","kun","真昼","まひる","midday"]]},
+{k:"秋",lvl:"N4",m:"autumn",v:[["シュウ","on","今秋","こんしゅう","this autumn"],["あき","kun","秋口","あきぐち","beginning of autumn"],["とき","kun","","",""]]},
+{k:"計",lvl:"N4",m:"plot / plan",v:[["ケイ","on","一計","いっけい","plan"],["はか","kun","時計","ときはかり","clock"]]},
+{k:"建",lvl:"N4",m:"build",v:[["ケン","on","建国","けんこく","founding of a nation"],["コン","on","建立","こんりゅう","(act of) building (temple, monument,"],["た","kun","建物","たてもの","building"]]},
+{k:"英",lvl:"N4",m:"england / english",v:[["エイ","on","英気","えいき","great wisdom"],["はなぶさ","kun","","",""]]},
+{k:"飯",lvl:"N4",m:"meal / boiled rice",v:[["ハン","on","赤飯","せきはん","red rice (beans and mochi) for auspi"],["めし","kun","朝飯","あさめし","breakfast"]]},
+{k:"曜",lvl:"N4",m:"weekday",v:[["ヨウ","on","火曜","かよう","Tuesday"]]},
+{k:"品",lvl:"N4",m:"goods / refinement",v:[["ヒン","on","下品","げひん","vulgar"],["ホン","on","九品","くほん","nine levels of Amitabha's Pure Land"],["しな","kun","一品","ひとしな","item"]]},
+{k:"急",lvl:"N4",m:"hurry / emergency",v:[["キュウ","on","急行","きゅうこう","hurrying (to somewhere)"],["いそ","kun","急足","いそぎあし","fast pace"]]},
+{k:"真",lvl:"N4",m:"true / reality",v:[["シン","on","真意","しんい","real intention"],["ま","kun","真近","まぢか","proximity"],["まこと","kun","","",""]]},
+{k:"堂",lvl:"N4",m:"public chamber / hall",v:[["ドウ","on","一堂","いちどう","one building (hall, temple, shrine, "]]},
+{k:"試",lvl:"N4",m:"test / try",v:[["シ","on","公試","こうし","national examinations"],["こころ","kun","","",""]]},
+{k:"借",lvl:"N4",m:"borrow / rent",v:[["シャク","on","借地","しゃくち","leased land"],["か","kun","借手","かりて","borrower"]]},
+{k:"験",lvl:"N4",m:"verification / effect",v:[["ケン","on","試験","しけん","examination"],["ゲン","on","原体験","げんたいけん","formative experience (from one's you"],["あかし","kun","","",""],["しるし","kun","","",""]]},
+{k:"質",lvl:"N4",m:"substance / quality",v:[["シツ","on","画質","がしつ","image quality (film, video, etc.)"],["シチ","on","言質","げんしち","commitment"],["たち","kun","","",""],["もと","kun","","",""]]},
+{k:"貸",lvl:"N4",m:"lend",v:[["タイ","on","借貸","しゃくたい","loan"],["か","kun","貸家","かしや","house for rent"]]},
+/* N3 */
+{k:"才",lvl:"N3",m:"genius / years old",v:[["サイ","on","何才","なんさい","how old?"]]},
+{k:"王",lvl:"N3",m:"king / rule",v:[["オウ","on","王位","おうい","the throne"],["ノウ","on","先王","せんのう","the late king"]]},
+{k:"石",lvl:"N3",m:"stone",v:[["セキ","on","一石","いっせき","one game (of go)"],["シャク","on","石女","しゃくにょ","barren woman"],["いし","kun","下石","したいし","nether millstone"]]},
+{k:"内",lvl:"N3",m:"inside / within",v:[["ナイ","on","国内","こくない","internal"],["ダイ","on","国内","こくだい","internal"],["うち","kun","内内","うちうち","private"]]},
+{k:"太",lvl:"N3",m:"plump / thick",v:[["タイ","on","太古","たいこ","ancient times"],["タ","on","太古","たいこ","ancient times"],["ふと","kun","太字","ふとじ","boldface"]]},
+{k:"引",lvl:"N3",m:"pull / tug",v:[["イン","on","引見","いんけん","audience"],["ひ","kun","引当","ひきあて","mortgage"]]},
+{k:"市",lvl:"N3",m:"market / city",v:[["シ","on","市会","しかい","city council"],["いち","kun","市人","いちびと","city market seller"]]},
+{k:"他",lvl:"N3",m:"other / another",v:[["タ","on","自他","じた","oneself and others"],["ほか","kun","","",""]]},
+{k:"号",lvl:"N3",m:"nickname / number",v:[["ゴウ","on","一号","いちごう","number one"],["よびな","kun","","",""]]},
+{k:"平",lvl:"N3",m:"even / flat",v:[["ヘイ","on","開平","かいへい","extraction of square root"],["ビョウ","on","平常心","びょうじょうしん","everyday feelings"],["ひら","kun","平手","ひらて","palm"]]},
+{k:"打",lvl:"N3",m:"strike / hit",v:[["ダ","on","安打","あんだ","safe hit"],["ダアス","on","","",""],["う","kun","強打","きょうだ","smiting"]]},
+{k:"申",lvl:"N3",m:"have the honor to / sign of the monkey",v:[["シン","on","上申","じょうしん","report to a superior"],["さる","kun","申年","さるどし","year of the Monkey"]]},
+{k:"礼",lvl:"N3",m:"salute / bow",v:[["レイ","on","一礼","いちれい","bow (salute, greeting)"],["ライ","on","家礼","けらい","retainer"]]},
+{k:"耳",lvl:"N3",m:"ear",v:[["ジ","on","外耳","がいじ","external ear"],["みみ","kun","初耳","はつみみ","something heard for the first time"]]},
+{k:"交",lvl:"N3",m:"mingle / mixing",v:[["コウ","on","外交","がいこう","diplomacy"],["こもごも","kun","交交","こもごも","alternately"]]},
+{k:"光",lvl:"N3",m:"ray / light",v:[["コウ","on","円光","えんこう","halo"],["ひかり","kun","光物","ひかりもの","luminous body (e.g. of a shooting st"]]},
+{k:"回",lvl:"N3",m:"-times / round",v:[["カイ","on","一回","いっかい","once"],["エ","on","回心","えしん","conversion"],["まわ","kun","小取回","ことりまわし","lively or quick witted person"]]},
+{k:"当",lvl:"N3",m:"hit / right",v:[["トウ","on","見当","けんとう","estimate"],["あ","kun","目当","めあて","mark"]]},
+{k:"米",lvl:"N3",m:"rice / usa",v:[["ベイ","on","中米","ちゅうべい","Central America"],["マイ","on","上米","じょうまい","first-class rice"],["こめ","kun","米所","こめどころ","rice-producing region"],["よね","kun","白米","しらよね","polished rice"]]},
+{k:"声",lvl:"N3",m:"voice",v:[["セイ","on","家声","かせい","honour of the family"],["ショウ","on","高声","こうしょう","loud voice"],["こえ","kun","一声","ひとこえ","voice"]]},
+{k:"形",lvl:"N3",m:"shape / form",v:[["ケイ","on","外形","がいけい","externals"],["ギョウ","on","形相","ぎょうそう","look (esp. an angry or upset look)"],["かた","kun","形気","かたぎ","disposition"],["かたち","kun","品形","しなかたち","quality and shape"]]},
+{k:"草",lvl:"N3",m:"grass / weeds",v:[["ソウ","on","海草","かいそう","marine plant"],["くさ","kun","下草","したくさ","undergrowth"]]},
+{k:"化",lvl:"N3",m:"change / take the form of",v:[["カ","on","化学","かがく","chemistry"],["ケ","on","化学","ばけがく","chemistry"],["ば","kun","化学","ばけがく","chemistry"]]},
+{k:"両",lvl:"N3",m:"both / old japanese coin",v:[["リョウ","on","一両","いちりょう","one vehicle"],["てる","kun","","",""],["ふたつ","kun","","",""]]},
+{k:"全",lvl:"N3",m:"whole / entire",v:[["ゼン","on","十全","じゅうぜん","perfection"],["まった","kun","","",""]]},
+{k:"向",lvl:"N3",m:"yonder / facing",v:[["コウ","on","一向","いっこう","completely"],["むこ","kun","向付","むこうづけ","dish placed on the far side of the s"]]},
+{k:"曲",lvl:"N3",m:"bend / music",v:[["キョク","on","一曲","いっきょく","tune (melody, piece of music)"],["くま","kun","","",""]]},
+{k:"次",lvl:"N3",m:"next / order",v:[["ジ","on","一次","いちじ","first"],["シ","on","次子","じし","the next child"],["つぎ","kun","中次","なかつぎ","joining"]]},
+{k:"直",lvl:"N3",m:"straightaway / honesty",v:[["チョク","on","安直","あんちょく","inexpensive"],["ジキ","on","正直","しょうじき","honest"],["ただ","kun","直中","ただなか","middle"]]},
+{k:"活",lvl:"N3",m:"lively / resuscitation",v:[["カツ","on","活動","かつどう","activity (of a person, organization,"],["い","kun","活性","かっせい","active"]]},
+{k:"点",lvl:"N3",m:"spot / point",v:[["テン","on","一点","いってん","speck"],["ぼち","kun","","",""]]},
+{k:"科",lvl:"N3",m:"department / course",v:[["カ","on","医科","いか","medical science"]]},
+{k:"首",lvl:"N3",m:"neck / counter for songs and poems",v:[["シュ","on","一首","いっしゅ","one tanka"],["くび","kun","手首","てくび","wrist"]]},
+{k:"欠",lvl:"N3",m:"lack / gap",v:[["ケツ","on","間欠","かんけつ","intermittence"],["ケン","on","欠伸","けんしん","yawn"],["か","kun","間欠","かんけつ","intermittence"]]},
+{k:"由",lvl:"N3",m:"wherefore / a reason",v:[["ユ","on","経由","けいゆ","going through"],["ユウ","on","経由","けいゆう","going through"],["よし","kun","候由","そうろうよし","I hear that ..."]]},
+{k:"民",lvl:"N3",m:"people / nation",v:[["ミン","on","国民","こくみん","people (of a country)"],["たみ","kun","国民","くにたみ","people of a country"]]},
+{k:"付",lvl:"N3",m:"adhere / attach",v:[["フ","on","下付","かふ","grant"],["つ","kun","原付","げんつき","motorized two-wheeled vehicle (with "]]},
+{k:"失",lvl:"N3",m:"lose / error",v:[["シツ","on","一失","いっしつ","disadvantage (defect, error)"],["うしな","kun","","",""]]},
+{k:"必",lvl:"N3",m:"invariably / certain",v:[["ヒツ","on","必定","ひつじょう","inevitably"],["かなら","kun","","",""]]},
+{k:"未",lvl:"N3",m:"un- / not yet",v:[["ミ","on","未開","みかい","uncivilized"],["ビ","on","未病","みびょう","ill health before symptoms appear"],["ひつじ","kun","未年","ひつじどし","year of the Sheep"]]},
+{k:"末",lvl:"N3",m:"end / close",v:[["マツ","on","期末","きまつ","end of term"],["バツ","on","末男","ばつなん","youngest son"],["すえ","kun","場末","ばすえ","outskirts (of a town)"]]},
+{k:"記",lvl:"N3",m:"scribe / account",v:[["キ","on","下記","かき","the following"],["しる","kun","","",""]]},
+{k:"組",lvl:"N3",m:"association / braid",v:[["ソ","on","組成","そせい","composition"],["くみ","kun","組方","くみかた","way of assembling"]]},
+{k:"船",lvl:"N3",m:"ship / boat",v:[["セン","on","下船","げせん","disembarkation"],["ふね","kun","黒船","くろふね","black ships"]]},
+{k:"雪",lvl:"N3",m:"snow",v:[["セツ","on","降雪","こうせつ","snowfall"],["ゆき","kun","初雪","はつゆき","first snow (of the season)"]]},
+{k:"支",lvl:"N3",m:"branch / support",v:[["シ","on","支持","しじ","support"],["ささ","kun","","",""]]},
+{k:"助",lvl:"N3",m:"help / rescue",v:[["ジョ","on","一助","いちじょ","a help"],["すけ","kun","助番","すけばん","leader of a female gang"]]},
+{k:"君",lvl:"N3",m:"mister / you",v:[["クン","on","君子","くんし","man of virtue"],["きみ","kun","君達","きみたち","you (plural)"]]},
+{k:"対",lvl:"N3",m:"vis-a-vis / opposite",v:[["タイ","on","対日","たいにち","toward Japan"],["ツイ","on","一対","いっつい","pair"],["あいて","kun","対手","あいて","opponent (in combat)"]]},
+{k:"局",lvl:"N3",m:"bureau / board",v:[["キョク","on","一局","いっきょく","one game (checkers, etc.)"],["つぼね","kun","局女郎","つぼねじょろう","prostitute of the lowest class (Edo "]]},
+{k:"役",lvl:"N3",m:"duty / war",v:[["ヤク","on","一役","いちやく","an office"],["エキ","on","現役","げんえき","active duty"]]},
+{k:"投",lvl:"N3",m:"throw / discard",v:[["トウ","on","先投","せんとう","starting pitcher"],["な","kun","投物","なげもの","sacrifice goods"]]},
+{k:"決",lvl:"N3",m:"decide / fix",v:[["ケツ","on","一決","いっけつ","agreed"],["き","kun","取決","とりきめ","decision"]]},
+{k:"馬",lvl:"N3",m:"horse",v:[["バ","on","意馬","いば","uncontrolled"],["うま","kun","馬屋","うまや","stable"],["ま","kun","馬屋","うまや","stable"]]},
+{k:"番",lvl:"N3",m:"turn / number in a series",v:[["バン","on","一番","いちばん","number one"],["つが","kun","一番","ひとつがい","pair"]]},
+{k:"絵",lvl:"N3",m:"picture / drawing",v:[["カイ","on","絵画","かいが","painting"],["エ","on","下絵","したえ","rough sketch"]]},
+{k:"数",lvl:"N3",m:"number / strength",v:[["スウ","on","加数","かすう","addend"],["ス","on","加数","かすう","addend"],["かず","kun","間数","まかず","number of rooms"],["しばしば","kun","数数","しばしば","often"]]},
+{k:"所",lvl:"N3",m:"place / extent",v:[["ショ","on","会所","かいしょ","meeting place"],["ところ","kun","一所","ひとところ","one place"],["どころ","kun","名所","などころ","famous place"]]},
+{k:"具",lvl:"N3",m:"tool / utensil",v:[["グ","on","一具","いちぐ","one set"],["そな","kun","","",""]]},
+{k:"受",lvl:"N3",m:"accept / undergo",v:[["ジュ","on","受動","じゅどう","passivity"],["う","kun","受入","うけいれ","receiving"]]},
+{k:"和",lvl:"N3",m:"harmony / japanese style",v:[["ワ","on","中和","ちゅうわ","neutralization"],["オ","on","和上","おしょう","preceptor or high priest (esp. in Ze"],["やわ","kun","","",""]]},
+{k:"定",lvl:"N3",m:"determine / fix",v:[["テイ","on","一定","いってい","fixed"],["ジョウ","on","一定","いちじょう","fixed"],["さだ","kun","","",""]]},
+{k:"実",lvl:"N3",m:"reality / truth",v:[["ジツ","on","事実","じじつ","fact"],["シツ","on","実質","じっしつ","substance"],["み","kun","実生","みしょう","seedling"],["まこと","kun","","",""]]},
+{k:"泳",lvl:"N3",m:"swim",v:[["エイ","on","泳法","えいほう","swimming style"],["およ","kun","","",""]]},
+{k:"苦",lvl:"N3",m:"suffering / trial",v:[["ク","on","苦力","くーりー","coolie"],["くる","kun","","",""]]},
+{k:"表",lvl:"N3",m:"surface / table",v:[["ヒョウ","on","上表","じょうひょう","memorial to the emperor"],["おもて","kun","京表","きょうおもて","vicinity of Kyoto"]]},
+{k:"部",lvl:"N3",m:"section / bureau",v:[["ブ","on","一部","いちぶ","one part"],["べ","kun","部民","べみん","people belonging to a hereditary occ"]]},
+{k:"乗",lvl:"N3",m:"ride / power",v:[["ジョウ","on","下乗","げじょう","dismounting"],["ショウ","on","小乗","しょうじょう","Hinayana (Buddhism)"],["の","kun","乗気","のりき","interest"]]},
+{k:"客",lvl:"N3",m:"guest / visitor",v:[["キャク","on","観客","かんきゃく","audience"],["カク","on","客員","かくいん","guest member"]]},
+{k:"相",lvl:"N3",m:"inter- / mutual",v:[["ソウ","on","三相","さんそう","three phases"],["ショウ","on","内相","ないしょう","Home Minister (pre-1947)"],["あい","kun","相対","あいたい","involving only the parties concerned"]]},
+{k:"美",lvl:"N3",m:"beauty / beautiful",v:[["ビ","on","真美","しんび","true beauty"],["ミ","on","美事","みごと","splendid"],["うつく","kun","","",""]]},
+{k:"負",lvl:"N3",m:"defeat / negative",v:[["フ","on","自負","じふ","pride"],["ま","kun","先負","せんまけ","lucky day but not in the morning"]]},
+{k:"談",lvl:"N3",m:"discuss / talk",v:[["ダン","on","画談","がだん","discussions on art and painting"]]},
+{k:"要",lvl:"N3",m:"need / main point",v:[["ヨウ","on","主要","しゅよう","chief"],["かなめ","kun","要石","かなめいし","keystone"]]},
+{k:"勝",lvl:"N3",m:"victory / win",v:[["ショウ","on","決勝","けっしょう","decision of a contest"],["かつ","kun","勝山","かつやま","woman's hairstyle (Edo period) (made"]]},
+{k:"速",lvl:"N3",m:"quick / fast",v:[["ソク","on","音速","おんそく","speed of sound"],["はや","kun","速口","はやくち","fast-talking"]]},
+{k:"配",lvl:"N3",m:"distribute / spouse",v:[["ハイ","on","加配","かはい","additional ration"],["くば","kun","","",""]]},
+{k:"酒",lvl:"N3",m:"sake / alcohol",v:[["シュ","on","悪酒","あくしゅ","cheap liquor"],["さけ","kun","酒処","さけどころ","drinking place"]]},
+{k:"進",lvl:"N3",m:"advance / proceed",v:[["シン","on","行進","こうしん","march"],["すす","kun","","",""]]},
+{k:"落",lvl:"N3",m:"fall / drop",v:[["ラク","on","下落","げらく","depreciation"],["お","kun","平落","ひらおち","pancake (landing)"]]},
+{k:"葉",lvl:"N3",m:"leaf / plane",v:[["ヨウ","on","一葉","いちよう","one leaf"],["は","kun","一葉","ひとは","one leaf"]]},
+{k:"路",lvl:"N3",m:"path / route",v:[["ロ","on","一路","いちろ","straight"],["ル","on","路加","るか","St Luke"],["みち","kun","直路","すぐみち","straight road"]]},
+{k:"鳴",lvl:"N3",m:"chirp / cry",v:[["メイ","on","共鳴","きょうめい","resonance"],["な","kun","鳴声","なきごえ","cry (esp. animal)"]]},
+{k:"横",lvl:"N3",m:"sideways / side",v:[["オウ","on","横議","おうぎ","arguing persistently"],["よこ","kun","横車","よこぐるま","perverseness"]]},
+{k:"調",lvl:"N3",m:"tune / tone",v:[["チョウ","on","合調","ごうちょう","tuning"],["しら","kun","取調","とりしらべ","investigation (e.g. by police or pro"]]},
+{k:"頭",lvl:"N3",m:"head / counter for large animals",v:[["トウ","on","一頭","いっとう","one large animal (horses, cattle, et"],["ズ","on","頭上","ずじょう","overhead"],["あたま","kun","石頭","いしあたま","obstinate person"],["かしら","kun","頭書","かしらがき","headnote"]]},
+{k:"顔",lvl:"N3",m:"face / expression",v:[["ガン","on","顔形","がんぼう","features"],["かお","kun","顔形","かおかたち","features"]]},
+{k:"最",lvl:"N3",m:"utmost / most",v:[["サイ","on","最外","さいがい","outer-most"],["シュ","on","最終","さいしゅう","last"],["つま","kun","","",""]]},
+{k:"争",lvl:"N3",m:"contend / dispute",v:[["ソウ","on","係争","けいそう","contention"],["あらそ","kun","","",""]]},
+{k:"伝",lvl:"N3",m:"transmit / go along",v:[["デン","on","家伝","かでん","family tradition"],["テン","on","伝手","てんじゅ","tuning peg (on a biwa or shamisen)"],["つて","kun","伝手","つて","means of making contact"]]},
+{k:"共",lvl:"N3",m:"together / both",v:[["キョウ","on","共学","きょうがく","coeducation"],["とも","kun","共共","ともども","together"]]},
+{k:"好",lvl:"N3",m:"fond / pleasing",v:[["コウ","on","好意","こうい","kindness"],["この","kun","","",""]]},
+{k:"成",lvl:"N3",m:"turn into / become",v:[["セイ","on","化成","かせい","change"],["ジョウ","on","成道","じょうどう","completing the path to becoming a Bu"],["な","kun","成手","なりて","person willing to take on a role"]]},
+{k:"老",lvl:"N3",m:"old man / old age",v:[["ロウ","on","家老","かろう","chief retainer"],["お","kun","年老","としおい","old person"]]},
+{k:"位",lvl:"N3",m:"rank / grade",v:[["イ","on","位官","いかん","rank and official position"],["くらい","kun","中位","ちゅうくらい","about medium"],["ぐらい","kun","中位","ちゅうぐらい","about medium"]]},
+{k:"初",lvl:"N3",m:"first time / beginning",v:[["ショ","on","最初","さいしょ","beginning"],["はつ","kun","初日","はつひ","New Year's Day sunrise"]]},
+{k:"利",lvl:"N3",m:"profit / advantage",v:[["リ","on","一利","いちり","one advantage"],["き","kun","金利","きんり","interest rate"]]},
+{k:"努",lvl:"N3",m:"toil / diligent",v:[["ド","on","努力","どりょく","effort"],["つと","kun","","",""]]},
+{k:"労",lvl:"N3",m:"labor / thank for",v:[["ロウ","on","過労","かろう","overwork"],["ねぎら","kun","","",""]]},
+{k:"命",lvl:"N3",m:"fate / command",v:[["メイ","on","一命","いちめい","(a) life"],["ミョウ","on","正命","しょうみょう","right livelihood"],["いのち","kun","命綱","いのちづな","lifeline"]]},
+{k:"放",lvl:"N3",m:"set free / release",v:[["ホウ","on","下放","かほう","movements for sending young people t"],["はな","kun","","",""]]},
+{k:"昔",lvl:"N3",m:"once upon a time / antiquity",v:[["セキ","on","古昔","こせき","ancient times"],["シャク","on","","",""],["むかし","kun","一昔","ひとむかし","ages"]]},
+{k:"育",lvl:"N3",m:"bring up / grow up",v:[["イク","on","化育","かいく","creation of the world"],["そだ","kun","","",""]]},
+{k:"指",lvl:"N3",m:"finger / point to",v:[["シ","on","一指","いっし","finger"],["ゆび","kun","手指","てゆび","finger"]]},
+{k:"神",lvl:"N3",m:"gods / mind",v:[["シン","on","安神","あんしん","relief"],["ジン","on","神社","じんじゃ","Shinto shrine"],["かみ","kun","神官","かみづかさ","Shinto priest"]]},
+{k:"追",lvl:"N3",m:"chase / drive away",v:[["ツイ","on","追加","ついか","addition"],["お","kun","追手","おって","pursuer"]]},
+{k:"戦",lvl:"N3",m:"war / battle",v:[["セン","on","一戦","いっせん","battle"],["いくさ","kun","戦場","いくさば","battlefield"]]},
+{k:"良",lvl:"N3",m:"good / pleasing",v:[["リョウ","on","最良","さいりょう","the best"],["よ","kun","","",""]]},
+{k:"便",lvl:"N3",m:"convenience / facility",v:[["ベン","on","大便","だいべん","feces"],["ビン","on","音便","おんびん","euphony"],["たよ","kun","便屋","たよりや","man in charge of delivering letters "]]},
+{k:"働",lvl:"N3",m:"work / (kokuji)",v:[["ドウ","on","自働","じどう","automatic"],["はたら","kun","","",""]]},
+{k:"庭",lvl:"N3",m:"courtyard / garden",v:[["テイ","on","家庭","かてい","home"],["にわ","kun","前庭","まえにわ","front garden"]]},
+{k:"息",lvl:"N3",m:"breath / respiration",v:[["ソク","on","愛息","あいそく","(your) beloved son"],["いき","kun","一息","ひといき","one breath"]]},
+{k:"流",lvl:"N3",m:"current / a sink",v:[["リュウ","on","一流","いちりゅう","first-class"],["ル","on","流民","るみん","refugees"],["なが","kun","","",""]]},
+{k:"消",lvl:"N3",m:"extinguish / blow out",v:[["ショウ","on","解消","かいしょう","cancellation"],["き","kun","消去","しょうきょ","elimination"]]},
+{k:"都",lvl:"N3",m:"metropolis / capital",v:[["ト","on","首都","しゅと","capital city"],["ツ","on","都合","つごう","circumstances"],["みやこ","kun","都人","みやこびと","residents of the capital"]]},
+{k:"商",lvl:"N3",m:"make a deal / selling",v:[["ショウ","on","画商","がしょう","picture dealer"],["あきな","kun","商屋","あきないや","merchant"]]},
+{k:"深",lvl:"N3",m:"deep / heighten",v:[["シン","on","海深","かいしん","depth of the sea"],["ふか","kun","深味","ふかみ","depth"]]},
+{k:"球",lvl:"N3",m:"ball / sphere",v:[["キュウ","on","気球","ききゅう","balloon"],["たま","kun","球際","たまぎわ","ball control"]]},
+{k:"陽",lvl:"N3",m:"sunshine / yang principle",v:[["ヨウ","on","重陽","ちょうよう","Chrysanthemum Festival (the 9th day "],["ひ","kun","夕陽","ゆうひ","evening sun"]]},
+{k:"寒",lvl:"N3",m:"cold",v:[["カン","on","悪寒","おかん","chill"],["さむ","kun","寒気","さむけ","chill"]]},
+{k:"悲",lvl:"N3",m:"grieve / sad",v:[["ヒ","on","悲運","ひうん","sad fate"],["かな","kun","","",""]]},
+{k:"期",lvl:"N3",m:"period / time",v:[["キ","on","一期","いっき","one term"],["ゴ","on","一期","いちご","one's whole life"]]},
+{k:"歯",lvl:"N3",m:"tooth / cog",v:[["シ","on","下歯","したば","lower teeth"],["よわい","kun","","",""],["は","kun","歯形","はがた","impression of the teeth"]]},
+{k:"港",lvl:"N3",m:"harbor",v:[["コウ","on","海港","かいこう","port"],["みなと","kun","港町","みなとまち","port city"]]},
+{k:"登",lvl:"N3",m:"ascend / climb up",v:[["トウ","on","登記","とうき","registry"],["ト","on","登記","とうき","registry"],["のぼ","kun","木登魚","きのぼりうお","climbing perch (esp. of genus Anabas"]]},
+{k:"亡",lvl:"N3",m:"deceased / the late",v:[["ボウ","on","死亡","しぼう","death"],["モウ","on","亡者","もうじゃ","the dead"],["な","kun","","",""]]},
+{k:"合",lvl:"N3",m:"fit / suit",v:[["ゴウ","on","会合","かいごう","meeting"],["ガッ","on","合本","がっぽん","collection in one volume"],["あ","kun","間合","まあい","interval"]]},
+{k:"予",lvl:"N3",m:"beforehand / previous",v:[["ヨ","on","不予","ふよ","indisposition"],["シャ","on","予言者","よげんしゃ","prophet"],["あらかじ","kun","","",""]]},
+{k:"反",lvl:"N3",m:"anti-",v:[["ハン","on","反間","はんかん","counterintelligence"],["ホン","on","反古","ほんご","wastepaper"],["そ","kun","相反","そうはん","inversion"]]},
+{k:"返",lvl:"N3",m:"return / answer",v:[["ヘン","on","代返","だいへん","answer a roll call for another"],["かえ","kun","見返","みかえし","endpaper (of a book)"]]},
+{k:"宿",lvl:"N3",m:"inn / lodging",v:[["シュク","on","一宿","いっしゅく","staying one night"],["やど","kun","安宿","やすやど","cheap hotel"]]},
+{k:"想",lvl:"N3",m:"concept / think",v:[["ソウ","on","回想","かいそう","recollection"],["ソ","on","回想","かいそう","recollection"],["おも","kun","","",""]]},
+{k:"感",lvl:"N3",m:"emotion / feeling",v:[["カン","on","感化","かんか","influence"]]},
+{k:"暗",lvl:"N3",m:"darkness / disappear",v:[["アン","on","暗君","あんくん","foolish ruler"],["くら","kun","真暗","まっくら","total darkness"]]},
+{k:"様",lvl:"N3",m:"esq. / way",v:[["ヨウ","on","一様","いちよう","uniform"],["ショウ","on","","",""],["さま","kun","横様","よこさま","wickedness"],["さん","kun","愛様","いとさん","daughter (of a good family)"]]},
+{k:"福",lvl:"N3",m:"blessing / fortune",v:[["フク","on","内福","ないふく","richer than it appears"]]},
+{k:"殺",lvl:"N3",m:"kill / murder",v:[["サツ","on","殺意","さつい","intent to kill"],["サイ","on","相殺","そうさい","offset"],["ころ","kun","","",""]]},
+{k:"然",lvl:"N3",m:"sort of thing / so",v:[["ゼン","on","果然","かぜん","as was expected"],["ネン","on","本然","ほんねん","natural"],["しか","kun","然然","しかじか","such and such"],["さ","kun","然然","ささ","such and such"]]},
+{k:"熱",lvl:"N3",m:"heat / temperature",v:[["ネツ","on","悪熱","おねつ","fever following a chill"],["あつ","kun","熱熱","あつあつ","piping hot"]]},
+{k:"選",lvl:"N3",m:"elect / select",v:[["セン","on","三選","さんせん","third-term election"],["えら","kun","","",""]]},
+{k:"願",lvl:"N3",m:"petition / request",v:[["ガン","on","願意","がんい","wish"],["ねが","kun","願事","ねがいごと","wish"]]},
+{k:"情",lvl:"N3",m:"feelings / emotion",v:[["ジョウ","on","下情","かじょう","condition of the common people"],["セイ","on","政情","せいじょう","political situation"],["なさ","kun","裏情","うらなさけ","inner affection"]]},
+{k:"疑",lvl:"N3",m:"doubt / distrust",v:[["ギ","on","疑心","ぎしん","doubt"],["うたが","kun","","",""]]},
+{k:"皆",lvl:"N3",m:"all / everything",v:[["カイ","on","皆勤","かいきん","perfect attendance"],["みな","kun","皆様","みなさま","everyone"],["みんな","kun","","",""]]},
+{k:"例",lvl:"N3",m:"example / custom",v:[["レイ","on","違例","いれい","unconventionality"],["たと","kun","","",""]]},
+{k:"参",lvl:"N3",m:"nonplussed / three (in documents)",v:[["サン","on","参院","さんいん","House of Councillors (upper house of"],["シン","on","新参","しんざん","newcomer"],["まじわる","kun","","",""],["みつ","kun","","",""]]},
+{k:"完",lvl:"N3",m:"perfect / completion",v:[["カン","on","完済","かんさい","full payment"]]},
+{k:"念",lvl:"N3",m:"wish / sense",v:[["ネン","on","一念","いちねん","determined purpose"]]},
+{k:"折",lvl:"N3",m:"fold / break",v:[["セツ","on","右折","うせつ","turning to the right"],["シャク","on","折伏","しゃくぶく","preaching down"],["おり","kun","折折","おりおり","occasionally"]]},
+{k:"望",lvl:"N3",m:"ambition / full moon",v:[["ボウ","on","失望","しつぼう","disappointment"],["モウ","on","所望","しょもう","desire"],["もち","kun","望月","もちづき","full moon"]]},
+{k:"束",lvl:"N3",m:"bundle / sheaf",v:[["ソク","on","収束","しゅうそく","conclusion"],["たば","kun","花束","はなたば","bunch of flowers"],["つか","kun","不束","ふつつか","inexperienced"]]},
+{k:"残",lvl:"N3",m:"remainder / leftover",v:[["ザン","on","残業","ざんぎょう","overtime (work)"],["サン","on","","",""],["のこ","kun","花残月","はなのこしづき","fourth lunar month"]]},
+{k:"求",lvl:"N3",m:"request / want",v:[["キュウ","on","求人","きゅうじん","recruiting"],["グ","on","求道","ぐどう","seeking after truth"],["もと","kun","","",""]]},
+{k:"約",lvl:"N3",m:"promise / approximately",v:[["ヤク","on","新約","しんやく","new contract"],["つづ","kun","","",""]]},
+{k:"性",lvl:"N3",m:"sex / gender",v:[["セイ","on","人性","じんせい","human nature"],["ショウ","on","本性","ほんしょう","true character"],["さが","kun","","",""]]},
+{k:"格",lvl:"N3",m:"status / rank",v:[["カク","on","家格","かかく","family status"],["コウ","on","格子","こうし","lattice"]]},
+{k:"能",lvl:"N3",m:"ability / talent",v:[["ノウ","on","官能","かんのう","the senses"],["よ","kun","","",""]]},
+{k:"術",lvl:"N3",m:"art / technique",v:[["ジュツ","on","学術","がくじゅつ","science"],["すべ","kun","為術","なすすべ","means"]]},
+{k:"晴",lvl:"N3",m:"clear up",v:[["セイ","on","晴天","せいてん","fine weather (i.e. little or no clou"],["は","kun","晴間","はれま","break (in the weather, esp. rain or "]]},
+{k:"列",lvl:"N3",m:"file / row",v:[["レツ","on","一列","いちれつ","(a) row"],["レ","on","列記","れっき","list"]]},
+{k:"式",lvl:"N3",m:"style / ceremony",v:[["シキ","on","一式","いっしき","complete set"]]},
+{k:"信",lvl:"N3",m:"faith / truth",v:[["シン","on","家信","かしん","word from home"]]},
+{k:"単",lvl:"N3",m:"simple / one",v:[["タン","on","単位","たんい","unit"],["ひとえ","kun","単物","ひとえもの","unlined kimono"]]},
+{k:"変",lvl:"N3",m:"unusual / change",v:[["ヘン","on","事変","じへん","accident"],["か","kun","変目","かわりめ","turning point"]]},
+{k:"夫",lvl:"N3",m:"husband / man",v:[["フ","on","工夫","くふう","devising (a way)"],["フウ","on","工夫","くふう","devising (a way)"],["おっと","kun","元夫","もとおっと","ex-husband"],["それ","kun","夫夫","それぞれ","each"]]},
+{k:"昨",lvl:"N3",m:"yesterday / previous",v:[["サク","on","一昨","いっさく","one previous"]]},
+{k:"法",lvl:"N3",m:"method / law",v:[["ホウ","on","合法","ごうほう","legal"],["ハッ","on","法度","はっと","law"],["のり","kun","内法","うちのり","inside measure"]]},
+{k:"晩",lvl:"N3",m:"nightfall / night",v:[["バン","on","一晩","ひとばん","one night"]]},
+{k:"猫",lvl:"N3",m:"cat",v:[["ビョウ","on","愛猫","あいびょう","pet cat"],["ねこ","kun","黒猫","くろねこ","black cat"]]},
+{k:"園",lvl:"N3",m:"park / garden",v:[["エン","on","園長","えんちょう","head of a garden"],["その","kun","園生","そのう","garden (esp. with trees)"]]},
+{k:"遠",lvl:"N3",m:"distant / far",v:[["エン","on","以遠","いえん","beyond"],["オン","on","遠国","おんごく","distant land"],["とお","kun","遠音","とおね","distant sound"]]},
+{k:"係",lvl:"N3",m:"person in charge / connection",v:[["ケイ","on","関係","かんけい","relation"],["かかり","kun","係官","かかりかん","official in charge"]]},
+{k:"取",lvl:"N3",m:"take / fetch",v:[["シュ","on","主取","しゅうどり","entering the service of a daimyo"],["とり","kun","取決","とりきめ","decision"]]},
+{k:"守",lvl:"N3",m:"guard / protect",v:[["シュ","on","家守","しゅきゅう","gecko"],["ス","on","留守","るす","absence"],["もり","kun","子守","こもり","nursemaid"],["かみ","kun","肥後守","ひごのかみ","higonokami"]]},
+{k:"幸",lvl:"N3",m:"happiness / blessing",v:[["コウ","on","幸福","こうふく","happiness"],["さち","kun","海幸","うみさち","seafood"]]},
+{k:"箱",lvl:"N3",m:"box / chest",v:[["ソウ","on","書箱","しょそう","bookcase"],["はこ","kun","箱庭","はこにわ","miniature garden"]]},
+{k:"面",lvl:"N3",m:"mask / face",v:[["メン","on","一面","いちめん","one face"],["ベン","on","","",""],["おも","kun","面持","おももち","expression"],["おもて","kun","強面","こわおもて","fierce look"]]},
+{k:"喜",lvl:"N3",m:"rejoice / take pleasure in",v:[["キ","on","喜色","きしょく","glad countenance"],["よろこ","kun","","",""]]},
+{k:"治",lvl:"N3",m:"reign / be at peace",v:[["ジ","on","自治","じち","self-government"],["チ","on","自治","じち","self-government"],["おさ","kun","治部省","おさむるつかさ","Ministry of Civil Administration (un"]]},
+{k:"笑",lvl:"N3",m:"laugh",v:[["ショウ","on","一笑","いっしょう","laugh"],["わら","kun","笑仏","わらいほとけ","smiling Buddha (statue)"]]},
+{k:"辞",lvl:"N3",m:"resign / word",v:[["ジ","on","疑辞","ぎじ","questionable word"],["や","kun","","",""]]},
+{k:"関",lvl:"N3",m:"connection / barrier",v:[["カン","on","関東","かんとう","Kanto"],["せき","kun","関取","せきとり","ranking wrestler in the makuuchi (se"],["からくり","kun","機関","からくり","mechanism"]]},
+{k:"政",lvl:"N3",m:"politics / government",v:[["セイ","on","国政","こくせい","national politics"],["ショウ","on","小政党","しょうせいとう","small political party"],["まつりごと","kun","政所","まつりごとどころ","official in charge of the administra"],["まん","kun","政所","まんどころ","official in charge of the administra"]]},
+{k:"留",lvl:"N3",m:"detain / fasten",v:[["リュウ","on","寄留","きりゅう","temporary residence"],["ル","on","留守","るす","absence"],["るうぶる","kun","","",""]]},
+{k:"険",lvl:"N3",m:"precipitous / inaccessible place",v:[["ケン","on","危険","きけん","danger"],["けわ","kun","","",""]]},
+{k:"危",lvl:"N3",m:"dangerous / fear",v:[["キ","on","安危","あんき","fate"],["あぶ","kun","危気","あぶなげ","possibility of danger"]]},
+{k:"存",lvl:"N3",m:"exist / suppose",v:[["ソン","on","残存","ざんそん","survival"],["ゾン","on","一存","いちぞん","one's own discretion (idea, responsi"],["ながら","kun","","",""]]},
+{k:"原",lvl:"N3",m:"meadow / original",v:[["ゲン","on","権原","けんげん","origin of rights"],["はら","kun","野原","のはら","field"]]},
+{k:"薬",lvl:"N3",m:"medicine / chemical",v:[["ヤク","on","医薬","いやく","medicine"],["くすり","kun","薬屋","くすりや","pharmacy"]]},
+{k:"側",lvl:"N3",m:"side / lean",v:[["ソク","on","側部","そくぶ","the side"],["かわ","kun","上側","うわかわ","upper side"],["がわ","kun","下側","したがわ","underside"]]},
+{k:"席",lvl:"N3",m:"seat / mat",v:[["セキ","on","一席","いっせき","sitting"],["むしろ","kun","竹席","たかむしろ","bamboo mat"]]},
+{k:"敗",lvl:"N3",m:"failure / defeat",v:[["ハイ","on","勝敗","しょうはい","victory or defeat"],["やぶ","kun","","",""]]},
+{k:"果",lvl:"N3",m:"fruit / reward",v:[["カ","on","果実","かじつ","fruit"],["は","kun","","",""]]},
+{k:"因",lvl:"N3",m:"cause / factor",v:[["イン","on","一因","いちいん","one cause"],["よ","kun","要因","よういん","main cause"]]},
+{k:"常",lvl:"N3",m:"usual / ordinary",v:[["ジョウ","on","家常","かじょう","family custom"],["つね","kun","常常","つねづね","always"]]},
+{k:"識",lvl:"N3",m:"discriminating / know",v:[["シキ","on","意識","いしき","consciousness"],["し","kun","意識","いしき","consciousness"]]},
+{k:"非",lvl:"N3",m:"un- / mistake",v:[["ヒ","on","非運","ひうん","bad fortune"],["あら","kun","","",""]]},
+{k:"官",lvl:"N3",m:"bureaucrat / the government",v:[["カン","on","官界","かんかい","bureaucracy"]]},
+{k:"察",lvl:"N3",m:"guess / presume",v:[["サツ","on","観察","かんさつ","observation"]]},
+{k:"愛",lvl:"N3",m:"love / affection",v:[["アイ","on","愛育","あいいく","tender nurture"],["まな","kun","愛子","まなご","beloved child"]]},
+{k:"警",lvl:"N3",m:"admonish / commandment",v:[["ケイ","on","警官","けいかん","police officer"],["いまし","kun","","",""]]},
+{k:"覚",lvl:"N3",m:"memorize / learn",v:[["カク","on","覚者","かくしゃ","enlightened person"],["おぼ","kun","覚書","おぼえがき","memo"]]},
+{k:"説",lvl:"N3",m:"opinion / theory",v:[["セツ","on","一説","いっせつ","one theory (opinion)"],["ゼイ","on","関説","かんぜい","allusion"],["と","kun","説得","せっとく","persuasion"]]},
+{k:"告",lvl:"N3",m:"revelation / tell",v:[["コク","on","原告","げんこく","plaintiff"],["つ","kun","告発","こくはつ","indictment"]]},
+{k:"種",lvl:"N3",m:"species / kind",v:[["シュ","on","育種","いくしゅ","breeding (of plants or animals)"],["たね","kun","種本","たねほん","source book"]]},
+{k:"達",lvl:"N3",m:"accomplished / reach",v:[["タツ","on","下達","かたつ","commanding a subordinate"],["ダ","on","公達","きんだち","kings"],["たち","kun","私達","わたしたち","we"]]},
+{k:"類",lvl:"N3",m:"sort / kind",v:[["ルイ","on","一類","いちるい","same kind"],["たぐ","kun","類希","たぐいまれ","unique"]]},
+{k:"報",lvl:"N3",m:"report / news",v:[["ホウ","on","会報","かいほう","bulletin (issued by a society)"],["むく","kun","","",""]]},
+{k:"等",lvl:"N3",m:"etc. / and so forth",v:[["トウ","on","一等","いっとう","first-class"],["など","kun","等等","などなど","etc."]]},
+{k:"座",lvl:"N3",m:"squat / seat",v:[["ザ","on","一座","いちざ","the whole company"],["すわ","kun","座技","すわりわざ","Aikido seated defence (defense)"]]},
+{k:"忘",lvl:"N3",m:"forget",v:[["ボウ","on","備忘","びぼう","reminder"],["わす","kun","都忘","みやこわすれ","China aster"]]},
+{k:"洗",lvl:"N3",m:"wash / inquire into",v:[["セン","on","一洗","いっせん","thoroughly wash away"],["あら","kun","手洗","てあらい","washing one's hands"]]},
+{k:"許",lvl:"N3",m:"permit / approve",v:[["キョ","on","官許","かんきょ","government permission"],["もと","kun","口許","くちもと","mouth"]]},
+{k:"静",lvl:"N3",m:"quiet",v:[["セイ","on","安静","あんせい","rest"],["ジョウ","on","静注","じょうちゅう","intravenous injection"],["しず","kun","静心","しずごころ","calm mind"]]},
+{k:"煙",lvl:"N3",m:"smoke",v:[["エン","on","煙雨","えんう","misty, fine or drizzling rain"],["けむり","kun","黒煙","くろけむり","black smoke"]]},
+{k:"加",lvl:"N3",m:"add / addition",v:[["カ","on","加行","かぎょう","the \"ka\" column of the Japanese syll"],["くわ","kun","","",""]]},
+{k:"容",lvl:"N3",m:"contain / form",v:[["ヨウ","on","受容","じゅよう","reception"],["い","kun","内容","ないよう","contents"]]},
+{k:"易",lvl:"N3",m:"easy / ready to",v:[["エキ","on","易学","えきがく","study of divination"],["イ","on","安易","あんい","easy"],["やさ","kun","","",""]]},
+{k:"財",lvl:"N3",m:"property / money",v:[["ザイ","on","家財","かざい","household belongings"],["サイ","on","最終財","さいしゅうざい","final goods"],["たから","kun","","",""]]},
+{k:"若",lvl:"N3",m:"young / if",v:[["ジャク","on","若年","じゃくねん","youth"],["ニャク","on","若道","にゃくどう","homosexuality"],["わか","kun","若者","わかもの","young man"]]},
+{k:"忙",lvl:"N3",m:"busy / occupied",v:[["ボウ","on","多忙","たぼう","being very busy"],["モウ","on","","",""],["うれえるさま","kun","","",""]]},
+{k:"徒",lvl:"N3",m:"on foot / junior",v:[["ト","on","悪徒","あくと","rascal"],["いたずら","kun","徒者","いたずらもの","mischief-maker"],["あだ","kun","徒花","あだばな","non-fruit-bearing flower"]]},
+{k:"得",lvl:"N3",m:"gain / get",v:[["トク","on","一得","いっとく","one advantage"],["え","kun","会得","えとく","understanding"]]},
+{k:"続",lvl:"N3",m:"continue / series",v:[["ゾク","on","後続","こうぞく","succeeding"],["ショク","on","","",""],["つづ","kun","手続","てつづき","procedure"]]},
+{k:"連",lvl:"N3",m:"take along / lead",v:[["レン","on","一連","いちれん","series"],["つら","kun","","",""]]},
+{k:"困",lvl:"N3",m:"quandary / become distressed",v:[["コン","on","困苦","こんく","privation"],["こま","kun","","",""]]},
+{k:"機",lvl:"N3",m:"loom / mechanism",v:[["キ","on","機化","きか","mechanization"],["はた","kun","高機","たかはた","traditional Japanese treadle-operate"]]},
+{k:"飛",lvl:"N3",m:"fly / skip (pages)",v:[["ヒ","on","飛行","ひこう","aviation"],["と","kun","突飛","とっぴ","erratic"]]},
+{k:"害",lvl:"N3",m:"harm / injury",v:[["ガイ","on","加害","かがい","assault"]]},
+{k:"余",lvl:"N3",m:"too much / myself",v:[["ヨ","on","余意","よい","implied meaning"],["あま","kun","","",""]]},
+{k:"難",lvl:"N3",m:"difficult / impossible",v:[["ナン","on","一難","いちなん","one difficulty"],["かた","kun","","",""]]},
+{k:"確",lvl:"N3",m:"assurance / firm",v:[["カク","on","確言","かくげん","assertion"],["コウ","on","小確幸","しょうかっこう","simple pleasure (in life)"],["たし","kun","","",""]]},
+{k:"在",lvl:"N3",m:"exist / outskirts",v:[["ザイ","on","近在","きんざい","neighboring villages"],["あ","kun","在米","ありまい","rice stocks"]]},
+{k:"夢",lvl:"N3",m:"dream / vision",v:[["ム","on","悪夢","あくむ","nightmare"],["ボウ","on","","",""],["ゆめ","kun","初夢","はつゆめ","first dream of the year"]]},
+{k:"産",lvl:"N3",m:"products / bear",v:[["サン","on","家産","かさん","family property"],["う","kun","産業","さんぎょう","industry"]]},
+{k:"倒",lvl:"N3",m:"overthrow / fall",v:[["トウ","on","打倒","だとう","knockdown (e.g. in boxing)"],["さかさま","kun","倒事","さかさまごと","child dying before parents"],["さかさ","kun","倒事","さかさまごと","child dying before parents"]]},
+{k:"妻",lvl:"N3",m:"wife / spouse",v:[["サイ","on","愛妻","あいさい","beloved wife"],["つま","kun","妻子","つまこ","wife and children"]]},
+{k:"議",lvl:"N3",m:"deliberation / consultation",v:[["ギ","on","一議","いちぎ","word (opinion, objection)"]]},
+{k:"犯",lvl:"N3",m:"crime / sin",v:[["ハン","on","共犯","きょうはん","complicity"],["ボン","on","重犯","じゅうぼん","felony"],["おか","kun","","",""]]},
+{k:"罪",lvl:"N3",m:"guilt / sin",v:[["ザイ","on","原罪","げんざい","original sin"],["つみ","kun","罪人","つみびと","sinner"]]},
+{k:"論",lvl:"N3",m:"argument / discourse",v:[["ロン","on","議論","ぎろん","argument"]]},
+{k:"経",lvl:"N3",m:"sutra / longitude",v:[["ケイ","on","月経","げっけい","menstruation"],["キョウ","on","五経","ごきょう","The Five Classics (of Confucianism)"],["たていと","kun","経糸","たていと","(weaving) warp"],["のり","kun","","",""]]},
+{k:"済",lvl:"N3",m:"settle (debt, etc.) / relieve (burden)",v:[["サイ","on","決済","けっさい","settlement"],["セイ","on","済世","さいせい","saving the world"],["わたし","kun","","",""]]},
+{k:"判",lvl:"N3",m:"judgement / signature",v:[["ハン","on","加判","かはん","affixing a seal"],["バン","on","合判","あいばん","medium-sized paper (approx. 15x21 cm"],["わか","kun","","",""]]},
+{k:"制",lvl:"N3",m:"system / law",v:[["セイ","on","市制","しせい","municipal organization"]]},
+{k:"務",lvl:"N3",m:"task / duties",v:[["ム","on","外務","がいむ","foreign affairs"],["つと","kun","","",""]]},
+{k:"資",lvl:"N3",m:"assets / resources",v:[["シ","on","外資","がいし","foreign capital (e.g. in a company)"]]},
+{k:"権",lvl:"N3",m:"authority / power",v:[["ケン","on","権力","けんりょく","(political) power"],["ゴン","on","権化","ごんげ","incarnation (of Buddha or bodhisattv"],["おもり","kun","","",""],["かり","kun","権殿","かりどの","temporary shrine (houses the object "]]},
+{k:"件",lvl:"N3",m:"affair / case",v:[["ケン","on","一件","いっけん","(one) matter"],["くだん","kun","","",""]]},
+{k:"断",lvl:"N3",m:"severance / decline",v:[["ダン","on","果断","かだん","decisive"],["た","kun","断金","たんぎん","(in Japan) 2nd note of the ancient c"]]},
+{k:"任",lvl:"N3",m:"responsibility / duty",v:[["ニン","on","一任","いちにん","entrusting (everything to)"],["まか","kun","","",""]]},
+{k:"責",lvl:"N3",m:"blame / condemn",v:[["セキ","on","引責","いんせき","taking responsibility"],["せ","kun","引責","いんせき","taking responsibility"]]},
+{k:"増",lvl:"N3",m:"increase / add",v:[["ゾウ","on","加増","かぞう","increase"],["ま","kun","年増","としま","mature woman"]]},
+{k:"解",lvl:"N3",m:"unravel / notes",v:[["カイ","on","解決","かいけつ","settlement"],["ゲ","on","和解","わげ","reconciliation"],["と","kun","解合","とけあい","liquidation by compromise"]]},
+{k:"際",lvl:"N3",m:"occasion / side",v:[["サイ","on","交際","こうさい","company"],["きわ","kun","一際","ひときわ","conspicuously"]]},
+{k:"認",lvl:"N3",m:"acknowledge / witness",v:[["ニン","on","公認","こうにん","official recognition"],["みと","kun","認印","みとめいん","private seal"]]},
+{k:"過",lvl:"N3",m:"overdo / exceed",v:[["カ","on","一過","いっか","passing (e.g. of a typhoon)"],["す","kun","過者","すぎもの","someone (e.g. a woman) who is out of"]]},
+{k:"寝",lvl:"N3",m:"lie down / sleep",v:[["シン","on","寝具","しんぐ","bedding"],["みたまや","kun","","",""]]},
+{k:"置",lvl:"N3",m:"placement / put",v:[["チ","on","安置","あんち","enshrinement"],["お","kun","置場","おきば","place for something"]]},
+{k:"費",lvl:"N3",m:"expense / cost",v:[["ヒ","on","会費","かいひ","membership fee"],["つい","kun","","",""]]},
+{k:"示",lvl:"N3",m:"show / indicate",v:[["ジ","on","開示","かいじ","release (e.g. information)"],["シ","on","教示","きょうし","instruction"],["しめ","kun","示偏","しめすへん","kanji \"show\" radical at left (radica"]]},
+{k:"観",lvl:"N3",m:"outlook / look",v:[["カン","on","外観","がいかん","outward appearance"],["み","kun","","",""]]},
+{k:"値",lvl:"N3",m:"price / cost",v:[["チ","on","数値","すうち","numerical value"],["ね","kun","安値","やすね","low price"],["あたい","kun","値千金","あたいせんきん","priceless"]]},
+{k:"吸",lvl:"N3",m:"suck / imbibe",v:[["キュウ","on","吸引","きゅういん","absorption"],["す","kun","吸口","すいくち","mouthpiece"]]},
+{k:"状",lvl:"N3",m:"status quo / conditions",v:[["ジョウ","on","回状","かいじょう","circular"]]},
+{k:"収",lvl:"N3",m:"income / obtain",v:[["シュウ","on","回収","かいしゅう","collection"],["おさ","kun","","",""]]},
+{k:"職",lvl:"N3",m:"post / employment",v:[["ショク","on","下職","したしょく","subcontractor"],["ソク","on","有職","ゆうそく","holding a job"]]},
+{k:"規",lvl:"N3",m:"standard / measure",v:[["キ","on","円規","えんき","pair of compasses"]]},
+{k:"割",lvl:"N3",m:"proportion / comparatively",v:[["カツ","on","正割","せいかつ","secant (trigonometric function)"],["わり","kun","一割","いちわり","ten percent"]]},
+{k:"演",lvl:"N3",m:"performance / act",v:[["エン","on","演者","えんじゃ","presenter"]]},
+{k:"師",lvl:"N3",m:"expert / teacher",v:[["シ","on","医師","いし","doctor"],["いくさ","kun","","",""]]},
+{k:"備",lvl:"N3",m:"equip / provision",v:[["ビ","on","全備","ぜんび","completeness"],["そな","kun","備付","そなえつけ","equipment"]]},
+{k:"優",lvl:"N3",m:"tenderness / excel",v:[["ユウ","on","女優","じょゆう","actress"],["ウ","on","女優","じょゆう","actress"],["やさ","kun","優女","やさおんな","gentle woman"]]},
+{k:"宅",lvl:"N3",m:"home / house",v:[["タク","on","家宅","かたく","domicile"]]},
+{k:"現",lvl:"N3",m:"present / existing",v:[["ゲン","on","現業","げんぎょう","on-site work"],["うつつ","kun","夢現","ゆめうつつ","half asleep and half awake"]]},
+{k:"呼",lvl:"N3",m:"call / call out to",v:[["コ","on","呼声","こせい","call"],["よ","kun","呼水","よびみず","pump-priming"]]},
+{k:"違",lvl:"N3",m:"difference / differ",v:[["イ","on","違心","いしん","treachery"],["ちが","kun","違棚","ちがいだな","set of staggered shelves"]]},
+{k:"差",lvl:"N3",m:"distinction / difference",v:[["サ","on","格差","かくさ","qualitative difference"],["さ","kun","格差","かくさ","qualitative difference"]]},
+{k:"供",lvl:"N3",m:"submit / offer",v:[["キョウ","on","供出","きょうしゅつ","obligatory supply (of goods to the g"],["ク","on","供物","くもつ","offering (e.g. to the gods)"],["とも","kun","供人","ともびと","companion"]]},
+{k:"限",lvl:"N3",m:"limit / restrict",v:[["ゲン","on","下限","かげん","lower limit"],["かぎ","kun","中限","なかぎり","next-month delivery"]]},
+{k:"与",lvl:"N3",m:"bestow / participate in",v:[["ヨ","on","関与","かんよ","participation"],["ともに","kun","","",""]]},
+{k:"渡",lvl:"N3",m:"transit / ford",v:[["ト","on","過渡","かと","crossing"],["わた","kun","受渡","うけわたし","delivery"]]},
+{k:"景",lvl:"N3",m:"scenery / view",v:[["ケイ","on","景気","けいき","business conditions"]]},
+{k:"抜",lvl:"N3",m:"slip out / extract",v:[["バツ","on","海抜","かいばつ","height above sea level"],["ハツ","on","","",""],["ぬ","kun","手抜","てぬき","omitting crucial steps"]]},
+{k:"候",lvl:"N3",m:"climate / season",v:[["コウ","on","気候","きこう","climate"],["そうろう","kun","候文","そうろうぶん","epistolary style (of Japanese litera"]]},
+{k:"構",lvl:"N3",m:"posture / build",v:[["コウ","on","機構","きこう","mechanism"],["かま","kun","","",""]]},
+{k:"捕",lvl:"N3",m:"catch / capture",v:[["ホ","on","捕球","ほきゅう","catch"],["と","kun","捕物","とりもの","capture"]]},
+{k:"慣",lvl:"N3",m:"accustomed / get used to",v:[["カン","on","慣行","かんこう","customary practice"],["な","kun","不慣","ふなれ","inexperienced"]]},
+{k:"満",lvl:"N3",m:"full / fullness",v:[["マン","on","円満","えんまん","harmonious"],["バン","on","","",""],["み","kun","未満","みまん","less than"]]},
+{k:"掛",lvl:"N3",m:"hang / suspend",v:[["カイ","on","買掛金","かいかけきん","accounts payable"],["ケイ","on","掛留","けいりゅう","music suspension"],["かかり","kun","掛長","かかりちょう","subsection head"]]},
+{k:"居",lvl:"N3",m:"reside / to be",v:[["キョ","on","安居","あんきょ","easy life"],["コ","on","居所","いどころ","whereabouts"],["い","kun","円居","まどい","small gathering"]]},
+{k:"突",lvl:"N3",m:"stab / protruding",v:[["トツ","on","追突","ついとつ","rear-end collision"],["カ","on","突角","とっかく","convex angle"],["つ","kun","追突","ついとつ","rear-end collision"]]},
+{k:"招",lvl:"N3",m:"beckon / invite",v:[["ショウ","on","招集","しょうしゅう","call"],["まね","kun","招木","まねき","part of a loom"]]},
+{k:"段",lvl:"N3",m:"grade / steps",v:[["ダン","on","一段","いちだん","more"],["タン","on","八段","はったん","twilled fabric"]]},
+{k:"腹",lvl:"N3",m:"abdomen / belly",v:[["フク","on","下腹","かふく","abdomen"],["はら","kun","下腹","したはら","abdomen"]]},
+{k:"痛",lvl:"N3",m:"pain / hurt",v:[["ツウ","on","苦痛","くつう","pain"],["いた","kun","痛手","いたで","serious wound"]]},
+{k:"退",lvl:"N3",m:"retreat / withdraw",v:[["タイ","on","引退","いんたい","retirement"],["しりぞ","kun","","",""]]},
+{k:"迷",lvl:"N3",m:"astray / be perplexed",v:[["メイ","on","迷信","めいしん","superstition"],["まよ","kun","","",""]]},
+{k:"訪",lvl:"N3",m:"call on / visit",v:[["ホウ","on","訪日","ほうにち","visit to Japan"],["おとず","kun","","",""]]},
+{k:"怒",lvl:"N3",m:"angry / be offended",v:[["ド","on","怒気","どき","anger"],["ヌ","on","","",""],["いか","kun","","",""]]},
+{k:"眠",lvl:"N3",m:"sleep / die",v:[["ミン","on","安眠","あんみん","sound sleep"],["ねむ","kun","眠気","ねむけ","sleepiness"]]},
+{k:"靴",lvl:"N3",m:"shoes",v:[["カ","on","半靴","ほうか","low shoes"],["くつ","kun","靴屋","くつや","shoe store"]]},
+{k:"途",lvl:"N3",m:"route / way",v:[["ト","on","一途","いっと","way"],["みち","kun","","",""]]},
+{k:"給",lvl:"N3",m:"salary / wage",v:[["キュウ","on","加給","かきゅう","raising salaries"],["たま","kun","","",""]]},
+{k:"冷",lvl:"N3",m:"cool / cold (beer, person)",v:[["レイ","on","空冷","くうれい","air cooling"],["つめ","kun","冷飯","つめためし","cold rice"]]},
+{k:"処",lvl:"N3",m:"dispose / manage",v:[["ショ","on","空処","くうしょ","blank"],["ところ","kun","一処","ひとところ","one place"]]},
+{k:"婦",lvl:"N3",m:"lady / woman",v:[["フ","on","悪婦","あくふ","wicked woman"],["よめ","kun","","",""]]},
+{k:"程",lvl:"N3",m:"extent / degree",v:[["テイ","on","音程","おんてい","interval"],["ほど","kun","程程","ほどほど","moderate"]]},
+{k:"精",lvl:"N3",m:"refined / ghost",v:[["セイ","on","出精","しゅっせい","diligence"],["ショウ","on","水精","すいしょう","(rock) crystal"],["しら","kun","","",""]]},
+{k:"絶",lvl:"N3",m:"discontinue / sever",v:[["ゼツ","on","気絶","きぜつ","faint"],["た","kun","絶対","ぜったい","definitely"]]},
+{k:"杯",lvl:"N3",m:"counter for cupfuls / wine glass",v:[["ハイ","on","苦杯","くはい","bitter experience (ordeal)"],["さかずき","kun","水杯","みずさかずき","farewell cups of water"]]},
+{k:"積",lvl:"N3",m:"volume / product (x*y)",v:[["セキ","on","求積","きゅうせき","mensuration"],["つ","kun","積立","つみたて","saving"]]},
+{k:"寄",lvl:"N3",m:"draw near / stop in",v:[["キ","on","寄金","ききん","contribution"],["よ","kun","寄合","よりあい","meeting"]]},
+{k:"娘",lvl:"N3",m:"daughter / girl",v:[["ジョウ","on","娘子","じょうし","girl"],["むすめ","kun","愛娘","まなむすめ","one's beloved daughter"],["こ","kun","娘心","むすめごころ","girlish mind"]]},
+{k:"怖",lvl:"N3",m:"dreadful / be frightened",v:[["フ","on","恐怖","きょうふ","fear"],["ホ","on","","",""],["こわ","kun","怖怖","こわごわ","fearfully"]]},
+{k:"恐",lvl:"N3",m:"fear / dread",v:[["キョウ","on","恐恐","きょうきょう","respect (epistolary usage)"],["おそ","kun","恐気","おそれげ","fear"]]},
+{k:"婚",lvl:"N3",m:"marriage",v:[["コン","on","求婚","きゅうこん","marriage proposal"]]},
+{k:"遊",lvl:"N3",m:"play",v:[["ユウ","on","回遊","かいゆう","excursion"],["ユ","on","回遊","かいゆう","excursion"],["あそ","kun","遊心","あそびごころ","playfulness"]]},
+{k:"貧",lvl:"N3",m:"poverty / poor",v:[["ヒン","on","赤貧","せきひん","extreme poverty"],["ビン","on","貧之","びんぼう","poverty-stricken"],["まず","kun","","",""]]},
+{k:"適",lvl:"N3",m:"suitable / occasional",v:[["テキ","on","好適","こうてき","ideal"],["かな","kun","","",""]]},
+{k:"押",lvl:"N3",m:"push / stop",v:[["オウ","on","押下","おうか","pressing down (button, keyboard, etc"],["お","kun","押下","おうか","pressing down (button, keyboard, etc"]]},
+{k:"更",lvl:"N3",m:"grow late / night watch",v:[["コウ","on","一更","いっこう","first watch"],["さら","kun","更地","さらち","empty lot"]]},
+{k:"浮",lvl:"N3",m:"floating / float",v:[["フ","on","浮上","ふじょう","surfacing"],["む","kun","","",""]]},
+{k:"越",lvl:"N3",m:"surpass / cross over",v:[["エツ","on","越南","えつなん","Vietnam"],["オツ","on","越年","おつねん","seeing the old year out"],["こ","kun","追越","おいこし","passing"]]},
+{k:"背",lvl:"N3",m:"stature / height",v:[["ハイ","on","違背","いはい","violation"],["せ","kun","背広","せびろ","business suit"],["せい","kun","背高","せいたか","tallness"]]},
+{k:"盗",lvl:"N3",m:"steal / rob",v:[["トウ","on","強盗","ごうとう","robber"],["ぬす","kun","盗人","ぬすびと","thief"]]},
+{k:"除",lvl:"N3",m:"exclude / division (x/3)",v:[["ジョ","on","加除","かじょ","insertion and deletion"],["ジ","on","加除","かじょ","insertion and deletion"],["のぞ","kun","","",""]]},
+{k:"幾",lvl:"N3",m:"how many / how much",v:[["キ","on","幾何","きか","geometry"],["いく","kun","幾千","いくせん","thousands"]]},
+{k:"散",lvl:"N3",m:"scatter / disperse",v:[["サン","on","解散","かいさん","breaking up (e.g. meeting)"],["ばら","kun","散積","ばらづみ","bulk"]]},
+{k:"似",lvl:"N3",m:"becoming / resemble",v:[["ジ","on","近似","きんじ","approximation"],["に","kun","空似","そらに","accidental resemblance"]]},
+{k:"富",lvl:"N3",m:"wealth / enrich",v:[["フ","on","国富","こくふ","national wealth"],["フウ","on","富強","ふうきょう","wealth and power"],["とみ","kun","富札","とみふだ","lottery ticket"]]},
+{k:"探",lvl:"N3",m:"grope / search",v:[["タン","on","探求","たんきゅう","search"],["さぐ","kun","","",""]]},
+{k:"迎",lvl:"N3",m:"welcome / meet",v:[["ゲイ","on","迎合","げいごう","ingratiation"],["むか","kun","","",""]]},
+{k:"祖",lvl:"N3",m:"ancestor / pioneer",v:[["ソ","on","遠祖","えんそ","remote ancestor"]]},
+{k:"雑",lvl:"N3",m:"miscellaneous",v:[["ザツ","on","雑音","ざつおん","noise (usu. unpleasant)"],["ゾウ","on","雑言","ぞうごん","foul language"],["まじ","kun","","",""]]},
+{k:"賛",lvl:"N3",m:"approve / praise",v:[["サン","on","賛歌","さんか","song of praise"],["たす","kun","","",""]]},
+{k:"込",lvl:"N3",m:"crowded / mixture",v:[["こ","kun","仕込","しこみ","training"]]},
+{k:"欲",lvl:"N3",m:"longing / covetousness",v:[["ヨク","on","強欲","ごうよく","greedy"],["ほっ","kun","","",""]]},
+{k:"閉",lvl:"N3",m:"closed / shut",v:[["ヘイ","on","開閉","かいへい","opening and shutting"],["と","kun","","",""]]},
+{k:"窓",lvl:"N3",m:"window / pane",v:[["ソウ","on","車窓","しゃそう","train window"],["ス","on","","",""],["まど","kun","円窓","まるまど","circular window"],["てんまど","kun","天窓","てんまど","skylight"]]},
+{k:"否",lvl:"N3",m:"negate / no",v:[["ヒ","on","合否","ごうひ","success or failure"],["いな","kun","","",""],["いや","kun","否否","いやいや","no!"]]},
+{k:"暮",lvl:"N3",m:"evening / twilight",v:[["ボ","on","歳暮","せいぼ","year-end gift"],["く","kun","暮色","ぼしょく","dusk"]]},
+{k:"誤",lvl:"N3",m:"mistake / err",v:[["ゴ","on","過誤","かご","mistake"],["あやま","kun","","",""]]},
+{k:"降",lvl:"N3",m:"descend / precipitate",v:[["コウ","on","以降","いこう","on and after"],["ゴ","on","来降","らいごう","advent"],["お","kun","","",""]]},
+{k:"勤",lvl:"N3",m:"diligence / become employed",v:[["キン","on","過勤","かきん","overtime work"],["ゴン","on","勤求","ごんぐ","inquiring the Buddha way"],["つと","kun","","",""]]},
+{k:"刻",lvl:"N3",m:"engrave / cut fine",v:[["コク","on","一刻","いっこく","a minute"],["きざ","kun","刻足","きざみあし","mincing steps"]]},
+{k:"遅",lvl:"N3",m:"slow / late",v:[["チ","on","遅速","ちそく","speed"],["おく","kun","","",""]]},
+{k:"破",lvl:"N3",m:"rend / rip",v:[["ハ","on","破目","はめ","panel"],["やぶ","kun","","",""]]},
+{k:"互",lvl:"N3",m:"mutually / reciprocally",v:[["ゴ","on","互格","ごかく","equal (in ability)"],["たが","kun","互先","たがいせん","even game (esp. in go)"]]},
+{k:"彼",lvl:"N3",m:"he / that",v:[["ヒ","on","彼岸","ひがん","equinoctial week (when Buddhist serv"],["かれ","kun","元彼","もとかれ","former boyfriend"],["かの","kun","彼女","かのじょ","she"]]},
+{k:"恥",lvl:"N3",m:"shame / dishonor",v:[["チ","on","恥部","ちぶ","private parts"],["はじ","kun","赤恥","あかはじ","shame"]]},
+{k:"払",lvl:"N3",m:"pay / clear out",v:[["フツ","on","","",""],["ヒツ","on","","",""],["はら","kun","未払","みはらい","unpaid"]]},
+{k:"舞",lvl:"N3",m:"dance / flit",v:[["ブ","on","円舞","えんぶ","waltz"],["まい","kun","舞子","まいこ","maiko"]]},
+{k:"頼",lvl:"N3",m:"trust / request",v:[["ライ","on","家頼","けらい","retainer"],["たの","kun","頼母子","たのもし","mutual financing association"]]},
+{k:"戻",lvl:"N3",m:"re- / return",v:[["レイ","on","背戻","はいれい","disobeying"],["もど","kun","払戻","はらいもどし","repayment"]]},
+{k:"抱",lvl:"N3",m:"embrace / hug",v:[["ホウ","on","合抱","ごうほう","armful"],["だ","kun","抱身","だきみ","breast meat (poultry, esp. duck)"]]},
+{k:"緒",lvl:"N3",m:"thong / beginning",v:[["ショ","on","一緒","いっしょ","together"],["チョ","on","緒戦","ちょせん","beginning of hostilities"],["お","kun","下緒","さげお","cord for attaching a sword scabbard "],["いとぐち","kun","","",""]]},
+{k:"逃",lvl:"N3",m:"escape / flee",v:[["トウ","on","逃走","とうそう","flight"],["に","kun","逃道","にげみち","way out"]]},
+{k:"御",lvl:"N3",m:"honorable / manipulate",v:[["ギョ","on","下御","げぎょ","dismounting"],["ゴ","on","御所","ごしょ","imperial palace (esp. Kyoto Imperial"],["おん","kun","御社","おんしゃ","your company"]]},
+{k:"吹",lvl:"N3",m:"blow / breathe",v:[["スイ","on","吹部","すいぶ","concert band (at a school)"],["ふ","kun","吹雪","ふぶき","snow storm"]]},
+{k:"到",lvl:"N3",m:"arrival / proceed",v:[["トウ","on","殺到","さっとう","rush"],["いた","kun","","",""]]},
+{k:"髪",lvl:"N3",m:"hair of the head",v:[["ハツ","on","束髪","そくはつ","hairstyle introduced in the Meiji er"],["かみ","kun","髪置","かみおき","ceremony of allowing the hair to gro"]]},
+{k:"疲",lvl:"N3",m:"exhausted / tire",v:[["ヒ","on","疲労","ひろう","fatigue"],["つか","kun","","",""]]},
+{k:"歳",lvl:"N3",m:"year-end / age",v:[["サイ","on","歳月","さいげつ","time"],["セイ","on","歳暮","せいぼ","year-end gift"],["とし","kun","歳月","としつき","time"],["とせ","kun","千歳","ちとせ","millennium"]]},
+{k:"偶",lvl:"N3",m:"accidentally / even number",v:[["グウ","on","偶因","ぐういん","contingent cause"],["たま","kun","偶偶","たまたま","occasionally"]]},
+{k:"偉",lvl:"N3",m:"admirable / greatness",v:[["イ","on","偉観","いかん","magnificent sight"],["えら","kun","偉物","えらぶつ","talented person"]]},
+{k:"頂",lvl:"N3",m:"place on the head / receive",v:[["チョウ","on","円頂","えんちょう","dome"],["いただき","kun","","",""]]},
+];
+
+// reading-direction state: 'fwd' = kanji→reading, 'rev' = reading→kanji
+let quizDir='fwd';
+
+const TIER_WEIGHTS={
+  easy:   {easy:1.0},
+  normal: {easy:0.30, normal:0.70},
+  hard:   {easy:0.15, normal:0.25, hard:0.60},
+  extreme:{easy:0.05, normal:0.15, hard:0.30, extreme:0.50},
+};
+
+function buildWeightedPool(diffKey){
+  const sel=levelSel;
+  let src=KANJI.filter(k=> sel==='all' || k.lvl===sel);
+  if(!src.length) src=KANJI.slice();
+  // Pre-compute reading pools (for forward distractors) and kanji pools (reverse) per level scope
+  const allReadings=[]; const allKanji=[];
+  src.forEach(k=>{ allKanji.push(k.k); k.v.forEach(v=>allReadings.push(v[0])); });
+  function pick3(arr, exclude){
+    const out=[]; const seen=new Set(exclude);
+    let guard=0;
+    while(out.length<3 && guard<400){
+      const c=arr[(Math.random()*arr.length)|0];
+      if(!seen.has(c)){ seen.add(c); out.push(c); }
+      guard++;
+    }
+    while(out.length<3) out.push(arr[(Math.random()*arr.length)|0]);
+    return out;
+  }
+  const items = shuffle(src.slice()).map(k=>{
+    // choose a random reading variant for this kanji
+    const variant = k.v[(Math.random()*k.v.length)|0];
+    const reading = variant[0];
+    const ex = variant[2] ? {w:variant[2], r:variant[3], g:variant[4]} : null;
+    // direction for this question
+    let dir = quizDir;
+    if(dir==='mix') dir = Math.random()<0.5 ? 'fwd':'rev';
+    if(dir==='rev'){
+      // reading→kanji: prompt is the reading, options are kanji
+      const allValidReadings = k.v.map(v=>v[0]);
+      const distract = pick3(allKanji, [k.k]);
+      return {dir:'rev', prompt:reading, ans:k.k, opts:[k.k,...distract],
+              meaning:k.m, ex, lvl:k.lvl, kanji:k.k, reading};
+    } else {
+      // kanji→reading: prompt is the kanji, options are readings
+      const ownReadings = new Set(k.v.map(v=>v[0]));
+      const distract = pick3(allReadings.filter(r=>!ownReadings.has(r)), Array.from(ownReadings));
+      return {dir:'fwd', prompt:k.k, ans:reading, opts:[reading,...distract],
+              meaning:k.m, ex, lvl:k.lvl, kanji:k.k, reading};
+    }
+  });
+  return items;
+}
+
+/* ════ Phonics-aware blanking ════ */
+const VOWELS='AEIOU';
+const CALT={B:'PDT',C:'KGS',D:'BTF',F:'TPV',G:'CKJ',H:'KNT',J:'GYZ',K:'CGT',L:'RNM',M:'NBP',N:'MLR',P:'BDT',R:'LWN',S:'CTF',T:'DBP',V:'BFW',W:'VBM',X:'ZSK',Y:'JEW',Z:'SXF'};
+
+function applyPhonics(q){
+  // If the question has a phonics spec, use it
+  if(q.phonics){
+    const p=q.phonics;
+    return{...q,blankIdx:p.blankIdx,blankLen:p.blankLen,ans:p.ans,opts:shuffle(p.opts.slice())};
+  }
+  // Otherwise fall back to old hardify logic (blank interior vowel or last consonant)
+  const w=q.word.toUpperCase().split('');
+  const vi=w.map((l,i)=>({l,i})).filter(({l,i})=>i>0&&VOWELS.includes(l));
+  if(vi.length){
+    const pick=vi[(Math.random()*vi.length)|0];const ans=pick.l;
+    const others=VOWELS.split('').filter(v=>v!==ans);
+    return{...q,blankIdx:pick.i,blankLen:1,ans,opts:shuffle([ans,...others.slice(0,3)])};
+  }
+  const idx=w.length-1,ans=w[idx];const alts=(CALT[ans]||'BCT').split('').slice(0,3);
+  return{...q,blankIdx:idx,blankLen:1,ans,opts:shuffle([ans,...alts])};
+}
+
+/* ════ Word display: handles blankLen 1 or 2, optional display override ════ */
+function makeWordDisplay(word,blankIdx,blankLen,displayWord){
+  blankLen=blankLen||1;
+  const w=(displayWord||word).toUpperCase();
+  // If displayWord has spaces, we need to map blankIdx from word (no spaces) to displayWord (with spaces)
+  // by counting non-space chars to find the right position
+  let adjIdx=blankIdx;
+  if(displayWord&&displayWord.includes(' ')){
+    let nonSpace=0;
+    for(let i=0;i<displayWord.length;i++){
+      if(displayWord[i]!==' '){
+        if(nonSpace===blankIdx){adjIdx=i;break;}
+        nonSpace++;
+      }
+    }
+  }
+  const pre=w.slice(0,adjIdx),post=w.slice(adjIdx+blankLen);
+  const blankStr='_'.repeat(blankLen);
+  return (pre?`<span style="opacity:.55">${pre}</span>`:'')+
+    `<span class="blank">${blankStr}</span>`+
+    (post?`<span style="opacity:.55">${post}</span>`:'');
+}
+
+/* ════ Image priority: external img → emoji → nothing ════ */
+function setQuestionMedia(q){
+  const wrap=document.getElementById('q-media');
+  wrap.innerHTML='';
+  if(q.emoji) wrap.textContent=q.emoji; else wrap.textContent='';
+  if(q.img){
+    const img=document.createElement('img');
+    img.onload=function(){wrap.textContent='';wrap.appendChild(img);};
+    img.src='images/'+q.img;
+  }
+}
+
+/* ════ Starfield — matching writing.html ════ */
+(function(){
+  const sf=document.getElementById('starfield');
+  const glyphs=['✦','✧','⋆','✴','★','✸','·','✦','✧'];
+  const colors=['#f0d060','#c9a030','#d9c9a8','#f0d060','#c8a0e0','#f8f0c0'];
+  for(let i=0;i<70;i++){
+    const s=document.createElement('span');
+    const sz=(Math.random()*1.2+0.5).toFixed(2);
+    s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+    s.style.cssText=`top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;--delay:-${Math.random()*7}s;--sz:${sz}rem;--col:${colors[Math.floor(Math.random()*colors.length)]};`;
+    sf.appendChild(s);
+  }
+})();
+
+/* ════ Router ════ */
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+/* ════ Audio ════ */
+let actx=null,musicGain=null,sfxGain=null,buf=null,srcNode=null,decoded=false,audioStarted=false;
+let musicVol=0.25,sfxVol=1.0,voiceVol=1.0,musicMuted=false,sfxMuted=false,voiceMuted=false;
+let autoSpeakEnabled=true;
+const bgm=document.getElementById('bgm'); bgm.volume=0.25;
+function ctx(){
+  if(!actx){try{
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    musicGain=actx.createGain(); musicGain.gain.value=musicVol; musicGain.connect(actx.destination);
+    sfxGain=actx.createGain();   sfxGain.gain.value=sfxVol;    sfxGain.connect(actx.destination);
+  }catch(e){}}return actx;
+}
+function setMusicVol(v){
+  musicVol=v;
+  try{bgm.volume=v;}catch(e){}
+  if(musicGain)musicGain.gain.value=musicMuted?0:v;
+  // sync slider if called from game toggle
+  const sl=document.getElementById('bgm-slider');if(sl)sl.value=v;
+}
+function setSfxVol(v){
+  sfxVol=v;
+  if(sfxGain)sfxGain.gain.value=sfxMuted?0:v;
+  const sl=document.getElementById('sfx-slider');if(sl)sl.value=v;
+}
+function setVoiceVol(v){voiceVol=v;}
+function setVol(v){setMusicVol(v);setSfxVol(v);}
+
+/* ── Title-screen audio panel ── */
+function toggleAudioPanel(){
+  const body=document.getElementById('audio-settings-body');
+  const chev=document.getElementById('audio-chevron');
+  const open=body.classList.toggle('open');
+  chev.classList.toggle('open',open);
+}
+function toggleMusicMuteSettings(){
+  musicMuted=!musicMuted;
+  if(musicGain)musicGain.gain.value=musicMuted?0:musicVol;
+  try{bgm.muted=musicMuted;}catch(e){}
+  const btn=document.getElementById('bgm-toggle-btn');
+  if(btn){btn.textContent=musicMuted?'🔇':'🎵';btn.classList.toggle('off',musicMuted);}
+  syncGameBgmBtn();
+}
+function toggleSfxMuteSettings(){
+  sfxMuted=!sfxMuted;
+  if(sfxGain)sfxGain.gain.value=sfxMuted?0:sfxVol;
+  const btn=document.getElementById('sfx-toggle-btn');
+  if(btn){btn.textContent=sfxMuted?'🔕':'🔔';btn.classList.toggle('off',sfxMuted);}
+}
+function toggleVoiceMuteSettings(){
+  voiceMuted=!voiceMuted;
+  // also hides the 🔊 button during gameplay when voice is off
+  updateWordAudioBtnVisibility();
+  const btn=document.getElementById('voice-toggle-btn');
+  if(btn){btn.textContent=voiceMuted?'🔇':'🔊';btn.classList.toggle('off',voiceMuted);}
+}
+function toggleAutoSpeak(){
+  autoSpeakEnabled=!autoSpeakEnabled;
+  const btn=document.getElementById('autospeak-toggle-btn');
+  if(btn){btn.textContent=autoSpeakEnabled?'ON':'OFF';btn.classList.toggle('off',!autoSpeakEnabled);}
+  syncGameSpeakBtn();
+}
+function updateWordAudioBtnVisibility(){
+  const btn=document.getElementById('word-audio-btn');
+  if(btn)btn.classList.toggle('hidden',voiceMuted);
+}
+
+/* ── In-game corner toggles ── */
+function syncGameBgmBtn(){
+  const btn=document.getElementById('game-bgm-btn');
+  if(btn)btn.classList.toggle('off',musicMuted);
+}
+function syncGameSpeakBtn(){
+  const btn=document.getElementById('game-speak-btn');
+  if(btn)btn.classList.toggle('off',!autoSpeakEnabled);
+}
+function toggleGameBgm(){
+  toggleMusicMuteSettings();
+  // brief visual feedback
+  const btn=document.getElementById('game-bgm-btn');
+  if(btn){btn.style.transform='scale(.88)';setTimeout(()=>btn.style.transform='',150);}
+}
+function toggleGameSpeak(){
+  toggleAutoSpeak();
+  const btn=document.getElementById('game-speak-btn');
+  if(btn){btn.style.transform='scale(.88)';setTimeout(()=>btn.style.transform='',150);}
+}
+
+/* ── Legacy HUD mute (still used by mute-btn in HUD) ── */
+function toggleMute(){
+  musicMuted=!musicMuted;sfxMuted=musicMuted;
+  document.getElementById('mute-btn').textContent=musicMuted?'🔇':'🔊';
+  if(musicGain)musicGain.gain.value=musicMuted?0:musicVol;
+  if(sfxGain)sfxGain.gain.value=sfxMuted?0:sfxVol;
+  try{bgm.muted=musicMuted;}catch(e){}
+  syncGameBgmBtn();
+  const b=document.getElementById('bgm-toggle-btn');
+  if(b){b.textContent=musicMuted?'🔇':'🎵';b.classList.toggle('off',musicMuted);}
+}
+function toggleMusicMute(){toggleMusicMuteSettings();}
+function toggleSfxMute(){toggleSfxMuteSettings();}
+
+document.addEventListener('pointerdown',function ul(){ctx();if(actx&&actx.state==='suspended')actx.resume();document.removeEventListener('pointerdown',ul);},{once:true});
+async function preloadAudio(){try{const r=await fetch('Lumi_Battle.mp3');if(!r.ok)throw 0;const ab=await r.arrayBuffer();buf=await ctx().decodeAudioData(ab);decoded=true;}catch(e){decoded=false;}}
+function unlockAudio(){const c=ctx();if(c&&c.state==='suspended')c.resume();try{bgm.volume=musicVol;bgm.play().then(()=>bgm.pause()).catch(()=>{});}catch(e){}}
+function startMusic(){if(audioStarted)return;audioStarted=true;const c=ctx();if(!c)return;if(decoded){try{srcNode=c.createBufferSource();srcNode.buffer=buf;srcNode.loop=true;srcNode.loopStart=0;srcNode.loopEnd=LOOP_END;srcNode.connect(musicGain||c.destination);srcNode.start();return;}catch(e){}}try{bgm.currentTime=0;bgm.loop=true;bgm.muted=musicMuted;bgm.volume=musicVol;bgm.play().catch(()=>{});}catch(e){}}
+function stopMusic(){try{srcNode&&srcNode.stop();}catch(e){}srcNode=null;try{bgm.pause();}catch(e){}audioStarted=false;}
+function tone(f,type,dur,vol,delay=0,f2=null){try{const c=ctx();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(sfxGain||c.destination);o.type=type;o.frequency.setValueAtTime(f,c.currentTime+delay);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+delay+dur);g.gain.setValueAtTime(0,c.currentTime+delay);g.gain.linearRampToValueAtTime(vol,c.currentTime+delay+.012);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+dur);o.start(c.currentTime+delay);o.stop(c.currentTime+delay+dur+.05);}catch(e){}}
+const sfxTap=()=>tone(520,'sine',.06,.18);
+const sfxPerfect=()=>{tone(880,'sine',.1,.3);tone(1320,'sine',.12,.26,.06);tone(1760,'sine',.12,.2,.12);};
+const sfxGood=()=>{tone(660,'sine',.1,.25);tone(990,'sine',.1,.18,.05);};
+const sfxLate=()=>tone(500,'sine',.12,.2);
+const sfxWrong=()=>{tone(300,'sawtooth',.2,.28,0,150);tone(150,'triangle',.32,.22,.1);};
+const sfxMiss=()=>tone(200,'triangle',.18,.22,0,120);
+
+// ── Voice clips (play if files exist in audio/ folder, silently skip if not) ──
+const VOICES={};
+const VOICE_LOADED={};
+['audio/lumi_ready.mp3','audio/lumi_go.mp3'].forEach(url=>{
+  const a=new Audio(url); a.preload='auto';
+  VOICE_LOADED[url]=false;
+  a.addEventListener('canplaythrough',()=>{VOICE_LOADED[url]=true;},{once:true});
+  a.addEventListener('error',()=>{VOICE_LOADED[url]=false;},{once:true});
+  VOICES[url]=a;
+});
+function playVoice(url){
+  if(voiceMuted)return;
+  try{const a=VOICES[url];if(!a)return;a.volume=voiceVol;a.currentTime=0;a.play().catch(()=>{});}catch(e){}
+}
+function hasVoice(url){return VOICE_LOADED[url]===true;}
+
+// ── Word audio: TTS via Web Speech API ──
+let speechUtter=null;
+function speakWord(){
+  if(voiceMuted)return;
+  if(!cur)return;
+  const word=cur.reading||cur.ans;
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const btn=document.getElementById('word-audio-btn');
+  speechUtter=new SpeechSynthesisUtterance(word);
+  speechUtter.lang='ja-JP';speechUtter.rate=0.9;speechUtter.pitch=1;
+  speechUtter.volume=voiceVol;
+  speechUtter.onstart=()=>{if(btn)btn.classList.add('speaking');};
+  speechUtter.onend=speechUtter.onerror=()=>{if(btn)btn.classList.remove('speaking');};
+  window.speechSynthesis.speak(speechUtter);
+}
+function autoSpeakWord(){if(autoSpeakEnabled&&!voiceMuted)speakWord();}
+function showExample(){
+  const el=document.getElementById('example-flash'); if(!el||!cur)return;
+  if(cur.ex && cur.ex.w){
+    el.innerHTML='<span class="ex-word">'+cur.ex.w+'</span><span class="ex-read">'+cur.ex.r+'</span>'+
+                 (cur.ex.g?'<span class="ex-gloss">'+cur.ex.g+'</span>':'');
+  } else {
+    // no compound: just reinforce the kanji + reading
+    el.innerHTML='<span class="ex-word">'+cur.kanji+'</span><span class="ex-read">'+cur.reading+'</span>';
+  }
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+
+const sfxCombo5=()=>{[660,880,1100].forEach((f,i)=>tone(f,'sine',.16,.32,i*.08));};
+const sfxCombo10=()=>{[660,880,1100,1320].forEach((f,i)=>tone(f,'sine',.18,.36,i*.07));setTimeout(()=>tone(1320,'sine',.38,.3),320);};
+const sfxCombo20=()=>{[440,550,660,880,1100,1320,1760].forEach((f,i)=>tone(f,'triangle',.18,.34,i*.055));};
+const sfxComboMax=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,'square',.22,.3,i*.09));setTimeout(()=>tone(1047,'square',.55,.25),380);};
+function flashTimeBonus(){
+  const el=document.getElementById('time-bonus-flash');
+  if(!el)return;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),900);
+}
+function flashComboMilestone(txt,col){
+  const el=document.getElementById('combo-flash');
+  el.textContent=txt;el.style.color=col;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+}
+function screenPulse(color){
+  const o=document.createElement('div');
+  o.style.cssText=`position:fixed;inset:0;background:${color};z-index:10;pointer-events:none;animation:pulseFade .55s ease-out forwards;`;
+  document.body.appendChild(o);
+  setTimeout(()=>o.remove(),600);
+}
+function addTime(sec){clockStart=Math.min(clockStart+sec*1000,performance.now());flashTimeBonus();}
+function checkComboMilestone(combo){
+  const xt=diffKey==='extreme';
+  if(combo===5)     {sfxCombo5();   flashComboMilestone('5 COMBO! ✨','#f0d060');                                          addGauge(3);}
+  else if(combo===10){sfxCombo10(); flashComboMilestone('10 COMBO! 💜','#c8a0e0');screenPulse('rgba(104,64,160,.35)');     addGauge(6); if(xt)addTime(0.5);}
+  else if(combo===20){sfxCombo20(); flashComboMilestone('20 COMBO! 🔥','#ff8c00');screenPulse('rgba(200,80,0,.3)');        addGauge(10);if(xt)addTime(0.5);}
+  else if(combo>=30&&combo%10===0){sfxComboMax();flashComboMilestone('MAX POWER! 👑','#f0d060');screenPulse('rgba(200,160,0,.35)');addGauge(6);if(xt)addTime(0.5);}
+}
+const sfxFanfare=(s)=>{if(s===3){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.25,.28),i*120));setTimeout(()=>tone(1047,'sine',.5,.28),480);}else if(s===2){[440,554,659].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.22,.25),i*110));}else{tone(330,'sine',.15,.18);setTimeout(()=>tone(294,'sine',.2,.18),150);}};
+
+/* ════ Scenario card — first line removed per user request ════ */
+const STORY=[
+  {en:"I'm Lumi! Before I let you save my world, I need to know you're ready. 💜",jp:"わたしはルミ！助けてもらう前に、まず実力を見せてもらわないとね！💜"},
+  {en:"I'll send my magic spells your way — answer each one to deflect it!",jp:"わたしの魔法をどんどん飛ばすよ！ちゃんとこたえて、はじき返してね！"},
+  {en:"Answer FAST — the quicker you tap, the more power you earn! ⚡",jp:"はやく答えてね！タップがはやいほど、もらえる力が大きくなるよ！⚡"},
+  {en:"Fill the Battle Gauge and prove yourself worthy. I'm rooting for you! 🌟",jp:"バトルゲージをいっぱいにして、本物の勇者さんだって証明して！応援してるよ！🌟"},
+];
+let scIdx=0,scDone=false;
+function initScenario(){scIdx=0;scDone=false;renderScenario();}
+function renderScenario(){const d=STORY[scIdx];document.getElementById('sc-en').textContent=d.en;document.getElementById('sc-jp').textContent=d.jp;const hint=document.getElementById('sc-hint');hint.innerHTML='<span class="sc-hint-tap">TAP!</span><span class="sc-hint-arr">➡️</span>';hint.className='sc-hint blink';}
+function advanceScenario(){sfxTap();if(scDone){scIdx=0;scDone=false;renderScenario();return;}scIdx++;if(scIdx>=STORY.length){scIdx=STORY.length-1;scDone=true;const hint=document.getElementById('sc-hint');hint.innerHTML='🔄';hint.className='sc-hint';}else renderScenario();}
+initScenario();
+
+/* ════ Mode toggle (ふつう ↔ Mini Quest) ════ */
+let miniQuestMode=false;
+const MINI_QUEST_COUNT=10;
+function toggleMode(){
+  miniQuestMode=!miniQuestMode;
+  const track=document.getElementById('mode-toggle-track');
+  const labelN=document.getElementById('mode-label-normal');
+  const labelM=document.getElementById('mode-label-mini');
+  const badge=document.getElementById('mode-badge');
+  track.classList.toggle('on',miniQuestMode);
+  labelN.classList.toggle('active',!miniQuestMode);
+  labelM.classList.toggle('active',miniQuestMode);
+  badge.style.opacity=miniQuestMode?'1':'0.45';
+  sfxTap();
+}
+
+/* ════ Diff select ════ */
+let levelSel='all';
+function selLevel(l){levelSel=l;document.querySelectorAll('.lvl-card').forEach(c=>c.classList.toggle('sel',c.dataset.lvl===l));try{sfxTap();}catch(e){}}
+function selDir(d){quizDir=d;document.querySelectorAll('.dir-card').forEach(c=>c.classList.toggle('sel',c.dataset.dir===d));try{sfxTap();}catch(e){}}
+let diffKey='normal';
+function selDiff(d){
+  diffKey=d;
+  document.querySelectorAll('.diff-card').forEach(b=>b.classList.toggle('sel',b.dataset.diff===d));
+  // Difficulty-select chime — soft rising triangle (740→1108 Hz); distinct from every other SFX
+  tone(740,'triangle',.07,.26);tone(1108,'triangle',.11,.22,.07);
+}
+
+/* ════ Game state ════ */
+let cfg,gauge=0,score=0,combo=0,maxCombo=0,qTotal=0,qRight=0,perfects=0,misses=0;
+let playing=false,accepting=false,locked=false;
+let clockStart=0,songTime=0,rafId=null;
+let pool=[],cur=null,qStart=0,qDeadline=0,lastBeat=-1;
+
+/* ════ Start ════ */
+function startGame(){
+  cfg=DIFF[diffKey];ctx();if(actx&&actx.state==='suspended')actx.resume();preloadAudio();
+  gauge=0;score=0;combo=0;maxCombo=0;qTotal=0;qRight=0;perfects=0;misses=0;
+  playing=false;accepting=false;locked=false;lastBeat=-1;
+  // Build weighted tier pool; blend questions added separately for Hard/Extreme
+  pool=buildWeightedPool(diffKey);
+  updateGauge();document.getElementById('hud-combo').textContent='';
+  document.getElementById('cracks').style.opacity='0.9';
+  // Mini Quest HUD: show word counter, hide timer
+  const timerEl=document.getElementById('hud-timer');
+  const wcountEl=document.getElementById('hud-wcount');
+  if(miniQuestMode){
+    timerEl.style.display='none';
+    wcountEl.style.display='';
+    wcountEl.textContent='1 / '+MINI_QUEST_COUNT;
+  }else{
+    timerEl.style.display='';
+    wcountEl.style.display='none';
+    timerEl.textContent=Math.floor(cfg.time/60)+':'+String(cfg.time%60).padStart(2,'0');
+  }
+  showScreen('screen-play');
+  // Sync in-game toggles with current settings
+  syncGameBgmBtn();syncGameSpeakBtn();updateWordAudioBtnVisibility();
+  unlockAudio();
+  const go=document.getElementById('go-overlay'),gt=document.getElementById('go-text'),gi=document.getElementById('go-instruction');
+  // Phase 1: instruction flash — clear any stale text first
+  gt.textContent='';gt.className='go-text';gt.style.opacity='';
+  const instrHTML=(quizDir==='rev')
+    ?'👆 Tap the KANJI!<span class="jp">漢字をタップ！</span>'
+    :(quizDir==='mix')
+    ?'👆 Read it &amp; tap!<span class="jp">よんでタップ！</span>'
+    :'👆 Tap the READING!<span class="jp">よみ方をタップ！</span>';
+  gi.innerHTML=instrHTML;gi.classList.add('show');
+  go.style.display='flex';
+  tone(523,'sine',.18,.08);
+  // Phase 2: READY? (+500ms longer = 2000ms total instruction)
+  setTimeout(()=>{
+    gi.classList.remove('show');
+    setTimeout(()=>{
+      gt.textContent='READY?';gt.className='go-text pop';void gt.offsetWidth;gt.classList.add('pop');
+      if(!hasVoice('audio/lumi_ready.mp3')){tone(660,'square',.12,.13);tone(990,'square',.2,.13,.12);}playVoice('audio/lumi_ready.mp3');
+      // Phase 3: GO!
+      setTimeout(()=>{
+        gt.textContent='GO! ✨';gt.classList.remove('pop');void gt.offsetWidth;gt.classList.add('pop');
+        if(!hasVoice('audio/lumi_go.mp3')){tone(660,'square',.12,.13);tone(990,'square',.2,.13,.12);}playVoice('audio/lumi_go.mp3');
+        // Launch
+        setTimeout(()=>{go.style.display='none';launchPlay();},1000);
+      },1100);
+    },500);
+  },2000);
+}
+function launchPlay(){playing=true;clockStart=performance.now();startMusic();nextQuestion(cfg.lead);loopGame();}
+function confirmReset(){document.getElementById('reset-modal').classList.add('show');}
+function hideResetModal(){document.getElementById('reset-modal').classList.remove('show');}
+function doReset(){document.getElementById('reset-modal').classList.remove('show');playing=false;accepting=false;cancelAnimationFrame(rafId);stopMusic();goTitle();}
+function goTitle(){stopMusic();showScreen('screen-title');}
+
+/* ════ Loop ════ */
+function loopGame(){
+  if(!playing)return;
+  songTime=(performance.now()-clockStart)/1000;
+  if(!miniQuestMode){
+    const remain=Math.max(0,cfg.time-songTime);
+    document.getElementById('hud-timer').textContent=Math.floor(remain/60)+':'+String(Math.floor(remain%60)).padStart(2,'0');
+    document.getElementById('hud-timer').classList.toggle('low',remain<=15);
+  }
+  const b=Math.floor((songTime-FIRST_BEAT)/BEAT);
+  if(b!==lastBeat){lastBeat=b;pulseBeat();}
+  if(cur&&accepting){
+    const prog=(songTime-qStart)/(qDeadline-qStart);
+    const scale=Math.max(1,2.6-1.6*Math.min(prog,1));
+    const ar=document.getElementById('approach-ring');
+    ar.style.transform=`scale(${scale.toFixed(3)})`;
+    ar.style.opacity=(0.35+0.65*Math.min(prog,1)).toFixed(2);
+    if(prog>=1.05)timeoutMiss();
+  }
+  if(gauge>=WIN_GAUGE){endGame(true);return;}
+  if(!miniQuestMode&&songTime>=cfg.time){endGame(false);return;}
+  rafId=requestAnimationFrame(loopGame);
+}
+function pulseBeat(){const t=document.getElementById('target-ring');t.classList.remove('beat');void t.offsetWidth;t.classList.add('beat');const f=document.getElementById('beatflash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+
+/* ════ Questions ════ */
+function snapBeat(t){return FIRST_BEAT+Math.ceil((t-FIRST_BEAT)/BEAT)*BEAT;}
+function nextQuestion(leadBeats){
+  if(!playing)return;
+  if(pool.length===0) pool=buildWeightedPool(diffKey);
+  let q=pool.pop();
+  cur=q;
+  // Use fresh clock — not stale RAF songTime — so window is always truly in the future
+  const realNow=(performance.now()-clockStart)/1000;
+  qStart=Math.max(snapBeat(realNow+0.05),realNow+0.18);
+  qDeadline=qStart+(cfg.Wbeats+(leadBeats||0))*BEAT;
+  setQuestionMedia(q);
+  var qwEl=document.getElementById('q-word');
+  if(q.dir==='rev'){
+    // reading→kanji : show the reading big, hint the meaning
+    qwEl.className='q-word kana-prompt';qwEl.textContent=q.prompt;
+    document.getElementById('q-meta').innerHTML='<small>「'+q.meaning+'」の漢字は？ &nbsp;·&nbsp; which kanji?</small>';
+  } else {
+    qwEl.className='q-word kanji';qwEl.textContent=q.prompt;
+    document.getElementById('q-meta').innerHTML='<small>'+q.meaning+'</small>';
+  }
+  const opts=shuffle(q.opts.slice());
+  const isBlend=false;
+  const box=document.getElementById('q-opts');box.innerHTML='';
+  opts.forEach(o=>{
+    const el=document.createElement('div');
+    el.className='q-opt'+(q.dir==='rev'?' kanji-opt':'');
+    el.textContent=o;el.onclick=()=>answer(el,o);
+    box.appendChild(el);
+  });
+  document.getElementById('approach-ring').style.cssText='transform:scale(2.6);opacity:.35;';
+  accepting=true;locked=false;qTotal++;
+  // Mini Quest: update word counter; end after MINI_QUEST_COUNT questions
+  if(miniQuestMode){
+    document.getElementById('hud-wcount').textContent=qTotal+' / '+MINI_QUEST_COUNT;
+    if(qTotal>MINI_QUEST_COUNT){endGame(true);return;}
+  }
+  // Reading is spoken AFTER answering (auto-speak at start would reveal the answer).
+}
+function answer(btn,chosen){
+  if(!accepting||locked)return;locked=true;accepting=false;
+  const correct=cur.ans,prog=(songTime-qStart)/(qDeadline-qStart);
+  if(chosen===correct){
+    qRight++;combo++;maxCombo=Math.max(maxCombo,combo);
+    let label,gain,pts;
+    const isLate=prog>GOOD_WIN;
+    if(prog<=cfg.perfWin){label='PERFECT! ✨';gain=cfg.gPerfect;pts=Math.round(120*(1+combo*0.03));perfects++;sfxPerfect();flashJudge(label,'#f0d060');}
+    else if(!isLate){label='GOOD!';gain=cfg.gGood;pts=Math.round(70*(1+combo*0.03));sfxGood();flashJudge(label,'#9fd0f0');}
+    else{label='LATE…';gain=cfg.gLate;pts=Math.round(30*(1+combo*0.02));sfxLate();flashJudge(label,'rgba(210,200,80,.95)');}
+    addGauge(gain);score+=pts;btn.classList.add('correct');blast();autoSpeakWord();showExample();
+    checkComboMilestone(combo);
+    updateCombo();setTimeout(()=>nextQuestion(0),340);
+  }else{
+    misses++;combo=0;addGauge(cfg.gWrong);sfxWrong();flashDanger();shake();flashJudge('MISS!','var(--mauve)');
+    btn.classList.add('wrong');
+    document.querySelectorAll('.q-opt').forEach(b=>{if(b.textContent===correct)b.classList.add('correct');else if(!b.classList.contains('wrong'))b.classList.add('dim');});
+    autoSpeakWord();showExample();updateCombo();setTimeout(()=>nextQuestion(0),1100);
+  }
+}
+function timeoutMiss(){
+  if(!accepting||locked)return;locked=true;accepting=false;
+  misses++;combo=0;addGauge(cfg.gMiss);sfxMiss();flashDanger();flashJudge('TOO SLOW!','var(--mauve)');
+  document.querySelectorAll('.q-opt').forEach(b=>{if(b.textContent===cur.ans)b.classList.add('correct');else b.classList.add('dim');});
+  autoSpeakWord();showExample();updateCombo();setTimeout(()=>nextQuestion(0),1050);
+}
+function blast(){const b=document.getElementById('battle');const e=document.createElement('div');e.className='blast';e.textContent=['✨','💜','⭐','🌟'][(Math.random()*4)|0];e.style.left='50%';e.style.top='45%';e.style.setProperty('--bx',(20+Math.random()*30)*(Math.random()>.5?1:-1)+'vw');e.style.setProperty('--by',-(10+Math.random()*25)+'vh');e.style.animation='blastFly .6s ease-out forwards';b.appendChild(e);setTimeout(()=>e.remove(),650);}
+function flashJudge(txt,col){const j=document.getElementById('judge');j.textContent=txt;j.style.color=col;j.classList.remove('show');void j.offsetWidth;j.classList.add('show');}
+function flashDanger(){const v=document.getElementById('vignette');v.style.boxShadow='inset 0 0 90px 18px rgba(200,40,40,.55)';setTimeout(()=>v.style.boxShadow='inset 0 0 90px 18px rgba(200,40,40,0)',200);}
+function shake(){const s=document.getElementById('screen-play');if(!s)return;s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake');}
+function updateCombo(){document.getElementById('hud-combo').textContent=combo>=3?combo+'x':'';}
+function addGauge(v){gauge=Math.max(0,Math.min(WIN_GAUGE,gauge+v));updateGauge();document.getElementById('cracks').style.opacity=(0.9*(1-gauge/WIN_GAUGE)+0.05).toFixed(2);}
+function updateGauge(){const f=document.getElementById('gauge-fill'),p=document.getElementById('gauge-pct');f.style.width=gauge+'%';if(gauge>=80)f.style.background='linear-gradient(90deg,#d97706,#fde68a)';else if(gauge>=50)f.style.background='linear-gradient(90deg,var(--purple),var(--gold-light))';else f.style.background='linear-gradient(90deg,var(--purple-dark),var(--purple-light))';p.textContent=Math.round(gauge)+'%';}
+
+/* ════ End ════ */
+function endGame(won){
+  playing=false;accepting=false;cancelAnimationFrame(rafId);stopMusic();
+  if(!miniQuestMode&&won)score+=Math.floor(Math.max(0,cfg.time-songTime))*15;
+  score+=Math.round(gauge*4);score=Math.max(0,Math.round(score));
+  const isBest=saveScore(diffKey+(miniQuestMode?'_mini':''),score);
+  const acc=qTotal>0?qRight/qTotal:0;
+  // Mini Quest: always "won" — stars purely by accuracy
+  const mqWon=miniQuestMode?true:won;
+  let stars,emoji,cls,title,sub;
+  if(mqWon&&acc>=0.8){stars=3;emoji='🏆';cls='great';title="VICTORY!\nかんぺき！";sub="Perfect kanji reading! Lumi is truly impressed. / かんぺきな漢字よみ！ルミもびっくり！";}
+  else if(mqWon&&acc>=0.6){stars=2;emoji='⚔️';cls='good';title="VICTORY!\nよくできました！";sub="You proved yourself worthy, hero! / 勇者さんの力、ちゃんと見たよ！";}
+  else if(mqWon){stars=2;emoji='⚔️';cls='good';title="VICTORY!\nギリギリ！";sub="A win is a win — but you can do better! / 勝ったけど、もっとできるよ！";}
+  else{stars=1;emoji='💪';cls='try';title="NOT YET…\nもうちょっと！";sub="I know you can do it — try again! / 絶対できるよ！もう一回！";}
+  document.getElementById('result-emoji').textContent=emoji;
+  const tEl=document.getElementById('result-title');tEl.className='result-title '+cls;tEl.textContent=title;
+  document.getElementById('result-sub').textContent=sub;
+  document.getElementById('result-score').textContent=score.toLocaleString();
+  document.getElementById('result-stats').innerHTML=`<span>✅ <b>${qRight}</b>/${qTotal}</span><span>🎯 <b>${perfects}</b></span><span>🔥 <b>${maxCombo}</b>x</span>`;
+  document.getElementById('result-newbest').style.display=isBest?'block':'none';
+  setResultLumi(stars);  // star-based Lumi image
+  sfxFanfare(stars);
+  for(let i=1;i<=3;i++){const s=document.getElementById('star'+i);s.className='star-icon';if(i<=stars)setTimeout(()=>s.classList.add('lit'),(i-1)*350);}
+  showScreen('screen-result');
+}
+
+/* ════ Scores ════ */
+function sKey(d){return 'kanjiQuest1_'+d;}
+function getScores(d){try{return JSON.parse(Store.get(sKey(d))||'[]');}catch(e){return[];}}
+function saveScore(d,sc){const l=getScores(d);l.push(sc);l.sort((a,b)=>b-a);const top=l.slice(0,5);Store.set(sKey(d),JSON.stringify(top));return sc>0&&top[0]===sc&&l.indexOf(sc)===0;}
+function showScores(){showScreen('screen-scores');showScoreList(diffKey);}
+function showScoreList(d){document.querySelectorAll('.score-tab').forEach(t=>t.classList.toggle('sel',t.dataset.st===d));const l=getScores(d),box=document.getElementById('score-list');if(!l.length){box.innerHTML='<div style="padding:22px;text-align:center;font-family:\'Zen Maru Gothic\',sans-serif;font-size:.84rem;color:var(--brown)">No scores yet!<br>まだスコアがないよ</div>';return;}box.innerHTML=l.map((sc,i)=>`<div class="score-item"><div class="score-rank ${i===0?'gold':''}">${i===0?'#1':'#'+(i+1)}</div><div class="score-val">${sc.toLocaleString()}</div></div>`).join('');sfxTap();}
+
+/* ════ Util ════ */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ════ Kanji Reference List ════ */
+let krefFilter='all';
+function toggleKref(){
+  const b=document.getElementById('kref-body');
+  const open=b.classList.toggle('open');
+  document.getElementById('kref-chevron').innerHTML = open?'&#9650;':'&#9660;';
+  if(open && !b.dataset.built){ renderKref(); b.dataset.built='1'; }
+  try{sfxTap();}catch(e){}
+}
+function setKrefFilter(f){krefFilter=f;document.querySelectorAll('.kref-fbtn').forEach(b=>b.classList.toggle('sel',b.dataset.kf===f));renderKref();}
+function renderKref(){
+  const q=(document.getElementById('kref-search').value||'').trim().toLowerCase();
+  const grid=document.getElementById('kref-grid');
+  const frag=document.createDocumentFragment();
+  let n=0;
+  for(const k of KANJI){
+    if(krefFilter!=='all' && k.lvl!==krefFilter) continue;
+    const readings=k.v.map(v=>v[0]).join('・');
+    if(q){
+      const hay=(k.k+' '+readings+' '+k.m).toLowerCase();
+      if(!hay.includes(q)) continue;
+    }
+    n++;
+    const cell=document.createElement('div'); cell.className='kref-cell';
+    const exLines=k.v.filter(v=>v[2]).slice(0,2).map(v=>v[2]+'（'+v[3]+'）').join('  ');
+    cell.innerHTML='<div class="kref-k">'+k.k+'</div><div class="kref-info">'+
+      '<span class="kref-lv">'+k.lvl+'</span><br>'+
+      '<span class="kref-rd">'+readings+'</span><br>'+
+      '<span class="kref-mn">'+k.m+'</span>'+
+      (exLines?'<br><span style="font-size:.68rem;opacity:.85">'+exLines+'</span>':'')+
+      '</div>';
+    frag.appendChild(cell);
+  }
+  grid.innerHTML=''; grid.appendChild(frag);
+  document.getElementById('kref-count').textContent=n+' kanji shown';
+}
+
+</script>
+</body>
+</html>
