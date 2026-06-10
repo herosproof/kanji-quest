@@ -1,0 +1,28 @@
+{
+  "name": "Kanji Quest – 漢字クエスト",
+  "short_name": "Kanji Quest",
+  "description": "A kanji reading battle game for JLPT N5–N3 learners. Part of the Hero's Proof ecosystem.",
+  "start_url": "/kanji-quest/",
+  "scope": "/kanji-quest/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2a1845",
+  "theme_color": "#3a2558",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "games"],
+  "lang": "en",
+  "dir": "ltr"
+}
