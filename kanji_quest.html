@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Kanji Quest – 漢字クエスト</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700;900&family=Kosugi+Maru&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#3a2558;--bg2:#2a1845;--panel2:#1e1235;
+  --cream:#f5eedc;--card-bg:rgba(245,238,220,0.97);--border-gold:rgba(245,158,11,0.25);
+  --purple:#9060c0;--purple-light:#c8a0e0;--purple-pale:#ede0f8;--purple-dark:#4a3870;
+  --gold:#c9a030;--gold-light:#f0d060;--gold-pale:#f8f0c0;
+  --brown:#5c2810;--text-dark:#1e1235;--text-soft:#3a2558;--text-muted:rgba(200,160,224,.75);
+  --green:#4a9040;--green-pale:#d0e8b0;--red:#c83030;--red-pale:#fee2e2;
+  --mauve:#c07888;--shadow:rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;}
+body{
+  font-family:'Fredoka','Kosugi Maru','Zen Maru Gothic',sans-serif;
+  background:var(--bg);
+  color:var(--text-dark);
+  min-height:100dvh;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+  padding:16px 12px 48px;
+  overflow-x:hidden;
+  user-select:none;-webkit-user-select:none;
+}
+/* ── Starfield — fixed, full-page ── */
+.starfield{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.starfield span{position:absolute;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s);display:flex;align-items:center;justify-content:center;font-size:var(--sz,1rem);color:var(--col,#fde68a);text-shadow:0 0 6px var(--col,#fde68a);line-height:1;}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}50%{opacity:.9;transform:scale(1) rotate(20deg)}}
+/* ── Container — responsive centred column ── */
+.container{position:relative;z-index:1;width:min(700px,95vw);display:flex;flex-direction:column;align-items:center;gap:0;}
+/* ── Screens ── */
+.screen{display:none;width:100%;}
+.screen.active{display:flex;flex-direction:column;align-items:center;gap:16px;}
+
+/* ── Title Header — matches writing.html exactly ── */
+#screen-title{padding-bottom:0;}
+.title-header{
+  width:100%;
+  background:linear-gradient(160deg,#2a1845 0%,#1e1235 60%,#150d28 100%);
+  padding:28px 20px 20px;
+  text-align:center;position:relative;
+  box-shadow:0 4px 24px rgba(124,58,237,.35);
+  border-bottom:1px solid rgba(167,139,250,.2);
+  border-radius:0 0 20px 20px;
+  margin-bottom:4px;overflow:hidden;
+  text-decoration:none;display:block;cursor:pointer;
+}
+.title-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(144,96,192,.22) 0%,transparent 70%);pointer-events:none;}
+.title-logo-img{max-height:160px;max-width:92%;object-fit:contain;display:block;margin:0 auto 8px;position:relative;z-index:1;filter:drop-shadow(0 2px 16px rgba(167,139,250,.5));}
+.title-emblem{font-size:3rem;display:block;margin-bottom:8px;position:relative;z-index:1;animation:embFloat 3s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(201,160,48,.5));}
+@keyframes embFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.title-game-name{font-family:'Press Start 2P',monospace;font-size:clamp(.8rem,3.5vw,1.1rem);color:#fff;text-shadow:0 0 24px rgba(167,139,250,.7),0 2px 4px rgba(0,0,0,.5);line-height:1.7;position:relative;z-index:1;}
+.title-sub{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:clamp(.88rem,2.5vw,1.05rem);color:var(--gold-light);font-weight:600;letter-spacing:.12em;margin-top:4px;position:relative;z-index:1;}
+.header-divider{width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto 0;opacity:.6;position:relative;z-index:1;}
+.scenario-section{width:100%;max-width:700px;margin:0;}
+.scenario-card{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:20px;box-shadow:0 4px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);padding:18px 20px 24px;cursor:pointer;position:relative;display:flex;gap:14px;align-items:center;min-height:96px;width:100%;}
+.sc-lumi{width:64px;height:64px;flex-shrink:0;object-fit:cover;border-radius:10px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));animation:embFloat 3s ease-in-out infinite;}
+.sc-text{flex:1;min-width:0;}
+.sc-name{font-family:'Press Start 2P',monospace;font-size:.46rem;letter-spacing:.08em;color:var(--purple-dark);margin-bottom:3px;}
+.sc-en{font-size:.95rem;font-weight:700;color:var(--text-dark);line-height:1.5;}
+.sc-jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.8rem;color:var(--brown);margin-top:3px;line-height:1.5;}
+.sc-hint{position:absolute;bottom:8px;right:12px;display:flex;align-items:center;gap:3px;font-family:'Fredoka',sans-serif;font-size:.76rem;font-weight:700;color:var(--gold);}
+.sc-hint-tap{display:inline-block;}
+.sc-hint-arr{font-size:.92rem;display:inline-block;}
+.sc-hint.blink .sc-hint-tap{animation:tapPulse 1s ease-in-out infinite;}
+.sc-hint.blink .sc-hint-arr{animation:arrFlash .8s ease-in-out infinite;}
+@keyframes tapPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.88)}}
+@keyframes arrFlash{0%,100%{opacity:1;transform:translateX(0)}50%{opacity:.4;transform:translateX(3px)}}
+/* ── Mode toggle (ふつう ↔ Mini Quest) ── */
+.mode-toggle-section{width:100%;max-width:700px;display:flex;justify-content:center;margin-bottom:4px;}
+.mode-toggle-wrap{display:flex;align-items:center;gap:10px;background:rgba(30,18,53,.7);border:1px solid rgba(167,139,250,.2);border-radius:50px;padding:8px 18px;}
+.mode-label{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.82rem;font-weight:700;color:var(--purple-light);white-space:nowrap;transition:color .2s;}
+.mode-label.active{color:var(--gold-light);}
+.toggle-track{position:relative;width:52px;height:28px;border-radius:50px;background:rgba(144,96,192,.35);border:2px solid rgba(144,96,192,.5);cursor:pointer;transition:background .25s,border-color .25s;flex-shrink:0;}
+.toggle-track.on{background:rgba(201,160,48,.35);border-color:rgba(201,160,48,.6);}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--purple-light);box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .25s;}
+.toggle-track.on .toggle-thumb{transform:translateX(24px);background:var(--gold-light);}
+.mode-badge{font-family:'Press Start 2P',monospace;font-size:.38rem;letter-spacing:.06em;padding:3px 8px;border-radius:50px;border:1px solid var(--gold);color:var(--gold);background:rgba(201,160,48,.12);white-space:nowrap;}
+/* ── Difficulty section — writing.html grid style ── */
+.diff-section{width:100%;max-width:700px;}
+.diff-title{font-family:'Press Start 2P',monospace;font-size:clamp(.6rem,2.5vw,.85rem);color:var(--gold-light);text-shadow:0 0 16px rgba(240,208,96,.5),2px 2px 0 var(--brown);letter-spacing:.1em;margin-bottom:12px;text-align:center;line-height:1.7;}
+.diff-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;width:100%;}
+.diff-card{background:var(--card-bg);border:2px solid var(--border-gold);border-radius:18px;padding:20px 10px;cursor:pointer;text-align:center;box-shadow:0 4px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);transition:transform .2s,box-shadow .2s,background .15s,border-color .15s;color:var(--text-dark);}
+.diff-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);}
+.diff-card:active{transform:translateY(2px);}
+.diff-card.easy{border-color:rgba(74,144,64,.45);}
+.diff-card.normal{border-color:rgba(201,160,48,.55);}
+.diff-card.hard{border-color:rgba(200,48,48,.45);}
+.diff-card.extreme{border-color:rgba(200,50,200,.55);background:rgba(20,8,28,.65);color:#e0a0f0;}
+.diff-card.extreme .diff-name{color:#e0a0f0;}
+.diff-card.extreme .diff-jp{color:#c070e0;}
+/* ── Selected states ── */
+.diff-card.sel{transform:translateY(3px) scale(1.04);}
+.diff-card.sel.easy{background:#b8f0a0;border:3px solid #3a9030;box-shadow:0 0 0 3px rgba(74,200,64,.35),0 6px 22px rgba(60,160,40,.55),inset 0 1px 0 rgba(255,255,255,.7);}
+.diff-card.sel.normal{background:#ffe87a;border:3px solid #c09010;box-shadow:0 0 0 3px rgba(240,200,40,.4),0 6px 22px rgba(200,160,20,.6),inset 0 1px 0 rgba(255,255,255,.7);}
+.diff-card.sel.hard{background:#ffc0c0;border:3px solid #c02020;box-shadow:0 0 0 3px rgba(220,60,60,.4),0 6px 22px rgba(200,40,40,.6),inset 0 1px 0 rgba(255,255,255,.7);}
+.diff-card.sel.extreme{background:rgba(80,0,120,.8);border:3px solid #cc44ff;box-shadow:0 0 0 3px rgba(200,50,240,.45),0 6px 24px rgba(180,0,220,.65),inset 0 1px 0 rgba(255,200,255,.15);}
+.diff-emoji{font-size:2.2rem;display:block;margin-bottom:6px;}
+.diff-name{font-family:'Fredoka',sans-serif;font-size:clamp(.85rem,2.5vw,1rem);font-weight:700;color:var(--text-dark);}
+.diff-jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.78rem;color:var(--brown);margin-top:3px;}
+@keyframes cfade{0%{opacity:.35}100%{opacity:0}}
+/* ── Buttons — matching writing.html ── */
+.btn{
+  font-family:'Press Start 2P',monospace;
+  font-size:clamp(.5rem,1.8vw,.7rem);
+  background:linear-gradient(135deg,#ede0f8,#d8c8f0);
+  color:var(--text-dark);
+  border:2px solid var(--purple);
+  border-radius:14px;
+  padding:14px 28px;
+  cursor:pointer;
+  box-shadow:0 4px 0 #6840a0;
+  transition:transform .1s,box-shadow .1s;
+  letter-spacing:.05em;
+  line-height:1.5;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #6840a0;}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6840a0;}
+.btn.btn-secondary,.btn-secondary{background:linear-gradient(135deg,var(--gold-pale),var(--gold-light));border-color:var(--gold);box-shadow:0 4px 0 #a07820;color:var(--brown);}
+.btn.btn-secondary:hover,.btn-secondary:hover{box-shadow:0 6px 0 #a07820;}
+.btn.btn-secondary:active,.btn-secondary:active{box-shadow:0 1px 0 #a07820;}
+.btn-ghost,.btn-hub{
+  font-family:'Fredoka',sans-serif;font-size:.9rem;font-weight:600;
+  color:var(--text-muted);background:transparent;
+  border:1px solid rgba(167,139,250,.25);
+  border-radius:50px;padding:8px 22px;
+  cursor:pointer;transition:color .2s,border-color .2s;
+  display:inline-block;text-decoration:none;
+}
+.btn-ghost:hover,.btn-hub:hover{color:var(--gold-light);border-color:rgba(245,158,11,.4);}
+.btn-primary{background:linear-gradient(135deg,#ede0f8,#d8c8f0);color:var(--text-dark);border:2px solid var(--purple);box-shadow:0 4px 0 #6840a0;}
+.title-cta{display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;}
+.q-word.kanji{font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP','Zen Maru Gothic',serif;letter-spacing:0;font-size:clamp(3.2rem,18vw,5.6rem);line-height:1;}
+.diff-card.lvl-card .diff-count{display:block;font-family:'Press Start 2P',monospace;font-size:.4rem;color:var(--text-soft);margin-top:5px;}
+/* ── Scores ── */
+#screen-scores{gap:14px;padding:20px 0 32px;}
+.panel-h{font-family:'Press Start 2P',monospace;font-size:clamp(.68rem,3vw,.88rem);color:var(--gold-light);text-shadow:0 0 18px rgba(240,208,96,.5);text-align:center;line-height:1.8;}
+.panel-h .jp{display:block;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.85rem;color:var(--purple-light);}
+.score-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.score-tab{padding:8px 14px;border-radius:50px;border:2px solid;cursor:pointer;font-family:'Press Start 2P',monospace;font-size:.4rem;letter-spacing:.06em;}
+.score-tab.easy{border-color:#4a9040;color:#c0e090;}
+.score-tab.normal{border-color:#c9a030;color:var(--gold-light);}
+.score-tab.hard{border-color:#c83030;color:#f0a090;}
+.score-tab.extreme{border-color:#8000c0;color:#d080ff;}
+.score-tab.sel{background:rgba(255,255,255,.12);}
+.score-list{width:100%;max-width:480px;background:var(--card-bg);border:1px solid var(--border-gold);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px var(--shadow);}
+.score-item{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid rgba(144,96,192,.15);}
+.score-item:last-child{border-bottom:none;}
+.score-rank{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--purple);width:32px;}
+.score-rank.gold{color:var(--gold);}
+.score-val{font-family:'Press Start 2P',monospace;font-size:.58rem;color:var(--text-dark);margin-left:auto;}
+/* ── Play ── */
+#screen-play{position:fixed;inset:0;z-index:2;padding:0;gap:0;overflow-y:auto;}
+.hud{width:100%;background:linear-gradient(160deg,#2a1845 0%,#1e1235 100%);border:1px solid rgba(167,139,250,.2);border-radius:16px;padding:10px 16px 12px;box-shadow:0 4px 20px rgba(0,0,0,.4);margin-bottom:10px;}
+.hud-row1{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.hud-vol{display:flex;align-items:center;gap:6px;flex:1;}
+.hud-vol label{font-family:'Press Start 2P',monospace;font-size:.36rem;color:var(--text-muted);white-space:nowrap;}
+.hud-vol input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:4px;background:rgba(200,160,224,.35);outline:none;cursor:pointer;}
+.hud-vol input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold-light);}
+.hud-vol input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--gold-light);border:none;}
+#mute-btn{background:none;border:none;cursor:pointer;font-size:.95rem;line-height:1;padding:0;flex-shrink:0;}
+.hud-timer{font-family:'Press Start 2P',monospace;font-size:.66rem;color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(255,255,255,.3);}
+.hud-timer.low{color:var(--mauve);animation:pulseR .5s ease-in-out infinite;}
+.hud-wcount{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);min-width:52px;text-align:left;white-space:nowrap;}
+@keyframes pulseR{0%,100%{opacity:1}50%{opacity:.4}}
+.hud-combo{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);min-width:52px;text-align:right;}
+.hud-row2{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.hud-gauge-label{font-family:'Press Start 2P',monospace;font-size:.38rem;letter-spacing:.1em;color:var(--gold-light);}
+.hud-gauge-label .jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.6rem;color:var(--purple-light);margin-left:4px;}
+.gauge-track{height:18px;background:rgba(0,0,0,.35);border-radius:50px;overflow:hidden;border:1px solid rgba(167,139,250,.2);box-shadow:inset 0 2px 6px rgba(0,0,0,.4);position:relative;}
+.gauge-fill{height:100%;width:0%;border-radius:50px;background:linear-gradient(90deg,var(--purple-dark),var(--purple-light));transition:width .3s cubic-bezier(.34,1.56,.64,1),background .5s;}
+.gauge-fill::after{content:'';position:absolute;top:2px;left:6px;right:6px;height:38%;background:rgba(255,255,255,.28);border-radius:50px;}
+.gauge-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Press Start 2P',monospace;font-size:.42rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);z-index:2;}
+.battle{position:relative;width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:6px 14px 10px;}
+.cracks{position:absolute;inset:0;pointer-events:none;z-index:1;transition:opacity .6s;}
+.danger-vignette{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 90px 18px rgba(200,40,40,0);transition:box-shadow .22s;}
+.beatflash{position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(circle at 50% 38%,rgba(200,160,224,.12),transparent 58%);opacity:0;}
+.beatflash.on{animation:bf .5s ease-out;}
+@keyframes bf{0%{opacity:.6}100%{opacity:0}}
+.ring-arena{position:relative;z-index:3;flex-shrink:0;width:clamp(110px,26vw,145px);height:clamp(110px,26vw,145px);display:flex;align-items:center;justify-content:center;}
+.target-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:3px solid rgba(201,160,48,.55);box-shadow:0 0 20px rgba(201,160,48,.2),inset 0 0 14px rgba(201,160,48,.1);}
+.target-ring.beat{animation:tBeat .52s ease-out;}
+@keyframes tBeat{0%{box-shadow:0 0 36px rgba(201,160,48,.65),inset 0 0 22px rgba(201,160,48,.3)}100%{box-shadow:0 0 20px rgba(201,160,48,.2),inset 0 0 14px rgba(201,160,48,.1)}}
+.approach-ring{position:absolute;width:100%;height:100%;border-radius:50%;border:4px solid var(--purple);box-shadow:0 0 16px rgba(144,96,192,.45);will-change:transform;}
+.q-media{width:clamp(60px,15vw,85px);height:clamp(60px,15vw,85px);display:flex;align-items:center;justify-content:center;font-size:clamp(2.4rem,10vw,3.4rem);z-index:2;line-height:1;}
+.q-media img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px;}
+.question-panel{position:relative;z-index:3;background:var(--card-bg);border:1px solid var(--border-gold);border-radius:20px;padding:18px 14px 20px;box-shadow:0 6px 28px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.9);display:flex;flex-direction:column;align-items:center;width:100%;max-width:480px;}
+.q-word{font-family:'Fredoka',sans-serif;font-size:clamp(1.7rem,8vw,2.2rem);font-weight:700;letter-spacing:4px;color:var(--text-dark);margin-bottom:2px;}
+.q-word .blank{color:var(--red);}
+.q-meta{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-weight:700;color:var(--brown);font-size:.86rem;text-align:center;}
+.q-meta small{display:block;color:var(--text-soft);font-size:.7rem;opacity:.72;}
+.q-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:100%;margin-top:11px;}
+.q-opt{font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(1.45rem,7vw,2rem);padding:16px 4px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(135deg,var(--purple-pale),#d8c8f0);color:var(--text-dark);border:2px solid rgba(144,96,192,.4);box-shadow:0 4px 0 #6840a0;transition:transform .07s,box-shadow .07s;line-height:1;}
+/* Blend options are 2 chars — slightly smaller */
+.q-opt.is-blend{font-size:clamp(1rem,5vw,1.45rem);letter-spacing:.04em;}
+.q-opt:active{transform:translateY(3px);box-shadow:0 1px 0 #6840a0;}
+.q-opt.correct{background:var(--green-pale);border-color:rgba(74,144,64,.6);box-shadow:0 4px 0 #3a7030;color:var(--brown);}
+.q-opt.wrong{background:var(--red-pale);border-color:rgba(200,48,48,.6);box-shadow:0 4px 0 #a02020;color:var(--brown);}
+.q-opt.dim{opacity:.38;}
+.judge{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:8;font-family:'Press Start 2P',monospace;font-size:clamp(.6rem,2.8vw,.85rem);pointer-events:none;opacity:0;text-shadow:0 2px 10px rgba(0,0,0,.7);}
+.judge.show{animation:judgePop .65s ease-out;}
+@keyframes judgePop{0%{opacity:0;transform:translate(-50%,-10%) scale(.4)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-100%) scale(.9)}}
+.blast{position:absolute;z-index:5;font-size:1.4rem;pointer-events:none;}
+@keyframes blastFly{0%{opacity:1;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(var(--bx),var(--by)) scale(1.6)}}
+/* ── Reset button — matches writing.html ── */
+.btn-reset-bottom{
+  background:transparent;
+  border:1px solid rgba(144,96,192,.4);
+  border-radius:50px;
+  padding:8px 22px;
+  font-family:'Fredoka',sans-serif;
+  font-size:.85rem;font-weight:700;
+  color:rgba(220,200,240,.85);
+  cursor:pointer;
+  margin-top:8px;
+}
+.btn-reset-bottom:active{background:rgba(144,96,192,.08);}
+.go-overlay{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:26%;gap:14px;background:rgba(10,5,25,.90);}
+.go-text{font-family:'Press Start 2P',monospace;font-size:clamp(1.5rem,7.5vw,2.3rem);color:var(--gold-light);text-shadow:0 0 30px rgba(240,208,96,.7),0 4px 8px rgba(0,0,0,.5);text-align:center;line-height:1.7;}
+.go-text.pop{animation:goPop .6s cubic-bezier(.34,1.56,.64,1);}
+.go-instruction{font-family:'Press Start 2P',monospace;font-size:clamp(.62rem,3.2vw,.88rem);color:#e8dff8;text-align:center;line-height:2.1;opacity:0;transition:opacity .35s;text-shadow:0 2px 10px rgba(0,0,0,.9);pointer-events:none;}
+.go-instruction .jp{display:block;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:clamp(.9rem,4.5vw,1.15rem);color:var(--gold-light);margin-top:4px;}
+.go-instruction.show{opacity:1;}
+.time-bonus-flash{position:absolute;top:50px;right:14px;z-index:10;font-family:'Press Start 2P',monospace;font-size:.62rem;color:#7fff7f;text-shadow:0 0 12px rgba(80,255,80,.8);opacity:0;pointer-events:none;transition:opacity .15s;}
+.time-bonus-flash.show{animation:timeBonusPop .9s ease-out forwards;}
+@keyframes timeBonusPop{0%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-22px);}}
+
+@keyframes goPop{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+.go-heroes{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:min(80%,380px);z-index:21;filter:drop-shadow(0 8px 24px rgba(0,0,0,.7));}
+/* ── Result ── */
+#screen-result{justify-content:center;gap:5px;text-align:center;padding:18px 14px;}
+.result-lumi{width:min(38%,150px);aspect-ratio:1/1;height:auto;margin:0 auto 8px;display:block;object-fit:cover;border-radius:14px;}
+.result-emoji-big{font-size:2.6rem;display:block;animation:embFloat 2.5s ease-in-out infinite;}
+.result-title{font-family:'Press Start 2P',monospace;font-size:clamp(.62rem,3.2vw,.85rem);line-height:1.8;text-shadow:0 0 28px currentColor,0 3px 6px rgba(0,0,0,.5);white-space:pre-line;}
+.result-title.great{color:var(--gold-light);}
+.result-title.good{color:var(--purple-light);}
+.result-title.try{color:var(--mauve);}
+.stars-row{display:flex;gap:8px;justify-content:center;margin:6px 0;}
+.star-icon{font-size:2rem;filter:grayscale(1) opacity(.25);transition:filter .3s,transform .3s;}
+.star-icon.lit{filter:grayscale(0) drop-shadow(0 0 10px var(--gold));animation:starPop .4s ease backwards;}
+@keyframes starPop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.result-sub{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.84rem;color:var(--purple-light);max-width:310px;line-height:1.5;}
+.score-panel{background:var(--card-bg);border:1px solid var(--border-gold);border-radius:18px;padding:11px 20px;margin:4px 0;min-width:225px;box-shadow:0 6px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,.8);}
+.score-cap{font-family:'Press Start 2P',monospace;font-size:.4rem;letter-spacing:.14em;color:var(--text-soft);margin-bottom:4px;}
+.score-big{font-family:'Press Start 2P',monospace;font-size:clamp(1.05rem,5vw,1.45rem);color:var(--text-dark);line-height:1;}
+.score-stats{display:flex;justify-content:center;gap:12px;margin-top:7px;font-family:'Press Start 2P',monospace;font-size:.36rem;color:var(--text-soft);}
+.score-stats span b{color:var(--purple-dark);}
+.newbest{font-family:'Press Start 2P',monospace;font-size:.4rem;color:var(--gold);margin-top:4px;animation:pulseR 1s ease-in-out infinite;}
+.result-actions{display:flex;gap:10px;margin-top:7px;flex-wrap:wrap;justify-content:center;}
+.shake{animation:shake .3s ease;}
+.confirm-overlay{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:rgba(21,13,40,.78);backdrop-filter:blur(3px);}
+.confirm-overlay.show{display:flex;}
+.confirm-box{background:var(--card-bg);border:2px solid var(--border-gold);border-radius:20px;padding:24px 28px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:290px;}
+.confirm-msg{font-family:'Press Start 2P',monospace;font-size:.58rem;color:var(--text-dark);line-height:1.8;}
+.confirm-msg .jp{display:block;font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.82rem;color:var(--brown);margin-top:5px;font-style:normal;}
+.confirm-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;}
+.combo-flash{position:absolute;top:8px;right:12px;z-index:9;font-family:'Press Start 2P',monospace;font-size:clamp(.68rem,3.5vw,1rem);pointer-events:none;opacity:0;text-align:right;line-height:1.5;text-shadow:0 2px 10px rgba(0,0,0,.9);white-space:nowrap;}
+.combo-flash.show{animation:comboFlash 2.5s ease-out;}
+@keyframes comboFlash{0%{opacity:0;transform:scale(.6) translateX(8px)}10%{opacity:1;transform:scale(1.12) translateX(0)}22%{transform:scale(1) translateX(0)}78%{opacity:1;transform:scale(1) translateX(0)}100%{opacity:0;transform:scale(.95) translateY(-8px)}}
+@keyframes pulseFade{0%{opacity:1}100%{opacity:0}}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
+/* ── Audio Settings Card (title screen) ── */
+.audio-settings-section{width:100%;max-width:700px;}
+.audio-settings-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(30,18,53,.7);border:1px solid rgba(167,139,250,.2);
+  border-radius:14px;padding:11px 16px;cursor:pointer;
+  transition:background .2s;
+}
+.audio-settings-toggle:hover{background:rgba(42,24,69,.85);}
+.audio-settings-toggle-label{font-family:'Press Start 2P',monospace;font-size:.52rem;color:var(--gold-light);letter-spacing:.08em;}
+.audio-settings-toggle-label .jp{font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.72rem;color:var(--purple-light);margin-left:6px;font-weight:600;}
+.audio-settings-chevron{font-size:.9rem;color:var(--purple-light);transition:transform .3s;}
+.audio-settings-chevron.open{transform:rotate(180deg);}
+.audio-settings-body{
+  overflow:hidden;max-height:0;transition:max-height .35s ease,opacity .3s;
+  opacity:0;
+}
+.audio-settings-body.open{max-height:400px;opacity:1;}
+.audio-settings-inner{
+  background:rgba(20,10,38,.6);border:1px solid rgba(167,139,250,.15);
+  border-top:none;border-radius:0 0 14px 14px;
+  padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px;
+}
+.audio-row{display:flex;align-items:center;gap:10px;}
+.audio-row-label{font-family:'Press Start 2P',monospace;font-size:.38rem;color:var(--text-muted);letter-spacing:.08em;width:42px;flex-shrink:0;}
+.audio-row input[type=range]{
+  -webkit-appearance:none;appearance:none;flex:1;height:5px;
+  border-radius:4px;background:rgba(200,160,224,.3);outline:none;cursor:pointer;
+}
+.audio-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold-light);box-shadow:0 0 6px rgba(240,208,96,.5);}
+.audio-row input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold-light);border:none;}
+.audio-toggle-btn{
+  background:none;border:1.5px solid rgba(167,139,250,.4);border-radius:8px;
+  padding:5px 8px;font-size:1rem;cursor:pointer;line-height:1;
+  transition:background .15s,border-color .15s;flex-shrink:0;
+}
+.audio-toggle-btn:hover{background:rgba(144,96,192,.2);}
+.audio-toggle-btn.off{opacity:.45;filter:grayscale(.6);}
+.audio-divider{height:1px;background:rgba(167,139,250,.12);margin:2px 0;}
+/* ── Word audio button ── */
+.word-audio-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(144,96,192,.22),rgba(201,160,48,.18));
+  border:1.5px solid rgba(201,160,48,.5);border-radius:50%;
+  width:2.2rem;height:2.2rem;font-size:1.1rem;
+  cursor:pointer;vertical-align:middle;margin-left:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+  transition:transform .1s,box-shadow .1s,background .15s,opacity .2s;
+  flex-shrink:0;
+}
+.word-audio-btn:active{transform:scale(.88);box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.word-audio-btn.speaking{background:linear-gradient(135deg,rgba(74,144,64,.35),rgba(144,200,80,.25));border-color:rgba(74,200,64,.7);animation:speakPulse .5s ease-in-out infinite alternate;}
+.word-audio-btn.hidden{display:none;}
+@keyframes speakPulse{0%{box-shadow:0 0 6px rgba(74,200,64,.4)}100%{box-shadow:0 0 14px rgba(74,200,64,.8)}}
+.q-word-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin-bottom:2px;}
+.word-audio-btn{margin-left:0;}
+/* ── In-game corner toggles ── */
+.game-corner-toggles{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;padding:0 8px;margin-top:2px;
+}
+.corner-toggle-btn{
+  background:rgba(30,18,53,.75);border:1.5px solid rgba(167,139,250,.3);
+  border-radius:50px;padding:8px 16px;font-size:1.05rem;
+  cursor:pointer;line-height:1;
+  transition:background .15s,border-color .15s,opacity .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.corner-toggle-btn span.lbl{font-family:'Press Start 2P',monospace;font-size:.32rem;color:var(--text-muted);letter-spacing:.06em;}
+.corner-toggle-btn:hover{background:rgba(60,35,90,.85);}
+.corner-toggle-btn.off{opacity:.5;filter:grayscale(.5);}
+.corner-toggle-btn:active{transform:scale(.93);}
+</style>
+</head>
+<body>
+
+<div class="starfield" id="starfield"></div>
+
+<div class="container">
+
+<!-- TITLE -->
+<div class="screen active" id="screen-title">
+  <div class="title-header">
+    <img class="title-logo-img" id="title-logo" alt="Hero's Proof"
+         onerror="this.style.display='none'">
+    <span class="title-emblem" id="title-emblem" style="display:none">⚔️</span>
+    <div class="title-game-name" id="title-wordmark">KANJI QUEST<br>漢字クエスト</div>
+    <div class="title-sub">✦ Battle Training · トレーニングバトル ✦</div>
+    <div class="header-divider"></div>
+  </div>
+  <div class="scenario-section">
+    <div class="scenario-card" id="scenario-card" onclick="advanceScenario()">
+      <img class="sc-lumi" id="sc-lumi" alt="Lumi">
+      <div class="sc-text">
+        <div class="sc-name">Lumi / ルミ</div>
+        <div class="sc-en" id="sc-en"></div>
+        <div class="sc-jp" id="sc-jp"></div>
+      </div>
+      <div class="sc-hint blink" id="sc-hint">▼</div>
+    </div>
+  </div>
+  <div class="mode-toggle-section">
+    <div class="mode-toggle-wrap">
+      <span class="mode-label active" id="mode-label-normal">ふつう</span>
+      <div class="toggle-track" id="mode-toggle-track" onclick="toggleMode()">
+        <div class="toggle-thumb"></div>
+      </div>
+      <span class="mode-label" id="mode-label-mini">Mini Quest</span>
+      <span class="mode-badge" id="mode-badge">⏱ 10もん</span>
+    </div>
+  </div>
+  <div class="diff-section">
+    <div class="diff-title">Choose Level / レベルを選ぼう</div>
+    <div class="diff-grid">
+      <div class="diff-card easy lvl-card" data-lvl="N5" onclick="selLevel('N5')"><span class="diff-emoji">🟢</span><div class="diff-name">N5</div><div class="diff-jp">きほん</div><span class="diff-count">79字</span></div>
+      <div class="diff-card normal lvl-card" data-lvl="N4" onclick="selLevel('N4')"><span class="diff-emoji">🔵</span><div class="diff-name">N4</div><div class="diff-jp">しょきゅう</div><span class="diff-count">166字</span></div>
+      <div class="diff-card hard lvl-card" data-lvl="N3" onclick="selLevel('N3')"><span class="diff-emoji">🟣</span><div class="diff-name">N3</div><div class="diff-jp">ちゅうきゅう</div><span class="diff-count">367字</span></div>
+      <div class="diff-card extreme lvl-card sel" data-lvl="all" onclick="selLevel('all')"><span class="diff-emoji">⭐</span><div class="diff-name">N5〜N3</div><div class="diff-jp">ぜんぶ</div><span class="diff-count">612字</span></div>
+    </div>
+  </div>
+  <div class="diff-section">
+    <div class="diff-title">Choose Difficulty / なんいどを選ぼう</div>
+    <div class="diff-grid">
+      <div class="diff-card easy" data-diff="easy" onclick="selDiff('easy')"><span class="diff-emoji">🌱</span><div class="diff-name">EASY</div><div class="diff-jp">かんたん</div></div>
+      <div class="diff-card normal sel" data-diff="normal" onclick="selDiff('normal')"><span class="diff-emoji">⚔️</span><div class="diff-name">NORMAL</div><div class="diff-jp">ふつう</div></div>
+      <div class="diff-card hard" data-diff="hard" onclick="selDiff('hard')"><span class="diff-emoji">🔥</span><div class="diff-name">HARD</div><div class="diff-jp">むずかしい</div></div>
+      <div class="diff-card extreme" data-diff="extreme" onclick="selDiff('extreme')"><span class="diff-emoji">💀</span><div class="diff-name">EXTREME</div><div class="diff-jp">おに</div></div>
+    </div>
+  </div>
+  <!-- Audio Settings -->
+  <div class="audio-settings-section">
+    <div class="audio-settings-toggle" onclick="toggleAudioPanel()">
+      <span class="audio-settings-toggle-label">⚙️ AUDIO<span class="jp">おとの設定</span></span>
+      <span class="audio-settings-chevron" id="audio-chevron">▼</span>
+    </div>
+    <div class="audio-settings-body" id="audio-settings-body">
+      <div class="audio-settings-inner">
+        <!-- BGM row -->
+        <div class="audio-row">
+          <span class="audio-row-label">BGM</span>
+          <input type="range" id="bgm-slider" min="0" max="1" step="0.05" value="0.25" oninput="setMusicVol(+this.value)">
+          <button class="audio-toggle-btn" id="bgm-toggle-btn" onclick="toggleMusicMuteSettings()" title="BGM on/off">🎵</button>
+        </div>
+        <div class="audio-divider"></div>
+        <!-- SFX row -->
+        <div class="audio-row">
+          <span class="audio-row-label">SFX</span>
+          <input type="range" id="sfx-slider" min="0" max="1" step="0.05" value="1.0" oninput="setSfxVol(+this.value)">
+          <button class="audio-toggle-btn" id="sfx-toggle-btn" onclick="toggleSfxMuteSettings()" title="SFX on/off">🔔</button>
+        </div>
+        <div class="audio-divider"></div>
+        <!-- Voice row -->
+        <div class="audio-row">
+          <span class="audio-row-label">VOICE</span>
+          <input type="range" id="voice-slider" min="0" max="1" step="0.05" value="1.0" oninput="setVoiceVol(+this.value)">
+          <button class="audio-toggle-btn" id="voice-toggle-btn" onclick="toggleVoiceMuteSettings()" title="Voice on/off">🔊</button>
+        </div>
+        <div class="audio-divider"></div>
+        <!-- Auto-speak row -->
+        <div class="audio-row" style="justify-content:space-between;">
+          <span style="font-family:'Zen Maru Gothic','Kosugi Maru',sans-serif;font-size:.78rem;color:var(--purple-light);font-weight:600;">🗣️ Auto-speak words<br><span style="font-size:.68rem;color:var(--text-muted);">単語を自動で読み上げる</span></span>
+          <button class="audio-toggle-btn" id="autospeak-toggle-btn" onclick="toggleAutoSpeak()" title="Auto-speak on/off" style="font-size:.85rem;padding:6px 12px;font-family:'Press Start 2P',monospace;font-size:.4rem;letter-spacing:.04em;color:var(--gold-light);">ON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="title-cta">
+    <button class="btn btn-primary" onclick="startGame()">▶ START BATTLE</button>
+    <button class="btn-ghost" onclick="showScores()">🏆 High Scores / ハイスコア</button>
+    <a href="https://herosproof.github.io" class="btn-hub">🏠 Home / ホーム</a>
+  </div>
+</div>
+
+<!-- SCORES -->
+<div class="screen" id="screen-scores">
+  <div class="panel-h">🏆 HIGH SCORES<span class="jp">ハイスコア</span></div>
+  <div class="score-tabs">
+    <div class="score-tab easy" data-st="easy" onclick="showScoreList('easy')">EASY</div>
+    <div class="score-tab normal sel" data-st="normal" onclick="showScoreList('normal')">NORMAL</div>
+    <div class="score-tab hard" data-st="hard" onclick="showScoreList('hard')">HARD</div>
+    <div class="score-tab extreme" data-st="extreme" onclick="showScoreList('extreme')">EXTREME</div>
+  </div>
+  <div class="score-list" id="score-list"></div>
+  <button class="btn btn-ghost" style="margin-top:10px;" onclick="showScreen('screen-title')">↩ Back / もどる</button>
+</div>
+
+<!-- PLAY -->
+<div class="screen" id="screen-play">
+  <div class="hud">
+    <div class="hud-row1">
+      <div class="hud-vol">
+        <label>VOL</label>
+        <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.4" oninput="setVol(+this.value)">
+        <button id="mute-btn" onclick="toggleMute()">🔊</button>
+      </div>
+      <div class="hud-combo" id="hud-combo"></div>
+      <div class="hud-wcount" id="hud-wcount" style="display:none"></div>
+      <div class="hud-timer" id="hud-timer">2:00</div>
+    </div>
+    <div class="hud-row2">
+      <div class="hud-gauge-label">⚔️ BATTLE GAUGE<span class="jp"> バトルゲージ</span></div>
+    </div>
+    <div class="gauge-track"><div class="gauge-fill" id="gauge-fill"></div><div class="gauge-pct" id="gauge-pct">0%</div></div>
+  </div>
+  <div class="battle" id="battle">
+    <svg class="cracks" id="cracks" viewBox="0 0 400 400" preserveAspectRatio="none">
+      <g stroke="#1a0d2e" stroke-width="2.5" fill="none" opacity="0.9" stroke-linecap="round">
+        <path d="M0,80 L70,120 L60,180 L130,210 L110,280 L190,300"/>
+        <path d="M400,60 L330,110 L350,170 L280,200 L300,260 L230,290"/>
+        <path d="M150,0 L160,60 L120,100 L150,150"/>
+        <path d="M260,0 L250,70 L290,110 L260,160"/>
+        <path d="M0,330 L80,340 L120,400"/>
+        <path d="M400,330 L320,350 L290,400"/>
+      </g>
+    </svg>
+    <div class="danger-vignette" id="vignette"></div>
+    <div class="beatflash" id="beatflash"></div>
+    <div class="judge" id="judge"></div>
+    <div class="combo-flash" id="combo-flash"></div>
+    <div class="time-bonus-flash" id="time-bonus-flash">+0.5s ⏱️</div>
+    <div class="ring-arena">
+      <div class="target-ring" id="target-ring"></div>
+      <div class="approach-ring" id="approach-ring"></div>
+      <div class="q-media" id="q-media"></div>
+    </div>
+    <div class="question-panel">
+      <div class="q-word-row">
+        <div class="q-word" id="q-word"></div>
+        <button class="word-audio-btn" id="word-audio-btn" onclick="speakWord()" title="Hear the reading / よみ方を聞く">🔊</button>
+      </div>
+      <div class="q-meta" id="q-meta"></div>
+      <div class="q-opts" id="q-opts"></div>
+    </div>
+    <button class="btn-reset-bottom" onclick="confirmReset()">↻ RESET / リセット</button>
+    <div class="game-corner-toggles">
+      <button class="corner-toggle-btn" id="game-bgm-btn" onclick="toggleGameBgm()" title="BGM on/off">
+        🎵<span class="lbl">BGM</span>
+      </button>
+      <button class="corner-toggle-btn" id="game-speak-btn" onclick="toggleGameSpeak()" title="Auto-speak on/off">
+        🗣️<span class="lbl">AUTO</span>
+      </button>
+    </div>
+    <div class="go-overlay" id="go-overlay">
+      <div class="go-instruction" id="go-instruction">👆 Tap the READING!<span class="jp">よみ方をタップ！</span></div>
+      <div class="go-text" id="go-text">READY?</div>
+      <img class="go-heroes" id="go-heroes" alt="Heroes" onerror="this.style.display='none'">
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="screen-result">
+  <img class="result-lumi" id="result-lumi" alt="Lumi">
+  <span class="result-emoji-big" id="result-emoji">🏆</span>
+  <div class="result-title great" id="result-title">VICTORY!</div>
+  <div class="stars-row">
+    <span class="star-icon" id="star1">⭐</span>
+    <span class="star-icon" id="star2">⭐</span>
+    <span class="star-icon" id="star3">⭐</span>
+  </div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="score-panel">
+    <div class="score-cap">Score / スコア</div>
+    <div class="score-big" id="result-score">0</div>
+    <div class="score-stats" id="result-stats"></div>
+    <div class="newbest" id="result-newbest" style="display:none;">🌟 NEW BEST!</div>
+  </div>
+  <div class="result-actions">
+    <button class="btn btn-primary" onclick="startGame()">↻ RETRY</button>
+    <button class="btn btn-secondary" onclick="goTitle()">🏠 MENU</button>
+  </div>
+</div>
+
+  <div class="confirm-overlay" id="reset-modal">
+    <div class="confirm-box">
+      <div class="confirm-msg">Reset game?<span class="jp">ゲームをリセットしますか？</span></div>
+      <div class="confirm-btns">
+        <button class="btn btn-secondary" style="font-size:.52rem;padding:12px 18px;" onclick="doReset()">Yes / はい</button>
+        <button class="btn-ghost" style="font-size:.52rem;padding:12px 18px;" onclick="hideResetModal()">No / いいえ</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<audio id="bgm" src="Lumi_Battle.mp3" preload="auto" playsinline></audio>
+
+<script>
+/* ════ ASSETS ════ */
+document.getElementById('title-logo').src='logo.png';
+document.getElementById('title-logo').onerror=function(){this.style.display='none';document.getElementById('title-emblem').style.display='block';};
+document.getElementById('sc-lumi').onerror=function(){this.style.display='none';};
+document.getElementById('sc-lumi').src='lumi.png';
+document.getElementById('go-heroes').src='heroes.png';
+// Result Lumi: tries lumi_3stars.png / lumi_2stars.png / lumi_1star.png first;
+// falls back to embedded portrait with CSS filter per star count.
+const LUMI_FILTERS={
+  3:'drop-shadow(0 8px 22px rgba(240,208,96,.6))',  // golden glow
+  2:'drop-shadow(0 8px 22px rgba(0,0,0,.5))',        // normal
+  1:'drop-shadow(0 8px 22px rgba(0,0,0,.5)) grayscale(.45) brightness(.82)' // sad
+};
+function setResultLumi(stars){
+  const el=document.getElementById('result-lumi');
+  el.style.filter=LUMI_FILTERS[stars];
+  el.onerror=function(){this.onerror=null;this.src='lumi.png';this.style.filter=LUMI_FILTERS[stars];};
+  el.src=`lumi_${stars}star${stars>1?'s':''}.png`;
+}
+
+/* ════ STORAGE ════ */
+const Store={mem:{},get(k){try{return localStorage.getItem(k);}catch(e){return this.mem[k]??null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){this.mem[k]=v;}}};
+
+/* ════ TUNING ════ */
+const BPM=113,BEAT=60/BPM,FIRST_BEAT=0.16,LOOP_END=68;
+const WIN_GAUGE=100;
+const GOOD_WIN=0.80;
+// perfWin: fraction of question window for PERFECT rating (25% = tighter for easy/normal).
+// Easy/Normal: gPerfect=5.0 → ~20 perfect answers fills gauge (~3min / ~2min timers).
+// Hard/Extreme: perfWin=0.45 (unchanged). Extreme: needs combos to win at all.
+// Wrong answer (gWrong) triggers on a bad tap; gMiss triggers on timeout (TOO SLOW).
+// 2-star: won + acc>=60%. 3-star: won + acc>=80%.
+const DIFF={
+  easy:    {Wbeats:18,time:180,gPerfect:5.0,gGood:3.5,gLate:1.5,gWrong:-1.5,gMiss:-1.0,lead:4,perfWin:0.25},
+  normal:  {Wbeats:12,time:120,gPerfect:5.0,gGood:3.2,gLate:1.2,gWrong:-2.0,gMiss:-1.5,lead:3,perfWin:0.25},
+  hard:    {Wbeats: 6,time: 90,gPerfect:3.0,gGood:2.0,gLate:0.7,gWrong:-4.5,gMiss:-3.0,lead:2,perfWin:0.45},
+  extreme: {Wbeats: 3,time: 59,gPerfect:2.5,gGood:1.4,gLate:0.2,gWrong:-9.0,gMiss:-6.0,lead:1,perfWin:0.45},
+};
+// Voice clip filenames — drop files next to HTML to enable
+const VOICE_READY='lumi_ready.mp3', VOICE_GO='lumi_go.mp3';
+
+// ── Phonics option sets ──
+const PH_SILENT_E_OPTS = ['A','E','I','O','U'];
+const PH_POLITE_OPTS   = ['AI','AY','EA','EE','IE','OA','OW','UE','UI'];
+const PH_MURMUR_OPTS   = ['AR','OR','IR','ER','EAR','WOR'];
+const PH_DIGRAPH_OPTS  = ['OO','OU','OW','OI','OY'];
+
+function phSilentE(vowel,bi){
+  return {type:'silent_e',ans:vowel,opts:shuffle([vowel,...PH_SILENT_E_OPTS.filter(v=>v!==vowel).slice(0,3)]),blankIdx:bi,blankLen:1};
+}
+function phPolite(digraph,bi){
+  return {type:'polite',ans:digraph,opts:shuffle([digraph,...PH_POLITE_OPTS.filter(v=>v!==digraph).slice(0,3)]),blankIdx:bi,blankLen:2};
+}
+function phMurmur(digraph,bi){
+  return {type:'murmur',ans:digraph,opts:shuffle([digraph,...PH_MURMUR_OPTS.filter(v=>v!==digraph).slice(0,3)]),blankIdx:bi,blankLen:2};
+}
+function phDigraph(digraph,bi){
+  return {type:'digraph',ans:digraph,opts:shuffle([digraph,...PH_DIGRAPH_OPTS.filter(v=>v!==digraph).slice(0,3)]),blankIdx:bi,blankLen:2};
+}
+
+const QUESTIONS=[
+// ── N5 ──
+{word:"一",ans:"イチ",opts:["ガク","イチ","ショ","ハン"],jp:"one / one radical (no.1)",lvl:"N5"},
+{word:"二",ans:"ふた",opts:["くに","しろ","のち","ふた"],jp:"two / two radical (no. 7)",lvl:"N5"},
+{word:"九",ans:"ここの",opts:["おんな","ここの","あまつ","うまれ"],jp:"nine",lvl:"N5"},
+{word:"七",ans:"なな",opts:["かわ","うえ","した","なな"],jp:"seven",lvl:"N5"},
+{word:"人",ans:"ひと",opts:["とお","もと","あめ","ひと"],jp:"person",lvl:"N5"},
+{word:"入",ans:"ニュウ",opts:["シュツ","ショウ","キュウ","ニュウ"],jp:"enter / insert",lvl:"N5"},
+{word:"八",ans:"や",opts:["や","ひ","き","む"],jp:"eight / eight radical (no. 12)",lvl:"N5"},
+{word:"十",ans:"とお",opts:["なに","いき","まる","とお"],jp:"ten",lvl:"N5"},
+{word:"三",ans:"み",opts:["や","み","よ","む"],jp:"three",lvl:"N5"},
+{word:"上",ans:"うえ",opts:["うえ","あめ","うま","みず"],jp:"above / up",lvl:"N5"},
+{word:"下",ans:"した",opts:["した","あめ","なか","そと"],jp:"below / down",lvl:"N5"},
+{word:"大",ans:"ダイ",opts:["コウ","イチ","ダイ","ドク"],jp:"large / big",lvl:"N5"},
+{word:"女",ans:"おんな",opts:["おんな","あいだ","ひだり","うまれ"],jp:"woman / female",lvl:"N5"},
+{word:"山",ans:"やま",opts:["まる","さき","かわ","やま"],jp:"mountain",lvl:"N5"},
+{word:"川",ans:"かわ",opts:["つち","そと","かわ","やま"],jp:"stream / river",lvl:"N5"},
+{word:"土",ans:"つち",opts:["ふた","いつ","つち","いき"],jp:"soil / earth",lvl:"N5"},
+{word:"千",ans:"ち",opts:["き","よ","こ","ち"],jp:"thousand",lvl:"N5"},
+{word:"子",ans:"こ",opts:["こ","み","な","き"],jp:"child / sign of the rat",lvl:"N5"},
+{word:"小",ans:"ショウ",opts:["シュツ","ショウ","ニュウ","ショク"],jp:"little / small",lvl:"N5"},
+{word:"中",ans:"なか",opts:["なか","ひと","みぎ","くに"],jp:"in / inside",lvl:"N5"},
+{word:"五",ans:"いつ",opts:["ひと","とお","いつ","しろ"],jp:"five",lvl:"N5"},
+{word:"六",ans:"む",opts:["む","こ","み","な"],jp:"six",lvl:"N5"},
+{word:"円",ans:"まる",opts:["きた","まる","かね","とし"],jp:"circle / yen",lvl:"N5"},
+{word:"天",ans:"あまつ",opts:["みなみ","ひがし","あまつ","うまれ"],jp:"heavens / sky",lvl:"N5"},
+{word:"日",ans:"ひ",opts:["ち","ひ","や","き"],jp:"day / sun",lvl:"N5"},
+{word:"月",ans:"つき",opts:["つき","にし","しろ","もも"],jp:"month / moon",lvl:"N5"},
+{word:"木",ans:"き",opts:["ち","き","よ","な"],jp:"tree / wood",lvl:"N5"},
+{word:"水",ans:"みず",opts:["した","みず","おさ","くに"],jp:"water",lvl:"N5"},
+{word:"火",ans:"ひ",opts:["み","ち","ひ","や"],jp:"fire",lvl:"N5"},
+{word:"出",ans:"シュツ",opts:["キュウ","ショク","ショウ","シュツ"],jp:"exit / leave",lvl:"N5"},
+{word:"右",ans:"みぎ",opts:["みぎ","かわ","のち","ちち"],jp:"right",lvl:"N5"},
+{word:"四",ans:"よ",opts:["や","よ","ひ","な"],jp:"four",lvl:"N5"},
+{word:"左",ans:"ひだり",opts:["みなみ","ひがし","ひだり","おとこ"],jp:"left",lvl:"N5"},
+{word:"本",ans:"もと",opts:["した","もも","うえ","もと"],jp:"book / present",lvl:"N5"},
+{word:"白",ans:"しろ",opts:["おさ","しろ","きた","とし"],jp:"white",lvl:"N5"},
+{word:"万",ans:"よろず",opts:["よろず","おんな","ひだり","みなみ"],jp:"ten thousand / 10,000",lvl:"N5"},
+{word:"今",ans:"いま",opts:["した","ちち","いま","うえ"],jp:"now",lvl:"N5"},
+{word:"午",ans:"うま",opts:["まえ","さき","つき","うま"],jp:"noon / sign of the horse",lvl:"N5"},
+{word:"友",ans:"とも",opts:["とも","おさ","なか","かね"],jp:"friend",lvl:"N5"},
+{word:"父",ans:"ちち",opts:["とも","つき","みぎ","ちち"],jp:"father",lvl:"N5"},
+{word:"北",ans:"きた",opts:["とも","さき","きた","しろ"],jp:"north",lvl:"N5"},
+{word:"半",ans:"ハン",opts:["ハン","ドク","ガク","ダイ"],jp:"half / middle",lvl:"N5"},
+{word:"外",ans:"そと",opts:["さき","いつ","みぎ","そと"],jp:"outside",lvl:"N5"},
+{word:"母",ans:"はは",opts:["のち","とし","みぎ","はは"],jp:"mother",lvl:"N5"},
+{word:"休",ans:"キュウ",opts:["ショク","ニュウ","シュツ","キュウ"],jp:"rest / day off",lvl:"N5"},
+{word:"先",ans:"さき",opts:["いま","うま","なな","さき"],jp:"before / ahead",lvl:"N5"},
+{word:"名",ans:"な",opts:["や","む","ち","な"],jp:"name / noted",lvl:"N5"},
+{word:"年",ans:"とし",opts:["あめ","もも","とし","なな"],jp:"year / counter for years",lvl:"N5"},
+{word:"気",ans:"いき",opts:["やま","おさ","くに","いき"],jp:"spirit / mind",lvl:"N5"},
+{word:"百",ans:"もも",opts:["もと","かわ","みず","もも"],jp:"hundred",lvl:"N5"},
+{word:"男",ans:"おとこ",opts:["おとこ","ひだり","ひがし","あまつ"],jp:"male",lvl:"N5"},
+{word:"見",ans:"ケン",opts:["ダイ","ドク","コウ","ケン"],jp:"see / hopes",lvl:"N5"},
+{word:"車",ans:"くるま",opts:["あいだ","うまれ","くるま","ひがし"],jp:"car",lvl:"N5"},
+{word:"毎",ans:"ごと",opts:["ごと","うま","まえ","みぎ"],jp:"every",lvl:"N5"},
+{word:"行",ans:"コウ",opts:["デン","ハン","ショ","コウ"],jp:"going / journey",lvl:"N5"},
+{word:"西",ans:"にし",opts:["いつ","にし","なな","さき"],jp:"west / spain",lvl:"N5"},
+{word:"何",ans:"なに",opts:["なに","うえ","そと","やま"],jp:"what",lvl:"N5"},
+{word:"来",ans:"き",opts:["む","み","き","な"],jp:"come / due",lvl:"N5"},
+{word:"学",ans:"ガク",opts:["ガク","ドク","ブン","ダイ"],jp:"study / learning",lvl:"N5"},
+{word:"金",ans:"かね",opts:["かね","きた","にし","しろ"],jp:"gold",lvl:"N5"},
+{word:"雨",ans:"あめ",opts:["あめ","とし","ちち","おさ"],jp:"rain",lvl:"N5"},
+{word:"国",ans:"くに",opts:["くに","たか","あめ","なに"],jp:"country",lvl:"N5"},
+{word:"東",ans:"ひがし",opts:["うまれ","おんな","ひがし","ここの"],jp:"east",lvl:"N5"},
+{word:"長",ans:"おさ",opts:["もも","なな","ちち","おさ"],jp:"long / leader",lvl:"N5"},
+{word:"前",ans:"まえ",opts:["うま","なな","ふた","まえ"],jp:"in front / before",lvl:"N5"},
+{word:"南",ans:"みなみ",opts:["みなみ","くるま","ここの","ひがし"],jp:"south",lvl:"N5"},
+{word:"後",ans:"のち",opts:["のち","つき","いま","ふた"],jp:"behind / back",lvl:"N5"},
+{word:"食",ans:"ショク",opts:["ショウ","キュウ","シュツ","ショク"],jp:"eat / food",lvl:"N5"},
+{word:"校",ans:"コウ",opts:["コウ","ドク","イチ","ショ"],jp:"exam / school",lvl:"N5"},
+{word:"時",ans:"とき",opts:["つき","ごと","とき","なに"],jp:"time / hour",lvl:"N5"},
+{word:"高",ans:"たか",opts:["たか","とき","まえ","つち"],jp:"tall / high",lvl:"N5"},
+{word:"間",ans:"あいだ",opts:["おとこ","あいだ","うまれ","あまつ"],jp:"interval / space",lvl:"N5"},
+{word:"話",ans:"はなし",opts:["みなみ","はなし","おとこ","ひだり"],jp:"tale / talk",lvl:"N5"},
+{word:"電",ans:"デン",opts:["ケン","ハン","コウ","デン"],jp:"electricity",lvl:"N5"},
+{word:"聞",ans:"ブン",opts:["ダイ","デン","ドク","ブン"],jp:"hear / ask",lvl:"N5"},
+{word:"語",ans:"ゴ",opts:["ブン","ドク","ゴ","ハン"],jp:"word / speech",lvl:"N5"},
+{word:"読",ans:"ドク",opts:["ダイ","ブン","イチ","ドク"],jp:"read",lvl:"N5"},
+{word:"生",ans:"うまれ",opts:["あまつ","うまれ","よろず","ここの"],jp:"life / genuine",lvl:"N5"},
+{word:"書",ans:"ショ",opts:["ブン","イチ","コウ","ショ"],jp:"write",lvl:"N5"},
+// ── N4 ──
+{word:"力",ans:"ちから",opts:["こころ","ちから","くすし","うてな"],jp:"power / strength",lvl:"N4"},
+{word:"口",ans:"くち",opts:["あに","うお","くち","もと"],jp:"mouth",lvl:"N4"},
+{word:"工",ans:"コウ",opts:["トウ","バイ","コウ","メイ"],jp:"craft / construction",lvl:"N4"},
+{word:"夕",ans:"ゆう",opts:["ゆう","いぬ","ぬし","とり"],jp:"evening",lvl:"N4"},
+{word:"手",ans:"て",opts:["ま","ば","て","め"],jp:"hand",lvl:"N4"},
+{word:"文",ans:"ふみ",opts:["いぬ","うお","ふみ","おと"],jp:"sentence / literature",lvl:"N4"},
+{word:"犬",ans:"いぬ",opts:["まち","いぬ","みち","ひる"],jp:"dog",lvl:"N4"},
+{word:"正",ans:"まさ",opts:["まさ","あし","うし","うお"],jp:"correct / justice",lvl:"N4"},
+{word:"田",ans:"た",opts:["め","よ","た","の"],jp:"rice field / rice paddy",lvl:"N4"},
+{word:"目",ans:"め",opts:["た","え","め","ば"],jp:"eye / class",lvl:"N4"},
+{word:"立",ans:"リツ",opts:["リツ","イン","カイ","ヨウ"],jp:"stand up / rise",lvl:"N4"},
+{word:"元",ans:"もと",opts:["いろ","もと","おや","かぜ"],jp:"beginning / former time",lvl:"N4"},
+{word:"公",ans:"おおやけ",opts:["おおやけ","わたくし","いもうと","おとうと"],jp:"public / prince",lvl:"N4"},
+{word:"切",ans:"セツ",opts:["チャ","ベン","ガク","セツ"],jp:"cut / cutoff",lvl:"N4"},
+{word:"少",ans:"ショウ",opts:["キュウ","リョウ","ショウ","ジュウ"],jp:"few / little",lvl:"N4"},
+{word:"心",ans:"こころ",opts:["からだ","やかた","こころ","うたた"],jp:"heart / mind",lvl:"N4"},
+{word:"方",ans:"かた",opts:["くち","おや","もの","かた"],jp:"direction / person",lvl:"N4"},
+{word:"牛",ans:"うし",opts:["まち","うし","おと","あに"],jp:"cow",lvl:"N4"},
+{word:"止",ans:"シ",opts:["コ","シ","タ","ホ"],jp:"stop / halt",lvl:"N4"},
+{word:"兄",ans:"あに",opts:["つい","あに","はる","とり"],jp:"elder brother / big brother",lvl:"N4"},
+{word:"冬",ans:"ふゆ",opts:["かぜ","かた","ふゆ","たび"],jp:"winter",lvl:"N4"},
+{word:"古",ans:"コ",opts:["シ","キ","イ","コ"],jp:"old",lvl:"N4"},
+{word:"台",ans:"うてな",opts:["うてな","うたた","やしろ","やかた"],jp:"pedestal / a stand",lvl:"N4"},
+{word:"広",ans:"コウ",opts:["カン","ベン","シャ","コウ"],jp:"wide / broad",lvl:"N4"},
+{word:"用",ans:"ヨウ",opts:["カイ","リツ","メイ","ヨウ"],jp:"utilize / business",lvl:"N4"},
+{word:"世",ans:"よ",opts:["た","よ","や","の"],jp:"generation / world",lvl:"N4"},
+{word:"主",ans:"ぬし",opts:["ぬし","ふゆ","はな","いぬ"],jp:"lord / chief",lvl:"N4"},
+{word:"代",ans:"よ",opts:["ば","め","よ","の"],jp:"substitute / change",lvl:"N4"},
+{word:"写",ans:"シャ",opts:["カン","シャ","チャ","ソウ"],jp:"copy / be photographed",lvl:"N4"},
+{word:"去",ans:"キョ",opts:["キョ","セツ","シャ","ウン"],jp:"gone / past",lvl:"N4"},
+{word:"字",ans:"あざ",opts:["あさ","ぬし","みせ","あざ"],jp:"character / letter",lvl:"N4"},
+{word:"早",ans:"はや",opts:["ああ","たち","みせ","はや"],jp:"early / fast",lvl:"N4"},
+{word:"町",ans:"まち",opts:["あき","まち","うみ","とん"],jp:"town / village",lvl:"N4"},
+{word:"花",ans:"はな",opts:["ひる","はな","もの","あお"],jp:"flower",lvl:"N4"},
+{word:"赤",ans:"あか",opts:["あか","ゆう","とん","かた"],jp:"red",lvl:"N4"},
+{word:"足",ans:"あし",opts:["なつ","あお","ああ","あし"],jp:"leg / foot",lvl:"N4"},
+{word:"不",ans:"フ",opts:["ジ","フ","コ","タ"],jp:"negative / non-",lvl:"N4"},
+{word:"仕",ans:"シ",opts:["チ","シ","ホ","キ"],jp:"attend / doing",lvl:"N4"},
+{word:"会",ans:"カイ",opts:["ベツ","サク","カイ","キン"],jp:"meeting / meet",lvl:"N4"},
+{word:"同",ans:"ドウ",opts:["イン","ソウ","ドウ","ベン"],jp:"same / agree",lvl:"N4"},
+{word:"多",ans:"タ",opts:["ジ","チ","イ","タ"],jp:"many / frequent",lvl:"N4"},
+{word:"考",ans:"コウ",opts:["ソウ","リツ","ベツ","コウ"],jp:"consider / think over",lvl:"N4"},
+{word:"肉",ans:"しし",opts:["しし","わざ","あじ","とん"],jp:"meat",lvl:"N4"},
+{word:"自",ans:"ジ",opts:["コ","ホ","ジ","チ"],jp:"oneself",lvl:"N4"},
+{word:"色",ans:"いろ",opts:["いろ","しな","あね","みち"],jp:"color",lvl:"N4"},
+{word:"体",ans:"からだ",opts:["みやこ","やかた","うたた","からだ"],jp:"body / substance",lvl:"N4"},
+{word:"作",ans:"サク",opts:["サク","トウ","セツ","メイ"],jp:"make / production",lvl:"N4"},
+{word:"図",ans:"え",opts:["え","ま","た","よ"],jp:"map / drawing",lvl:"N4"},
+{word:"売",ans:"バイ",opts:["イン","バイ","エイ","トク"],jp:"sell",lvl:"N4"},
+{word:"弟",ans:"おとうと",opts:["わたくし","いもうと","おとうと","ことわり"],jp:"younger brother / faithful service to elders",lvl:"N4"},
+{word:"社",ans:"やしろ",opts:["やしろ","うてな","からだ","あかし"],jp:"company / firm",lvl:"N4"},
+{word:"言",ans:"こと",opts:["あお","こと","うお","はな"],jp:"say / word",lvl:"N4"},
+{word:"走",ans:"ソウ",opts:["トク","ダイ","ソウ","カン"],jp:"run",lvl:"N4"},
+{word:"近",ans:"キン",opts:["カン","キン","トク","キョ"],jp:"near / early",lvl:"N4"},
+{word:"空",ans:"そら",opts:["あに","かみ","ぬし","そら"],jp:"empty / sky",lvl:"N4"},
+{word:"青",ans:"あお",opts:["いえ","あき","ゆう","あお"],jp:"blue / green",lvl:"N4"},
+{word:"音",ans:"おと",opts:["あか","しし","やす","おと"],jp:"sound / noise",lvl:"N4"},
+{word:"地",ans:"チ",opts:["コ","イ","チ","フ"],jp:"ground / earth",lvl:"N4"},
+{word:"安",ans:"やす",opts:["はや","いろ","やす","まさ"],jp:"relax / cheap",lvl:"N4"},
+{word:"有",ans:"ユウ",opts:["ユウ","ベツ","ドウ","エイ"],jp:"possess / have",lvl:"N4"},
+{word:"死",ans:"シ",opts:["シ","イ","コ","タ"],jp:"death / die",lvl:"N4"},
+{word:"京",ans:"みやこ",opts:["くすし","みやこ","やまい","うてな"],jp:"capital / 10**16",lvl:"N4"},
+{word:"夜",ans:"よ",opts:["よ","て","め","え"],jp:"night / evening",lvl:"N4"},
+{word:"妹",ans:"いもうと",opts:["いもうと","はなぶさ","ことわり","おおやけ"],jp:"younger sister",lvl:"N4"},
+{word:"姉",ans:"あね",opts:["くち","あね","あじ","おや"],jp:"elder sister",lvl:"N4"},
+{word:"店",ans:"みせ",opts:["やす","もの","みせ","うお"],jp:"store / shop",lvl:"N4"},
+{word:"明",ans:"メイ",opts:["バイ","カン","フク","メイ"],jp:"bright / light",lvl:"N4"},
+{word:"歩",ans:"ホ",opts:["キ","ジ","タ","ホ"],jp:"walk / counter for steps",lvl:"N4"},
+{word:"画",ans:"はかりごと",opts:["はかりごと","おおやけ","おとうと","ことわり"],jp:"brush-stroke / picture",lvl:"N4"},
+{word:"知",ans:"チ",opts:["ホ","ジ","チ","タ"],jp:"know / wisdom",lvl:"N4"},
+{word:"室",ans:"むろ",opts:["むろ","つい","ぬし","あざ"],jp:"room / apartment",lvl:"N4"},
+{word:"思",ans:"シ",opts:["キ","シ","ホ","タ"],jp:"think",lvl:"N4"},
+{word:"海",ans:"うみ",opts:["むろ","とり","うみ","あき"],jp:"sea / ocean",lvl:"N4"},
+{word:"茶",ans:"チャ",opts:["フク","シャ","チャ","シン"],jp:"tea",lvl:"N4"},
+{word:"以",ans:"イ",opts:["タ","ジ","シ","イ"],jp:"by means of / because",lvl:"N4"},
+{word:"夏",ans:"なつ",opts:["なつ","うみ","めし","あさ"],jp:"summer",lvl:"N4"},
+{word:"家",ans:"いえ",opts:["そら","いえ","ゆう","ひる"],jp:"house / home",lvl:"N4"},
+{word:"紙",ans:"かみ",opts:["ふみ","わざ","うし","かみ"],jp:"paper",lvl:"N4"},
+{word:"通",ans:"ツウ",opts:["ツウ","コウ","チャ","ベン"],jp:"traffic / pass through",lvl:"N4"},
+{word:"強",ans:"キョウ",opts:["キョウ","ジュウ","シャク","チュウ"],jp:"strong",lvl:"N4"},
+{word:"教",ans:"キョウ",opts:["シュウ","シャク","チュウ","キョウ"],jp:"teach / faith",lvl:"N4"},
+{word:"理",ans:"ことわり",opts:["はなぶさ","いもうと","おとうと","ことわり"],jp:"logic / arrangement",lvl:"N4"},
+{word:"週",ans:"シュウ",opts:["チュウ","シュウ","シャク","ジュウ"],jp:"week",lvl:"N4"},
+{word:"魚",ans:"うお",opts:["はな","おと","うお","たび"],jp:"fish",lvl:"N4"},
+{word:"鳥",ans:"とり",opts:["あお","とり","まさ","ああ"],jp:"bird / chicken",lvl:"N4"},
+{word:"黒",ans:"くろ",opts:["まさ","あじ","とん","くろ"],jp:"black",lvl:"N4"},
+{word:"住",ans:"ジュウ",opts:["キュウ","シュウ","ショウ","ジュウ"],jp:"dwell / reside",lvl:"N4"},
+{word:"医",ans:"くすし",opts:["からだ","あかし","くすし","みやこ"],jp:"doctor / medicine",lvl:"N4"},
+{word:"究",ans:"キュウ",opts:["ショウ","キョウ","キュウ","リョウ"],jp:"research / study",lvl:"N4"},
+{word:"者",ans:"もの",opts:["もの","あし","ひる","こと"],jp:"someone / person",lvl:"N4"},
+{word:"研",ans:"ケン",opts:["セツ","ケン","ユウ","トウ"],jp:"polish / study of",lvl:"N4"},
+{word:"場",ans:"ば",opts:["や","ば","て","ま"],jp:"location / place",lvl:"N4"},
+{word:"朝",ans:"あさ",opts:["あさ","はな","しな","そら"],jp:"morning / dynasty",lvl:"N4"},
+{word:"答",ans:"トウ",opts:["ベツ","ヨウ","サク","トウ"],jp:"solution / answer",lvl:"N4"},
+{word:"買",ans:"バイ",opts:["ソウ","バイ","ドウ","キン"],jp:"buy",lvl:"N4"},
+{word:"道",ans:"みち",opts:["かみ","めし","おと","みち"],jp:"road-way / street",lvl:"N4"},
+{word:"楽",ans:"ガク",opts:["コウ","ベツ","ケン","ガク"],jp:"music / comfort",lvl:"N4"},
+{word:"事",ans:"こと",opts:["こと","あね","たび","むろ"],jp:"matter / thing",lvl:"N4"},
+{word:"使",ans:"シ",opts:["キ","タ","ジ","シ"],jp:"use / send on a mission",lvl:"N4"},
+{word:"始",ans:"シ",opts:["ホ","コ","シ","フ"],jp:"commence / begin",lvl:"N4"},
+{word:"服",ans:"フク",opts:["エイ","コウ","ガク","フク"],jp:"clothing / admit",lvl:"N4"},
+{word:"物",ans:"もの",opts:["そら","もの","あさ","はる"],jp:"thing / object",lvl:"N4"},
+{word:"屋",ans:"や",opts:["ま","て","や","ば"],jp:"roof / house",lvl:"N4"},
+{word:"度",ans:"たび",opts:["あに","はる","たび","あね"],jp:"degrees / occurrence",lvl:"N4"},
+{word:"待",ans:"タイ",opts:["シャ","ガク","タイ","コウ"],jp:"wait / depend on",lvl:"N4"},
+{word:"持",ans:"ジ",opts:["ホ","シ","ジ","フ"],jp:"hold / have",lvl:"N4"},
+{word:"界",ans:"カイ",opts:["カイ","チャ","ウン","サク"],jp:"world / boundary",lvl:"N4"},
+{word:"発",ans:"ハツ",opts:["セツ","トク","エイ","ハツ"],jp:"departure / discharge",lvl:"N4"},
+{word:"送",ans:"ソウ",opts:["タイ","ソウ","ベツ","シン"],jp:"escort / send",lvl:"N4"},
+{word:"重",ans:"え",opts:["ま","の","て","え"],jp:"heavy / important",lvl:"N4"},
+{word:"起",ans:"キ",opts:["キ","コ","ホ","ジ"],jp:"rouse / wake up",lvl:"N4"},
+{word:"院",ans:"イン",opts:["フク","チャ","エイ","イン"],jp:"inst. / institution",lvl:"N4"},
+{word:"終",ans:"つい",opts:["つい","まさ","やす","あき"],jp:"end / finish",lvl:"N4"},
+{word:"習",ans:"シュウ",opts:["チャク","リョウ","シュウ","ショウ"],jp:"learn",lvl:"N4"},
+{word:"転",ans:"うたた",opts:["あかし","うたた","からだ","うてな"],jp:"revolve / turn around",lvl:"N4"},
+{word:"運",ans:"ウン",opts:["ツウ","ウン","サク","シャ"],jp:"carry / luck",lvl:"N4"},
+{word:"開",ans:"カイ",opts:["カイ","ケイ","ケン","ユウ"],jp:"open / unfold",lvl:"N4"},
+{word:"集",ans:"シュウ",opts:["リョウ","キュウ","シュウ","ショウ"],jp:"gather / meet",lvl:"N4"},
+{word:"飲",ans:"イン",opts:["シン","イン","リツ","キン"],jp:"drink / smoke",lvl:"N4"},
+{word:"業",ans:"わざ",opts:["やす","かみ","めし","わざ"],jp:"business / vocation",lvl:"N4"},
+{word:"漢",ans:"カン",opts:["サク","キン","ケイ","カン"],jp:"sino- / china",lvl:"N4"},
+{word:"歌",ans:"うた",opts:["ぬし","うた","あき","そら"],jp:"song / sing",lvl:"N4"},
+{word:"親",ans:"おや",opts:["おや","あざ","ふみ","ひる"],jp:"parent / intimacy",lvl:"N4"},
+{word:"病",ans:"やまい",opts:["からだ","あかし","やまい","ちから"],jp:"ill / sick",lvl:"N4"},
+{word:"別",ans:"ベツ",opts:["シン","ベツ","ゾク","リツ"],jp:"separate / branch off",lvl:"N4"},
+{word:"注",ans:"チュウ",opts:["チュウ","シュウ","シャク","リョウ"],jp:"pour / irrigate",lvl:"N4"},
+{word:"洋",ans:"ヨウ",opts:["ヨウ","エキ","メイ","トウ"],jp:"ocean / sea",lvl:"N4"},
+{word:"特",ans:"トク",opts:["ベツ","シャ","トク","ツウ"],jp:"special",lvl:"N4"},
+{word:"意",ans:"イ",opts:["キ","イ","チ","コ"],jp:"idea / mind",lvl:"N4"},
+{word:"味",ans:"あじ",opts:["そら","あお","あじ","みせ"],jp:"flavor / taste",lvl:"N4"},
+{word:"勉",ans:"ベン",opts:["メイ","シン","ベン","コウ"],jp:"exertion / endeavour",lvl:"N4"},
+{word:"旅",ans:"たび",opts:["とり","くろ","たび","あお"],jp:"trip / travel",lvl:"N4"},
+{word:"員",ans:"イン",opts:["ダイ","シャ","イン","ケン"],jp:"employee / member",lvl:"N4"},
+{word:"動",ans:"ドウ",opts:["イン","ドウ","ツウ","ダイ"],jp:"move / motion",lvl:"N4"},
+{word:"悪",ans:"ああ",opts:["しし","ああ","かみ","おや"],jp:"bad / vice",lvl:"N4"},
+{word:"族",ans:"ゾク",opts:["ケイ","ゾク","ベン","ウン"],jp:"tribe / family",lvl:"N4"},
+{word:"着",ans:"チャク",opts:["ショウ","リョウ","キュウ","チャク"],jp:"don / arrive",lvl:"N4"},
+{word:"野",ans:"の",opts:["の","よ","ま","め"],jp:"plains / field",lvl:"N4"},
+{word:"風",ans:"かぜ",opts:["いろ","あき","まち","かぜ"],jp:"wind / air",lvl:"N4"},
+{word:"新",ans:"シン",opts:["ベン","ハツ","トウ","シン"],jp:"new",lvl:"N4"},
+{word:"問",ans:"とん",opts:["こと","とん","おと","かみ"],jp:"question / ask",lvl:"N4"},
+{word:"銀",ans:"しろがね",opts:["おとうと","ことわり","いもうと","しろがね"],jp:"silver",lvl:"N4"},
+{word:"題",ans:"ダイ",opts:["ダイ","ウン","トク","トウ"],jp:"topic / subject",lvl:"N4"},
+{word:"館",ans:"やかた",opts:["からだ","やかた","みやこ","やしろ"],jp:"building / mansion",lvl:"N4"},
+{word:"駅",ans:"エキ",opts:["ベン","エキ","トク","リツ"],jp:"station",lvl:"N4"},
+{word:"料",ans:"リョウ",opts:["チャク","ジュウ","キョウ","リョウ"],jp:"fee / materials",lvl:"N4"},
+{word:"映",ans:"エイ",opts:["ガク","エイ","ウン","カン"],jp:"reflect / reflection",lvl:"N4"},
+{word:"私",ans:"わたくし",opts:["いもうと","ことわり","わたくし","はなぶさ"],jp:"private / i",lvl:"N4"},
+{word:"帰",ans:"キ",opts:["キ","ジ","シ","フ"],jp:"homecoming / arrive at",lvl:"N4"},
+{word:"春",ans:"はる",opts:["ふみ","いえ","おや","はる"],jp:"springtime / spring (season)",lvl:"N4"},
+{word:"昼",ans:"ひる",opts:["そら","うみ","なつ","ひる"],jp:"daytime / noon",lvl:"N4"},
+{word:"秋",ans:"あき",opts:["あね","あき","ああ","うみ"],jp:"autumn",lvl:"N4"},
+{word:"計",ans:"ケイ",opts:["ケイ","シャ","バイ","キン"],jp:"plot / plan",lvl:"N4"},
+{word:"建",ans:"ケン",opts:["リツ","ユウ","ケン","トク"],jp:"build",lvl:"N4"},
+{word:"英",ans:"はなぶさ",opts:["はなぶさ","わたくし","ことわり","いもうと"],jp:"england / english",lvl:"N4"},
+{word:"飯",ans:"めし",opts:["ふゆ","そら","めし","いろ"],jp:"meal / boiled rice",lvl:"N4"},
+{word:"曜",ans:"ヨウ",opts:["ソウ","ガク","ヨウ","トウ"],jp:"weekday",lvl:"N4"},
+{word:"品",ans:"しな",opts:["いろ","かみ","しな","しし"],jp:"goods / refinement",lvl:"N4"},
+{word:"急",ans:"キュウ",opts:["チャク","シャク","キュウ","シュウ"],jp:"hurry / emergency",lvl:"N4"},
+{word:"真",ans:"ま",opts:["め","よ","た","ま"],jp:"true / reality",lvl:"N4"},
+{word:"堂",ans:"ドウ",opts:["カイ","ドウ","ダイ","エキ"],jp:"public chamber / hall",lvl:"N4"},
+{word:"試",ans:"シ",opts:["ホ","キ","フ","シ"],jp:"test / try",lvl:"N4"},
+{word:"借",ans:"シャク",opts:["シャク","シュウ","キョウ","リョウ"],jp:"borrow / rent",lvl:"N4"},
+{word:"験",ans:"あかし",opts:["からだ","あかし","うたた","こころ"],jp:"verification / effect",lvl:"N4"},
+{word:"質",ans:"たち",opts:["うみ","はな","たち","とん"],jp:"substance / quality",lvl:"N4"},
+{word:"貸",ans:"タイ",opts:["エイ","ウン","タイ","コウ"],jp:"lend",lvl:"N4"},
+// ── N3 ──
+{word:"才",ans:"サイ",opts:["ヘイ","ゲン","テイ","サイ"],jp:"genius / years old",lvl:"N3"},
+{word:"王",ans:"オウ",opts:["カン","ラク","オウ","タイ"],jp:"king / rule",lvl:"N3"},
+{word:"石",ans:"いし",opts:["きみ","など","いし","さま"],jp:"stone",lvl:"N3"},
+{word:"内",ans:"うち",opts:["かず","ほど","たば","うち"],jp:"inside / within",lvl:"N3"},
+{word:"太",ans:"タイ",opts:["シン","ゾク","タイ","オウ"],jp:"plump / thick",lvl:"N3"},
+{word:"引",ans:"イン",opts:["ヒン","イン","ドウ","カイ"],jp:"pull / tug",lvl:"N3"},
+{word:"市",ans:"いち",opts:["ねこ","さる","かれ","いち"],jp:"market / city",lvl:"N3"},
+{word:"他",ans:"ほか",opts:["ほか","つね","てる","さが"],jp:"other / another",lvl:"N3"},
+{word:"号",ans:"よびな",opts:["よびな","わたし","あいて","たから"],jp:"nickname / number",lvl:"N3"},
+{word:"平",ans:"ひら",opts:["くさ","もり","しか","ひら"],jp:"even / flat",lvl:"N3"},
+{word:"打",ans:"ダ",opts:["カ","ホ","ダ","コ"],jp:"strike / hit",lvl:"N3"},
+{word:"申",ans:"さる",opts:["もと","さま","はた","さる"],jp:"have the honor to / sign of the monkey",lvl:"N3"},
+{word:"礼",ans:"レイ",opts:["レイ","ゼツ","カン","ミン"],jp:"salute / bow",lvl:"N3"},
+{word:"耳",ans:"みみ",opts:["みみ","たば","ねこ","のり"],jp:"ear",lvl:"N3"},
+{word:"交",ans:"こもごも",opts:["こもごも","まじわる","そうろう","るうぶる"],jp:"mingle / mixing",lvl:"N3"},
+{word:"光",ans:"ひかり",opts:["ひつじ","おもて","ひかり","みやこ"],jp:"ray / light",lvl:"N3"},
+{word:"回",ans:"カイ",opts:["ジョ","サツ","エン","カイ"],jp:"-times / round",lvl:"N3"},
+{word:"当",ans:"トウ",opts:["ソウ","トウ","バン","フク"],jp:"hit / right",lvl:"N3"},
+{word:"米",ans:"こめ",opts:["うち","ねこ","ゆめ","こめ"],jp:"rice / usa",lvl:"N3"},
+{word:"声",ans:"こえ",opts:["ほか","ねこ","もと","こえ"],jp:"voice",lvl:"N3"},
+{word:"形",ans:"かた",opts:["かた","すべ","つみ","いし"],jp:"shape / form",lvl:"N3"},
+{word:"草",ans:"くさ",opts:["くさ","つぎ","など","さる"],jp:"grass / weeds",lvl:"N3"},
+{word:"化",ans:"カ",opts:["カ","ヨ","ド","チ"],jp:"change / take the form of",lvl:"N3"},
+{word:"両",ans:"てる",opts:["ほか","てる","のり","とみ"],jp:"both / old japanese coin",lvl:"N3"},
+{word:"全",ans:"ゼン",opts:["ルイ","ナン","ゼン","コン"],jp:"whole / entire",lvl:"N3"},
+{word:"向",ans:"むこ",opts:["まな","とし","くつ","むこ"],jp:"yonder / facing",lvl:"N3"},
+{word:"曲",ans:"くま",opts:["いき","わり","くま","むこ"],jp:"bend / music",lvl:"N3"},
+{word:"次",ans:"つぎ",opts:["みみ","つぎ","のり","てる"],jp:"next / order",lvl:"N3"},
+{word:"直",ans:"チョク",opts:["キャク","リョウ","リュウ","チョク"],jp:"straightaway / honesty",lvl:"N3"},
+{word:"活",ans:"カツ",opts:["タク","カツ","ザイ","コク"],jp:"lively / resuscitation",lvl:"N3"},
+{word:"点",ans:"ぼち",opts:["ぼち","かみ","とし","まな"],jp:"spot / point",lvl:"N3"},
+{word:"科",ans:"カ",opts:["ヨ","ビ","ボ","カ"],jp:"department / course",lvl:"N3"},
+{word:"首",ans:"くび",opts:["その","くび","のり","はら"],jp:"neck / counter for songs and poems",lvl:"N3"},
+{word:"欠",ans:"ケツ",opts:["フツ","ネツ","エン","ケツ"],jp:"lack / gap",lvl:"N3"},
+{word:"由",ans:"よし",opts:["かわ","よし","むこ","ほど"],jp:"wherefore / a reason",lvl:"N3"},
+{word:"民",ans:"たみ",opts:["たみ","ゆき","まな","つね"],jp:"people / nation",lvl:"N3"},
+{word:"付",ans:"フ",opts:["ヒ","チ","ブ","フ"],jp:"adhere / attach",lvl:"N3"},
+{word:"失",ans:"シツ",opts:["ユウ","シツ","ザイ","ノウ"],jp:"lose / error",lvl:"N3"},
+{word:"必",ans:"ヒツ",opts:["ゾウ","ヒツ","セン","エツ"],jp:"invariably / certain",lvl:"N3"},
+{word:"未",ans:"ひつじ",opts:["むすめ","むかし","みやこ","ひつじ"],jp:"un- / not yet",lvl:"N3"},
+{word:"末",ans:"すえ",opts:["たね","むこ","すえ","よめ"],jp:"end / close",lvl:"N3"},
+{word:"記",ans:"キ",opts:["ム","リ","ク","キ"],jp:"scribe / account",lvl:"N3"},
+{word:"組",ans:"くみ",opts:["すべ","よこ","くみ","ねこ"],jp:"association / braid",lvl:"N3"},
+{word:"船",ans:"ふね",opts:["ふね","いち","ほど","さま"],jp:"ship / boat",lvl:"N3"},
+{word:"雪",ans:"ゆき",opts:["すべ","まな","ゆき","うち"],jp:"snow",lvl:"N3"},
+{word:"支",ans:"シ",opts:["ハ","ブ","ム","シ"],jp:"branch / support",lvl:"N3"},
+{word:"助",ans:"すけ",opts:["もち","すけ","こめ","まど"],jp:"help / rescue",lvl:"N3"},
+{word:"君",ans:"きみ",opts:["きみ","ひら","もち","はこ"],jp:"mister / you",lvl:"N3"},
+{word:"対",ans:"あいて",opts:["かかり","むすめ","むかし","あいて"],jp:"vis-a-vis / opposite",lvl:"N3"},
+{word:"局",ans:"つぼね",opts:["あいて","ところ","みなと","つぼね"],jp:"bureau / board",lvl:"N3"},
+{word:"役",ans:"ヤク",opts:["ガン","ヤク","ゴウ","コン"],jp:"duty / war",lvl:"N3"},
+{word:"投",ans:"トウ",opts:["トウ","セイ","ゼツ","ロウ"],jp:"throw / discard",lvl:"N3"},
+{word:"決",ans:"ケツ",opts:["ヨウ","メイ","バン","ケツ"],jp:"decide / fix",lvl:"N3"},
+{word:"馬",ans:"うま",opts:["うま","てる","ぼち","よこ"],jp:"horse",lvl:"N3"},
+{word:"番",ans:"バン",opts:["バン","ネン","ヤク","ホウ"],jp:"turn / number in a series",lvl:"N3"},
+{word:"絵",ans:"カイ",opts:["ハン","タク","カイ","ジョ"],jp:"picture / drawing",lvl:"N3"},
+{word:"数",ans:"かず",opts:["さら","わり","かず","かみ"],jp:"number / strength",lvl:"N3"},
+{word:"所",ans:"ところ",opts:["かなめ","あたま","ところ","むすめ"],jp:"place / extent",lvl:"N3"},
+{word:"具",ans:"グ",opts:["ム","ボ","ク","グ"],jp:"tool / utensil",lvl:"N3"},
+{word:"受",ans:"ジュ",opts:["ザイ","ジュ","ゴウ","ミン"],jp:"accept / undergo",lvl:"N3"},
+{word:"和",ans:"ワ",opts:["ボ","リ","シ","ワ"],jp:"harmony / japanese style",lvl:"N3"},
+{word:"定",ans:"テイ",opts:["ソン","ゲイ","レツ","テイ"],jp:"determine / fix",lvl:"N3"},
+{word:"実",ans:"み",opts:["せ","こ","み","む"],jp:"reality / truth",lvl:"N3"},
+{word:"泳",ans:"エイ",opts:["タク","レイ","ゾウ","エイ"],jp:"swim",lvl:"N3"},
+{word:"苦",ans:"ク",opts:["フ","コ","ク","ヨ"],jp:"suffering / trial",lvl:"N3"},
+{word:"表",ans:"おもて",opts:["おもて","かかり","むかし","ひかり"],jp:"surface / table",lvl:"N3"},
+{word:"部",ans:"ブ",opts:["ブ","チ","ダ","キ"],jp:"section / bureau",lvl:"N3"},
+{word:"乗",ans:"ジョウ",opts:["キャク","ジョウ","ショク","リュウ"],jp:"ride / power",lvl:"N3"},
+{word:"客",ans:"キャク",opts:["ジョウ","チョウ","ショク","キャク"],jp:"guest / visitor",lvl:"N3"},
+{word:"相",ans:"ソウ",opts:["ソウ","ドウ","キョ","ソク"],jp:"inter- / mutual",lvl:"N3"},
+{word:"美",ans:"ビ",opts:["シ","コ","ビ","ハ"],jp:"beauty / beautiful",lvl:"N3"},
+{word:"負",ans:"フ",opts:["フ","ヨ","ギ","ク"],jp:"defeat / negative",lvl:"N3"},
+{word:"談",ans:"ダン",opts:["ヨウ","ダン","コウ","トク"],jp:"discuss / talk",lvl:"N3"},
+{word:"要",ans:"かなめ",opts:["みなと","かかり","ひつじ","かなめ"],jp:"need / main point",lvl:"N3"},
+{word:"勝",ans:"かつ",opts:["さま","たね","かれ","かつ"],jp:"victory / win",lvl:"N3"},
+{word:"速",ans:"ソク",opts:["セツ","テイ","ソク","セイ"],jp:"quick / fast",lvl:"N3"},
+{word:"配",ans:"ハイ",opts:["ハイ","カク","サイ","ガイ"],jp:"distribute / spouse",lvl:"N3"},
+{word:"酒",ans:"さけ",opts:["みみ","はつ","さけ","ゆび"],jp:"sake / alcohol",lvl:"N3"},
+{word:"進",ans:"シン",opts:["ロン","カク","フク","シン"],jp:"advance / proceed",lvl:"N3"},
+{word:"落",ans:"ラク",opts:["カン","ドウ","ラク","ロウ"],jp:"fall / drop",lvl:"N3"},
+{word:"葉",ans:"は",opts:["む","ひ","せ","は"],jp:"leaf / plane",lvl:"N3"},
+{word:"路",ans:"みち",opts:["おも","さら","わり","みち"],jp:"path / route",lvl:"N3"},
+{word:"鳴",ans:"メイ",opts:["メイ","カツ","イン","ゲン"],jp:"chirp / cry",lvl:"N3"},
+{word:"横",ans:"よこ",opts:["よこ","もち","つま","ほど"],jp:"sideways / side",lvl:"N3"},
+{word:"調",ans:"チョウ",opts:["キョウ","ショク","ショウ","チョウ"],jp:"tune / tone",lvl:"N3"},
+{word:"頭",ans:"あたま",opts:["むかし","むしろ","あたま","おっと"],jp:"head / counter for large animals",lvl:"N3"},
+{word:"顔",ans:"かお",opts:["ゆき","かお","くさ","はこ"],jp:"face / expression",lvl:"N3"},
+{word:"最",ans:"つま",opts:["つま","はら","ゆき","もり"],jp:"utmost / most",lvl:"N3"},
+{word:"争",ans:"ソウ",opts:["ハン","ソウ","ザン","マン"],jp:"contend / dispute",lvl:"N3"},
+{word:"伝",ans:"つて",opts:["ひら","きわ","つて","わり"],jp:"transmit / go along",lvl:"N3"},
+{word:"共",ans:"とも",opts:["ゆき","とも","のり","はこ"],jp:"together / both",lvl:"N3"},
+{word:"好",ans:"コウ",opts:["イン","コウ","ザイ","ヒツ"],jp:"fond / pleasing",lvl:"N3"},
+{word:"成",ans:"セイ",opts:["レイ","セイ","カン","コク"],jp:"turn into / become",lvl:"N3"},
+{word:"老",ans:"ロウ",opts:["ゾウ","ロウ","ヨク","ネン"],jp:"old man / old age",lvl:"N3"},
+{word:"位",ans:"くらい",opts:["いくさ","わたし","くらい","みなと"],jp:"rank / grade",lvl:"N3"},
+{word:"初",ans:"はつ",opts:["おも","はつ","きみ","もと"],jp:"first time / beginning",lvl:"N3"},
+{word:"利",ans:"リ",opts:["リ","チ","キ","ヨ"],jp:"profit / advantage",lvl:"N3"},
+{word:"努",ans:"ド",opts:["ム","ド","ソ","コ"],jp:"toil / diligent",lvl:"N3"},
+{word:"労",ans:"ねぎら",opts:["いのち","ねぎら","くすり","あたま"],jp:"labor / thank for",lvl:"N3"},
+{word:"命",ans:"いのち",opts:["かなめ","うつつ","むかし","いのち"],jp:"fate / command",lvl:"N3"},
+{word:"放",ans:"ホウ",opts:["タイ","イン","ホウ","ゾク"],jp:"set free / release",lvl:"N3"},
+{word:"昔",ans:"むかし",opts:["いくさ","むかし","みなと","けむり"],jp:"once upon a time / antiquity",lvl:"N3"},
+{word:"育",ans:"イク",opts:["レツ","ソウ","ガイ","イク"],jp:"bring up / grow up",lvl:"N3"},
+{word:"指",ans:"ゆび",opts:["かず","みち","ゆび","ひら"],jp:"finger / point to",lvl:"N3"},
+{word:"神",ans:"かみ",opts:["さま","はた","つて","かみ"],jp:"gods / mind",lvl:"N3"},
+{word:"追",ans:"ツイ",opts:["テキ","ホウ","ツイ","サイ"],jp:"chase / drive away",lvl:"N3"},
+{word:"戦",ans:"いくさ",opts:["ひつじ","いくさ","けむり","くだん"],jp:"war / battle",lvl:"N3"},
+{word:"良",ans:"リョウ",opts:["キョウ","ショク","リョウ","ショウ"],jp:"good / pleasing",lvl:"N3"},
+{word:"便",ans:"ベン",opts:["コン","コウ","エキ","ベン"],jp:"convenience / facility",lvl:"N3"},
+{word:"働",ans:"ドウ",opts:["ドウ","レイ","セキ","エキ"],jp:"work / (kokuji)",lvl:"N3"},
+{word:"庭",ans:"にわ",opts:["ひら","にわ","かわ","かつ"],jp:"courtyard / garden",lvl:"N3"},
+{word:"息",ans:"いき",opts:["いき","うま","もり","くさ"],jp:"breath / respiration",lvl:"N3"},
+{word:"流",ans:"リュウ",opts:["キャク","リョウ","リュウ","ショク"],jp:"current / a sink",lvl:"N3"},
+{word:"消",ans:"ショウ",opts:["ジャク","リュウ","ショウ","キャク"],jp:"extinguish / blow out",lvl:"N3"},
+{word:"都",ans:"みやこ",opts:["くだん","みやこ","くすり","ともに"],jp:"metropolis / capital",lvl:"N3"},
+{word:"商",ans:"ショウ",opts:["ジョウ","ショウ","キョウ","リュウ"],jp:"make a deal / selling",lvl:"N3"},
+{word:"深",ans:"シン",opts:["ザン","ニン","メイ","シン"],jp:"deep / heighten",lvl:"N3"},
+{word:"球",ans:"たま",opts:["つみ","その","やど","たま"],jp:"ball / sphere",lvl:"N3"},
+{word:"陽",ans:"ひ",opts:["ね","む","こ","ひ"],jp:"sunshine / yang principle",lvl:"N3"},
+{word:"寒",ans:"カン",opts:["カク","カン","サイ","セン"],jp:"cold",lvl:"N3"},
+{word:"悲",ans:"ヒ",opts:["ヒ","ダ","リ","ブ"],jp:"grieve / sad",lvl:"N3"},
+{word:"期",ans:"キ",opts:["シ","ド","キ","サ"],jp:"period / time",lvl:"N3"},
+{word:"歯",ans:"よわい",opts:["みなと","よわい","ひとえ","くすり"],jp:"tooth / cog",lvl:"N3"},
+{word:"港",ans:"みなと",opts:["ひかり","みなと","いのち","よびな"],jp:"harbor",lvl:"N3"},
+{word:"登",ans:"トウ",opts:["トウ","スイ","ロン","ハン"],jp:"ascend / climb up",lvl:"N3"},
+{word:"亡",ans:"ボウ",opts:["ロウ","カツ","エツ","ボウ"],jp:"deceased / the late",lvl:"N3"},
+{word:"合",ans:"ゴウ",opts:["バン","ハン","ゴウ","ザン"],jp:"fit / suit",lvl:"N3"},
+{word:"予",ans:"ヨ",opts:["ザ","ジ","ヨ","ブ"],jp:"beforehand / previous",lvl:"N3"},
+{word:"反",ans:"ハン",opts:["ヨウ","キン","ハン","タク"],jp:"anti-",lvl:"N3"},
+{word:"返",ans:"ヘン",opts:["ヘン","セイ","ケイ","ガイ"],jp:"return / answer",lvl:"N3"},
+{word:"宿",ans:"やど",opts:["かみ","いち","やど","まど"],jp:"inn / lodging",lvl:"N3"},
+{word:"想",ans:"ソウ",opts:["カン","ソウ","ザイ","マン"],jp:"concept / think",lvl:"N3"},
+{word:"感",ans:"カン",opts:["ニン","ライ","カン","ホウ"],jp:"emotion / feeling",lvl:"N3"},
+{word:"暗",ans:"アン",opts:["ゲイ","トク","ニン","アン"],jp:"darkness / disappear",lvl:"N3"},
+{word:"様",ans:"さま",opts:["いし","はじ","さま","せき"],jp:"esq. / way",lvl:"N3"},
+{word:"福",ans:"フク",opts:["ネン","フク","レン","ジョ"],jp:"blessing / fortune",lvl:"N3"},
+{word:"殺",ans:"サツ",opts:["ヤク","トウ","イン","サツ"],jp:"kill / murder",lvl:"N3"},
+{word:"然",ans:"しか",opts:["わり","みみ","しか","ほか"],jp:"sort of thing / so",lvl:"N3"},
+{word:"熱",ans:"ネツ",opts:["カイ","フク","ネツ","ソン"],jp:"heat / temperature",lvl:"N3"},
+{word:"選",ans:"セン",opts:["ゼン","セツ","セン","トツ"],jp:"elect / select",lvl:"N3"},
+{word:"願",ans:"ガン",opts:["シキ","ガン","テキ","ラク"],jp:"petition / request",lvl:"N3"},
+{word:"情",ans:"ジョウ",opts:["ショウ","ジョウ","リョウ","チョウ"],jp:"feelings / emotion",lvl:"N3"},
+{word:"疑",ans:"ギ",opts:["コ","ギ","ボ","ダ"],jp:"doubt / distrust",lvl:"N3"},
+{word:"皆",ans:"みな",opts:["はじ","よめ","さま","みな"],jp:"all / everything",lvl:"N3"},
+{word:"例",ans:"レイ",opts:["ザツ","レイ","レン","ベン"],jp:"example / custom",lvl:"N3"},
+{word:"参",ans:"まじわる",opts:["みたまや","そうろう","るうぶる","まじわる"],jp:"nonplussed / three (in documents)",lvl:"N3"},
+{word:"完",ans:"カン",opts:["ボウ","カン","ガン","レイ"],jp:"perfect / completion",lvl:"N3"},
+{word:"念",ans:"ネン",opts:["ネン","ゼン","ザツ","カイ"],jp:"wish / sense",lvl:"N3"},
+{word:"折",ans:"おり",opts:["おり","はじ","うち","かつ"],jp:"fold / break",lvl:"N3"},
+{word:"望",ans:"もち",opts:["たま","もち","うま","のり"],jp:"ambition / full moon",lvl:"N3"},
+{word:"束",ans:"たば",opts:["たば","てる","かお","くさ"],jp:"bundle / sheaf",lvl:"N3"},
+{word:"残",ans:"ザン",opts:["ジョ","ザン","ゼン","ネン"],jp:"remainder / leftover",lvl:"N3"},
+{word:"求",ans:"キュウ",opts:["リョウ","キュウ","ジョウ","シュウ"],jp:"request / want",lvl:"N3"},
+{word:"約",ans:"ヤク",opts:["ツウ","ヤク","ソウ","ヘイ"],jp:"promise / approximately",lvl:"N3"},
+{word:"性",ans:"さが",opts:["ゆび","さが","くさ","こえ"],jp:"sex / gender",lvl:"N3"},
+{word:"格",ans:"カク",opts:["コク","ルイ","ソク","カク"],jp:"status / rank",lvl:"N3"},
+{word:"能",ans:"ノウ",opts:["ノウ","オウ","マン","ゲイ"],jp:"ability / talent",lvl:"N3"},
+{word:"術",ans:"すべ",opts:["さら","ねこ","たみ","すべ"],jp:"art / technique",lvl:"N3"},
+{word:"晴",ans:"セイ",opts:["ゼン","ゲイ","セン","セイ"],jp:"clear up",lvl:"N3"},
+{word:"列",ans:"レツ",opts:["レツ","ゾウ","シキ","ボウ"],jp:"file / row",lvl:"N3"},
+{word:"式",ans:"シキ",opts:["シキ","ナン","キョ","ザン"],jp:"style / ceremony",lvl:"N3"},
+{word:"信",ans:"シン",opts:["サク","カク","ライ","シン"],jp:"faith / truth",lvl:"N3"},
+{word:"単",ans:"ひとえ",opts:["むしろ","むすめ","ひとえ","かなめ"],jp:"simple / one",lvl:"N3"},
+{word:"変",ans:"ヘン",opts:["ヘン","コン","ザツ","ゾク"],jp:"unusual / change",lvl:"N3"},
+{word:"夫",ans:"おっと",opts:["くすり","おもて","おっと","くだん"],jp:"husband / man",lvl:"N3"},
+{word:"昨",ans:"サク",opts:["シキ","サク","カイ","ヘイ"],jp:"yesterday / previous",lvl:"N3"},
+{word:"法",ans:"のり",opts:["つて","のり","にわ","くさ"],jp:"method / law",lvl:"N3"},
+{word:"晩",ans:"バン",opts:["ユウ","コク","ツウ","バン"],jp:"nightfall / night",lvl:"N3"},
+{word:"猫",ans:"ねこ",opts:["いき","まい","ねこ","さる"],jp:"cat",lvl:"N3"},
+{word:"園",ans:"その",opts:["いな","よこ","くつ","その"],jp:"park / garden",lvl:"N3"},
+{word:"遠",ans:"エン",opts:["ヨウ","テキ","フク","エン"],jp:"distant / far",lvl:"N3"},
+{word:"係",ans:"かかり",opts:["みなと","わたし","かかり","おもり"],jp:"person in charge / connection",lvl:"N3"},
+{word:"取",ans:"とり",opts:["うち","こめ","とり","はら"],jp:"take / fetch",lvl:"N3"},
+{word:"守",ans:"もり",opts:["もり","とみ","はた","かわ"],jp:"guard / protect",lvl:"N3"},
+{word:"幸",ans:"さち",opts:["さち","まど","くさ","いし"],jp:"happiness / blessing",lvl:"N3"},
+{word:"箱",ans:"はこ",opts:["さが","むこ","やど","はこ"],jp:"box / chest",lvl:"N3"},
+{word:"面",ans:"おも",opts:["さち","はら","おも","さら"],jp:"mask / face",lvl:"N3"},
+{word:"喜",ans:"キ",opts:["ブ","ヨ","ヒ","キ"],jp:"rejoice / take pleasure in",lvl:"N3"},
+{word:"治",ans:"ジ",opts:["ジ","リ","コ","グ"],jp:"reign / be at peace",lvl:"N3"},
+{word:"笑",ans:"ショウ",opts:["ショク","キョウ","キュウ","ショウ"],jp:"laugh",lvl:"N3"},
+{word:"辞",ans:"ジ",opts:["コ","ザ","カ","ジ"],jp:"resign / word",lvl:"N3"},
+{word:"関",ans:"せき",opts:["みち","かみ","はら","せき"],jp:"connection / barrier",lvl:"N3"},
+{word:"政",ans:"まつりごと",opts:["いたずら","さかずき","たていと","まつりごと"],jp:"politics / government",lvl:"N3"},
+{word:"留",ans:"るうぶる",opts:["たていと","こもごも","るうぶる","まじわる"],jp:"detain / fasten",lvl:"N3"},
+{word:"険",ans:"ケン",opts:["ゾウ","フツ","レイ","ケン"],jp:"precipitous / inaccessible place",lvl:"N3"},
+{word:"危",ans:"キ",opts:["ビ","ゴ","キ","ハ"],jp:"dangerous / fear",lvl:"N3"},
+{word:"存",ans:"ソン",opts:["ソン","カン","ザイ","ゴウ"],jp:"exist / suppose",lvl:"N3"},
+{word:"原",ans:"はら",opts:["など","その","よめ","はら"],jp:"meadow / original",lvl:"N3"},
+{word:"薬",ans:"くすり",opts:["かなめ","ひつじ","よわい","くすり"],jp:"medicine / chemical",lvl:"N3"},
+{word:"側",ans:"かわ",opts:["こめ","つぎ","かわ","ふね"],jp:"side / lean",lvl:"N3"},
+{word:"席",ans:"むしろ",opts:["あたま","ひつじ","くすり","むしろ"],jp:"seat / mat",lvl:"N3"},
+{word:"敗",ans:"ハイ",opts:["エツ","ハイ","ザツ","ザン"],jp:"failure / defeat",lvl:"N3"},
+{word:"果",ans:"カ",opts:["ム","シ","リ","カ"],jp:"fruit / reward",lvl:"N3"},
+{word:"因",ans:"イン",opts:["レン","ナン","イン","ベン"],jp:"cause / factor",lvl:"N3"},
+{word:"常",ans:"つね",opts:["つね","おり","ゆめ","かつ"],jp:"usual / ordinary",lvl:"N3"},
+{word:"識",ans:"シキ",opts:["シキ","テイ","ライ","セキ"],jp:"discriminating / know",lvl:"N3"},
+{word:"非",ans:"ヒ",opts:["ヒ","カ","ク","ギ"],jp:"un- / mistake",lvl:"N3"},
+{word:"官",ans:"カン",opts:["ゴウ","カン","テイ","カイ"],jp:"bureaucrat / the government",lvl:"N3"},
+{word:"察",ans:"サツ",opts:["レン","ザツ","アン","サツ"],jp:"guess / presume",lvl:"N3"},
+{word:"愛",ans:"まな",opts:["さけ","とし","まな","よめ"],jp:"love / affection",lvl:"N3"},
+{word:"警",ans:"ケイ",opts:["エツ","アン","シキ","ケイ"],jp:"admonish / commandment",lvl:"N3"},
+{word:"覚",ans:"カク",opts:["ジュ","カク","ガン","ツウ"],jp:"memorize / learn",lvl:"N3"},
+{word:"説",ans:"セツ",opts:["バツ","レイ","セツ","キョ"],jp:"opinion / theory",lvl:"N3"},
+{word:"告",ans:"コク",opts:["イク","コク","イン","フツ"],jp:"revelation / tell",lvl:"N3"},
+{word:"種",ans:"たね",opts:["かれ","つて","たね","とり"],jp:"species / kind",lvl:"N3"},
+{word:"達",ans:"タツ",opts:["ガイ","ツウ","セツ","タツ"],jp:"accomplished / reach",lvl:"N3"},
+{word:"類",ans:"ルイ",opts:["セツ","ルイ","ドウ","バン"],jp:"sort / kind",lvl:"N3"},
+{word:"報",ans:"ホウ",opts:["ガイ","ホウ","ユウ","セツ"],jp:"report / news",lvl:"N3"},
+{word:"等",ans:"など",opts:["さる","など","くび","たね"],jp:"etc. / and so forth",lvl:"N3"},
+{word:"座",ans:"ザ",opts:["ザ","ハ","ド","コ"],jp:"squat / seat",lvl:"N3"},
+{word:"忘",ans:"ボウ",opts:["オウ","ケイ","レツ","ボウ"],jp:"forget",lvl:"N3"},
+{word:"洗",ans:"セン",opts:["ヨク","レン","ニン","セン"],jp:"wash / inquire into",lvl:"N3"},
+{word:"許",ans:"もと",opts:["つぎ","もと","さち","こめ"],jp:"permit / approve",lvl:"N3"},
+{word:"静",ans:"セイ",opts:["セイ","オウ","カイ","ジュ"],jp:"quiet",lvl:"N3"},
+{word:"煙",ans:"けむり",opts:["いくさ","かかり","おもり","けむり"],jp:"smoke",lvl:"N3"},
+{word:"加",ans:"カ",opts:["リ","ド","カ","ト"],jp:"add / addition",lvl:"N3"},
+{word:"容",ans:"ヨウ",opts:["ヒツ","ヨウ","エイ","ヤク"],jp:"contain / form",lvl:"N3"},
+{word:"易",ans:"エキ",opts:["ジョ","ゲイ","エキ","イン"],jp:"easy / ready to",lvl:"N3"},
+{word:"財",ans:"たから",opts:["たから","おっと","おもて","むかし"],jp:"property / money",lvl:"N3"},
+{word:"若",ans:"ジャク",opts:["ショウ","リョウ","ショク","ジャク"],jp:"young / if",lvl:"N3"},
+{word:"忙",ans:"うれえるさま",opts:["こもごも","みたまや","うれえるさま","まつりごと"],jp:"busy / occupied",lvl:"N3"},
+{word:"徒",ans:"いたずら",opts:["いたずら","みたまや","まじわる","るうぶる"],jp:"on foot / junior",lvl:"N3"},
+{word:"得",ans:"トク",opts:["トク","ソン","エン","ナン"],jp:"gain / get",lvl:"N3"},
+{word:"続",ans:"ゾク",opts:["ゾク","ツイ","タツ","カイ"],jp:"continue / series",lvl:"N3"},
+{word:"連",ans:"レン",opts:["ラク","レン","ヘイ","ソク"],jp:"take along / lead",lvl:"N3"},
+{word:"困",ans:"コン",opts:["エツ","バン","スイ","コン"],jp:"quandary / become distressed",lvl:"N3"},
+{word:"機",ans:"はた",opts:["はた","おも","まい","みち"],jp:"loom / mechanism",lvl:"N3"},
+{word:"飛",ans:"ヒ",opts:["シ","ヒ","リ","ゴ"],jp:"fly / skip (pages)",lvl:"N3"},
+{word:"害",ans:"ガイ",opts:["エキ","ガイ","ソウ","タツ"],jp:"harm / injury",lvl:"N3"},
+{word:"余",ans:"ヨ",opts:["ヨ","ヒ","コ","ザ"],jp:"too much / myself",lvl:"N3"},
+{word:"難",ans:"ナン",opts:["ホウ","ノウ","シン","ナン"],jp:"difficult / impossible",lvl:"N3"},
+{word:"確",ans:"カク",opts:["セツ","ゼツ","カク","カツ"],jp:"assurance / firm",lvl:"N3"},
+{word:"在",ans:"ザイ",opts:["ネツ","サイ","シツ","ザイ"],jp:"exist / outskirts",lvl:"N3"},
+{word:"夢",ans:"ゆめ",opts:["みな","ゆめ","まな","かわ"],jp:"dream / vision",lvl:"N3"},
+{word:"産",ans:"サン",opts:["マン","レイ","サン","ロウ"],jp:"products / bear",lvl:"N3"},
+{word:"倒",ans:"さかさま",opts:["るうぶる","さかずき","さかさま","いただき"],jp:"overthrow / fall",lvl:"N3"},
+{word:"妻",ans:"つま",opts:["せき","さる","つま","ゆき"],jp:"wife / spouse",lvl:"N3"},
+{word:"議",ans:"ギ",opts:["ヨ","ト","ギ","ダ"],jp:"deliberation / consultation",lvl:"N3"},
+{word:"犯",ans:"ハン",opts:["ハン","トク","ゾク","トウ"],jp:"crime / sin",lvl:"N3"},
+{word:"罪",ans:"つみ",opts:["もり","つみ","たね","きみ"],jp:"guilt / sin",lvl:"N3"},
+{word:"論",ans:"ロン",opts:["サン","バン","ギョ","ロン"],jp:"argument / discourse",lvl:"N3"},
+{word:"経",ans:"たていと",opts:["こもごも","いただき","さかさま","たていと"],jp:"sutra / longitude",lvl:"N3"},
+{word:"済",ans:"わたし",opts:["いくさ","ねぎら","いのち","わたし"],jp:"settle (debt, etc.) / relieve (burden)",lvl:"N3"},
+{word:"判",ans:"ハン",opts:["ヒツ","ナン","ヨウ","ハン"],jp:"judgement / signature",lvl:"N3"},
+{word:"制",ans:"セイ",opts:["ネン","ネツ","セイ","ツウ"],jp:"system / law",lvl:"N3"},
+{word:"務",ans:"ム",opts:["ザ","ハ","ム","ド"],jp:"task / duties",lvl:"N3"},
+{word:"資",ans:"シ",opts:["ト","シ","ワ","ビ"],jp:"assets / resources",lvl:"N3"},
+{word:"権",ans:"おもり",opts:["おもり","みなと","くすり","ひかり"],jp:"authority / power",lvl:"N3"},
+{word:"件",ans:"くだん",opts:["おもり","わたし","くだん","ともに"],jp:"affair / case",lvl:"N3"},
+{word:"断",ans:"ダン",opts:["サン","ダン","キョ","オウ"],jp:"severance / decline",lvl:"N3"},
+{word:"任",ans:"ニン",opts:["ニン","フク","コウ","セキ"],jp:"responsibility / duty",lvl:"N3"},
+{word:"責",ans:"セキ",opts:["セキ","タツ","キョ","ケイ"],jp:"blame / condemn",lvl:"N3"},
+{word:"増",ans:"ゾウ",opts:["ジュ","ザツ","テイ","ゾウ"],jp:"increase / add",lvl:"N3"},
+{word:"解",ans:"カイ",opts:["ゼン","タツ","セツ","カイ"],jp:"unravel / notes",lvl:"N3"},
+{word:"際",ans:"きわ",opts:["はこ","かみ","しか","きわ"],jp:"occasion / side",lvl:"N3"},
+{word:"認",ans:"ニン",opts:["アン","サイ","ニン","ロウ"],jp:"acknowledge / witness",lvl:"N3"},
+{word:"過",ans:"カ",opts:["ジ","ド","カ","グ"],jp:"overdo / exceed",lvl:"N3"},
+{word:"寝",ans:"みたまや",opts:["さかさま","いたずら","るうぶる","みたまや"],jp:"lie down / sleep",lvl:"N3"},
+{word:"置",ans:"チ",opts:["フ","チ","ホ","ム"],jp:"placement / put",lvl:"N3"},
+{word:"費",ans:"ヒ",opts:["ブ","ダ","キ","ヒ"],jp:"expense / cost",lvl:"N3"},
+{word:"示",ans:"ジ",opts:["フ","リ","ジ","キ"],jp:"show / indicate",lvl:"N3"},
+{word:"観",ans:"カン",opts:["カン","フツ","ケン","ゲイ"],jp:"outlook / look",lvl:"N3"},
+{word:"値",ans:"ね",opts:["む","ね","お","み"],jp:"price / cost",lvl:"N3"},
+{word:"吸",ans:"キュウ",opts:["キュウ","キョウ","ジャク","ショク"],jp:"suck / imbibe",lvl:"N3"},
+{word:"状",ans:"ジョウ",opts:["チョウ","リョウ","ジョウ","キョウ"],jp:"status quo / conditions",lvl:"N3"},
+{word:"収",ans:"シュウ",opts:["チョウ","ジャク","シュウ","ショウ"],jp:"income / obtain",lvl:"N3"},
+{word:"職",ans:"ショク",opts:["キョウ","キャク","リュウ","ショク"],jp:"post / employment",lvl:"N3"},
+{word:"規",ans:"キ",opts:["ジ","ビ","シ","キ"],jp:"standard / measure",lvl:"N3"},
+{word:"割",ans:"わり",opts:["いち","わり","すけ","こえ"],jp:"proportion / comparatively",lvl:"N3"},
+{word:"演",ans:"エン",opts:["フク","ラク","エン","タク"],jp:"performance / act",lvl:"N3"},
+{word:"師",ans:"いくさ",opts:["いくさ","ひかり","わたし","ひつじ"],jp:"expert / teacher",lvl:"N3"},
+{word:"備",ans:"ビ",opts:["ブ","ム","ビ","ソ"],jp:"equip / provision",lvl:"N3"},
+{word:"優",ans:"ユウ",opts:["ユウ","ゾウ","カツ","サン"],jp:"tenderness / excel",lvl:"N3"},
+{word:"宅",ans:"タク",opts:["サツ","ツウ","タク","フツ"],jp:"home / house",lvl:"N3"},
+{word:"現",ans:"うつつ",opts:["むすめ","かなめ","うつつ","ところ"],jp:"present / existing",lvl:"N3"},
+{word:"呼",ans:"コ",opts:["チ","ワ","ボ","コ"],jp:"call / call out to",lvl:"N3"},
+{word:"違",ans:"イ",opts:["イ","ヨ","ト","ダ"],jp:"difference / differ",lvl:"N3"},
+{word:"差",ans:"サ",opts:["ボ","リ","サ","フ"],jp:"distinction / difference",lvl:"N3"},
+{word:"供",ans:"とも",opts:["その","とも","こめ","つま"],jp:"submit / offer",lvl:"N3"},
+{word:"限",ans:"ゲン",opts:["ゲン","ギョ","ハイ","ロウ"],jp:"limit / restrict",lvl:"N3"},
+{word:"与",ans:"ともに",opts:["たから","ともに","おもり","うつつ"],jp:"bestow / participate in",lvl:"N3"},
+{word:"渡",ans:"ト",opts:["イ","コ","ム","ト"],jp:"transit / ford",lvl:"N3"},
+{word:"景",ans:"ケイ",opts:["ツイ","ケイ","テキ","セイ"],jp:"scenery / view",lvl:"N3"},
+{word:"抜",ans:"バツ",opts:["テイ","バツ","ユウ","ザン"],jp:"slip out / extract",lvl:"N3"},
+{word:"候",ans:"そうろう",opts:["いただき","まじわる","そうろう","こもごも"],jp:"climate / season",lvl:"N3"},
+{word:"構",ans:"コウ",opts:["ジュ","ホウ","ロウ","コウ"],jp:"posture / build",lvl:"N3"},
+{word:"捕",ans:"ホ",opts:["ホ","イ","ザ","コ"],jp:"catch / capture",lvl:"N3"},
+{word:"慣",ans:"カン",opts:["オウ","カン","ライ","テキ"],jp:"accustomed / get used to",lvl:"N3"},
+{word:"満",ans:"マン",opts:["ゴウ","ミン","ガイ","マン"],jp:"full / fullness",lvl:"N3"},
+{word:"掛",ans:"かかり",opts:["くらい","おもて","いくさ","かかり"],jp:"hang / suspend",lvl:"N3"},
+{word:"居",ans:"キョ",opts:["キョ","レイ","タツ","ベン"],jp:"reside / to be",lvl:"N3"},
+{word:"突",ans:"トツ",opts:["タン","ゲイ","フク","トツ"],jp:"stab / protruding",lvl:"N3"},
+{word:"招",ans:"ショウ",opts:["ショウ","ジャク","キュウ","ジョウ"],jp:"beckon / invite",lvl:"N3"},
+{word:"段",ans:"ダン",opts:["ダン","ノウ","ザイ","ギョ"],jp:"grade / steps",lvl:"N3"},
+{word:"腹",ans:"はら",opts:["つみ","その","はら","もと"],jp:"abdomen / belly",lvl:"N3"},
+{word:"痛",ans:"ツウ",opts:["スイ","ツウ","コン","セツ"],jp:"pain / hurt",lvl:"N3"},
+{word:"退",ans:"タイ",opts:["ヘイ","ヨク","タイ","ガイ"],jp:"retreat / withdraw",lvl:"N3"},
+{word:"迷",ans:"メイ",opts:["ツイ","メイ","レツ","エキ"],jp:"astray / be perplexed",lvl:"N3"},
+{word:"訪",ans:"ホウ",opts:["セキ","ホウ","タク","ニン"],jp:"call on / visit",lvl:"N3"},
+{word:"怒",ans:"ド",opts:["ワ","ド","ボ","グ"],jp:"angry / be offended",lvl:"N3"},
+{word:"眠",ans:"ミン",opts:["メイ","ベン","ミン","ザン"],jp:"sleep / die",lvl:"N3"},
+{word:"靴",ans:"くつ",opts:["たみ","すえ","すべ","くつ"],jp:"shoes",lvl:"N3"},
+{word:"途",ans:"みち",opts:["もと","みち","てる","つま"],jp:"route / way",lvl:"N3"},
+{word:"給",ans:"キュウ",opts:["ショウ","ジャク","キュウ","チョウ"],jp:"salary / wage",lvl:"N3"},
+{word:"冷",ans:"レイ",opts:["ツイ","レイ","カン","ヒツ"],jp:"cool / cold (beer, person)",lvl:"N3"},
+{word:"処",ans:"ところ",opts:["むかし","ねぎら","ところ","よびな"],jp:"dispose / manage",lvl:"N3"},
+{word:"婦",ans:"よめ",opts:["ほど","よめ","すべ","たみ"],jp:"lady / woman",lvl:"N3"},
+{word:"程",ans:"ほど",opts:["ゆび","かれ","ほど","くび"],jp:"extent / degree",lvl:"N3"},
+{word:"精",ans:"セイ",opts:["シキ","セイ","エン","ノウ"],jp:"refined / ghost",lvl:"N3"},
+{word:"絶",ans:"ゼツ",opts:["タク","ゼツ","カツ","レツ"],jp:"discontinue / sever",lvl:"N3"},
+{word:"杯",ans:"さかずき",opts:["みたまや","こもごも","たていと","さかずき"],jp:"counter for cupfuls / wine glass",lvl:"N3"},
+{word:"積",ans:"セキ",opts:["ライ","セキ","ロン","トツ"],jp:"volume / product (x*y)",lvl:"N3"},
+{word:"寄",ans:"キ",opts:["ダ","ホ","ザ","キ"],jp:"draw near / stop in",lvl:"N3"},
+{word:"娘",ans:"むすめ",opts:["つぼね","むすめ","むかし","いくさ"],jp:"daughter / girl",lvl:"N3"},
+{word:"怖",ans:"フ",opts:["ジ","フ","ギ","ド"],jp:"dreadful / be frightened",lvl:"N3"},
+{word:"恐",ans:"キョウ",opts:["リュウ","キョウ","リョウ","ショウ"],jp:"fear / dread",lvl:"N3"},
+{word:"婚",ans:"コン",opts:["ケン","ザイ","コン","ガイ"],jp:"marriage",lvl:"N3"},
+{word:"遊",ans:"ユウ",opts:["ユウ","コク","セキ","ボウ"],jp:"play",lvl:"N3"},
+{word:"貧",ans:"ヒン",opts:["ギョ","ヘン","ヒン","ゼン"],jp:"poverty / poor",lvl:"N3"},
+{word:"適",ans:"テキ",opts:["コウ","ゾク","セイ","テキ"],jp:"suitable / occasional",lvl:"N3"},
+{word:"押",ans:"オウ",opts:["オウ","ラク","セツ","テイ"],jp:"push / stop",lvl:"N3"},
+{word:"更",ans:"さら",opts:["いき","さら","さま","はこ"],jp:"grow late / night watch",lvl:"N3"},
+{word:"浮",ans:"む",opts:["こ","ね","む","は"],jp:"floating / float",lvl:"N3"},
+{word:"越",ans:"エツ",opts:["サイ","サツ","エツ","ジュ"],jp:"surpass / cross over",lvl:"N3"},
+{word:"背",ans:"せ",opts:["こ","せ","み","ひ"],jp:"stature / height",lvl:"N3"},
+{word:"盗",ans:"トウ",opts:["ケツ","トツ","トウ","ミン"],jp:"steal / rob",lvl:"N3"},
+{word:"除",ans:"ジョ",opts:["ジョ","エン","カン","シキ"],jp:"exclude / division (x/3)",lvl:"N3"},
+{word:"幾",ans:"キ",opts:["ワ","グ","ド","キ"],jp:"how many / how much",lvl:"N3"},
+{word:"散",ans:"ばら",opts:["うち","ゆめ","ひら","ばら"],jp:"scatter / disperse",lvl:"N3"},
+{word:"似",ans:"ジ",opts:["キ","ギ","ゴ","ジ"],jp:"becoming / resemble",lvl:"N3"},
+{word:"富",ans:"とみ",opts:["おも","さち","ねこ","とみ"],jp:"wealth / enrich",lvl:"N3"},
+{word:"探",ans:"タン",opts:["ユウ","ザツ","タン","カツ"],jp:"grope / search",lvl:"N3"},
+{word:"迎",ans:"ゲイ",opts:["ケイ","ゲイ","オウ","ガン"],jp:"welcome / meet",lvl:"N3"},
+{word:"祖",ans:"ソ",opts:["ギ","ボ","ソ","グ"],jp:"ancestor / pioneer",lvl:"N3"},
+{word:"雑",ans:"ザツ",opts:["エキ","ザツ","セイ","マン"],jp:"miscellaneous",lvl:"N3"},
+{word:"賛",ans:"サン",opts:["コク","ソク","ライ","サン"],jp:"approve / praise",lvl:"N3"},
+{word:"込",ans:"こ",opts:["こ","む","お","せ"],jp:"crowded / mixture",lvl:"N3"},
+{word:"欲",ans:"ヨク",opts:["ノウ","ダン","ヨク","ネツ"],jp:"longing / covetousness",lvl:"N3"},
+{word:"閉",ans:"ヘイ",opts:["ハイ","ヘイ","ツウ","バン"],jp:"closed / shut",lvl:"N3"},
+{word:"窓",ans:"まど",opts:["よし","ふね","まど","うま"],jp:"window / pane",lvl:"N3"},
+{word:"否",ans:"いな",opts:["はた","ばら","いな","くつ"],jp:"negate / no",lvl:"N3"},
+{word:"暮",ans:"ボ",opts:["ボ","フ","ソ","リ"],jp:"evening / twilight",lvl:"N3"},
+{word:"誤",ans:"ゴ",opts:["カ","ゴ","ム","ジ"],jp:"mistake / err",lvl:"N3"},
+{word:"降",ans:"コウ",opts:["カン","コウ","ゴウ","ヨク"],jp:"descend / precipitate",lvl:"N3"},
+{word:"勤",ans:"キン",opts:["ガイ","ナン","キン","コウ"],jp:"diligence / become employed",lvl:"N3"},
+{word:"刻",ans:"コク",opts:["ラク","コク","ケン","ゾク"],jp:"engrave / cut fine",lvl:"N3"},
+{word:"遅",ans:"チ",opts:["チ","ヒ","リ","ソ"],jp:"slow / late",lvl:"N3"},
+{word:"破",ans:"ハ",opts:["サ","チ","ビ","ハ"],jp:"rend / rip",lvl:"N3"},
+{word:"互",ans:"ゴ",opts:["キ","ソ","ゴ","カ"],jp:"mutually / reciprocally",lvl:"N3"},
+{word:"彼",ans:"かれ",opts:["かお","やど","うち","かれ"],jp:"he / that",lvl:"N3"},
+{word:"恥",ans:"はじ",opts:["にわ","もり","はじ","きわ"],jp:"shame / dishonor",lvl:"N3"},
+{word:"払",ans:"フツ",opts:["トツ","タイ","カク","フツ"],jp:"pay / clear out",lvl:"N3"},
+{word:"舞",ans:"まい",opts:["もち","よめ","まい","はじ"],jp:"dance / flit",lvl:"N3"},
+{word:"頼",ans:"ライ",opts:["ライ","ゲン","ベン","ガン"],jp:"trust / request",lvl:"N3"},
+{word:"戻",ans:"レイ",opts:["レイ","トツ","フツ","タイ"],jp:"re- / return",lvl:"N3"},
+{word:"抱",ans:"ホウ",opts:["ホウ","ソン","ユウ","ザイ"],jp:"embrace / hug",lvl:"N3"},
+{word:"緒",ans:"お",opts:["み","せ","お","こ"],jp:"thong / beginning",lvl:"N3"},
+{word:"逃",ans:"トウ",opts:["トウ","フツ","タツ","ザン"],jp:"escape / flee",lvl:"N3"},
+{word:"御",ans:"ギョ",opts:["ゼツ","ヘン","ギョ","レン"],jp:"honorable / manipulate",lvl:"N3"},
+{word:"吹",ans:"スイ",opts:["カン","ゲイ","ヤク","スイ"],jp:"blow / breathe",lvl:"N3"},
+{word:"到",ans:"トウ",opts:["サン","トウ","フク","レン"],jp:"arrival / proceed",lvl:"N3"},
+{word:"髪",ans:"かみ",opts:["かみ","ぼち","うち","まい"],jp:"hair of the head",lvl:"N3"},
+{word:"疲",ans:"ヒ",opts:["ギ","ハ","シ","ヒ"],jp:"exhausted / tire",lvl:"N3"},
+{word:"歳",ans:"とし",opts:["とし","つて","みち","いな"],jp:"year-end / age",lvl:"N3"},
+{word:"偶",ans:"たま",opts:["とし","かつ","はつ","たま"],jp:"accidentally / even number",lvl:"N3"},
+{word:"偉",ans:"イ",opts:["イ","ゴ","ボ","ヨ"],jp:"admirable / greatness",lvl:"N3"},
+{word:"頂",ans:"いただき",opts:["たていと","いただき","さかずき","みたまや"],jp:"place on the head / receive",lvl:"N3"},
+];
+
+/* ════ Tier weights for cumulative pool ════
+   Each entry = [minTier, weight] where minTier words are included
+   but drawn at this probability relative to the current-level words.
+   easy on Easy=100%; Normal gets easy@30% + normal@70%; etc.
+════ */
+const TIER_ORDER=['easy','normal','hard','extreme'];
+const TIER_WEIGHTS={
+  easy:   {easy:1.0},
+  normal: {easy:0.30, normal:0.70},
+  hard:   {easy:0.15, normal:0.25, hard:0.60},
+  extreme:{easy:0.05, normal:0.15, hard:0.30, extreme:0.50},
+};
+
+function buildWeightedPool(diffKey){
+  const sel=levelSel;
+  let items=QUESTIONS.filter(k=> sel==='all' || k.lvl===sel);
+  if(!items.length) items=QUESTIONS.slice();
+  return shuffle(items.slice());
+}
+
+/* ════ Phonics-aware blanking ════ */
+const VOWELS='AEIOU';
+const CALT={B:'PDT',C:'KGS',D:'BTF',F:'TPV',G:'CKJ',H:'KNT',J:'GYZ',K:'CGT',L:'RNM',M:'NBP',N:'MLR',P:'BDT',R:'LWN',S:'CTF',T:'DBP',V:'BFW',W:'VBM',X:'ZSK',Y:'JEW',Z:'SXF'};
+
+function applyPhonics(q){
+  // If the question has a phonics spec, use it
+  if(q.phonics){
+    const p=q.phonics;
+    return{...q,blankIdx:p.blankIdx,blankLen:p.blankLen,ans:p.ans,opts:shuffle(p.opts.slice())};
+  }
+  // Otherwise fall back to old hardify logic (blank interior vowel or last consonant)
+  const w=q.word.toUpperCase().split('');
+  const vi=w.map((l,i)=>({l,i})).filter(({l,i})=>i>0&&VOWELS.includes(l));
+  if(vi.length){
+    const pick=vi[(Math.random()*vi.length)|0];const ans=pick.l;
+    const others=VOWELS.split('').filter(v=>v!==ans);
+    return{...q,blankIdx:pick.i,blankLen:1,ans,opts:shuffle([ans,...others.slice(0,3)])};
+  }
+  const idx=w.length-1,ans=w[idx];const alts=(CALT[ans]||'BCT').split('').slice(0,3);
+  return{...q,blankIdx:idx,blankLen:1,ans,opts:shuffle([ans,...alts])};
+}
+
+/* ════ Word display: handles blankLen 1 or 2, optional display override ════ */
+function makeWordDisplay(word,blankIdx,blankLen,displayWord){
+  blankLen=blankLen||1;
+  const w=(displayWord||word).toUpperCase();
+  // If displayWord has spaces, we need to map blankIdx from word (no spaces) to displayWord (with spaces)
+  // by counting non-space chars to find the right position
+  let adjIdx=blankIdx;
+  if(displayWord&&displayWord.includes(' ')){
+    let nonSpace=0;
+    for(let i=0;i<displayWord.length;i++){
+      if(displayWord[i]!==' '){
+        if(nonSpace===blankIdx){adjIdx=i;break;}
+        nonSpace++;
+      }
+    }
+  }
+  const pre=w.slice(0,adjIdx),post=w.slice(adjIdx+blankLen);
+  const blankStr='_'.repeat(blankLen);
+  return (pre?`<span style="opacity:.55">${pre}</span>`:'')+
+    `<span class="blank">${blankStr}</span>`+
+    (post?`<span style="opacity:.55">${post}</span>`:'');
+}
+
+/* ════ Image priority: external img → emoji → nothing ════ */
+function setQuestionMedia(q){
+  const wrap=document.getElementById('q-media');
+  wrap.innerHTML='';
+  if(q.emoji) wrap.textContent=q.emoji; else wrap.textContent='';
+  if(q.img){
+    const img=document.createElement('img');
+    img.onload=function(){wrap.textContent='';wrap.appendChild(img);};
+    img.src='images/'+q.img;
+  }
+}
+
+/* ════ Starfield — matching writing.html ════ */
+(function(){
+  const sf=document.getElementById('starfield');
+  const glyphs=['✦','✧','⋆','✴','★','✸','·','✦','✧'];
+  const colors=['#f0d060','#c9a030','#d9c9a8','#f0d060','#c8a0e0','#f8f0c0'];
+  for(let i=0;i<70;i++){
+    const s=document.createElement('span');
+    const sz=(Math.random()*1.2+0.5).toFixed(2);
+    s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+    s.style.cssText=`top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;--delay:-${Math.random()*7}s;--sz:${sz}rem;--col:${colors[Math.floor(Math.random()*colors.length)]};`;
+    sf.appendChild(s);
+  }
+})();
+
+/* ════ Router ════ */
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+/* ════ Audio ════ */
+let actx=null,musicGain=null,sfxGain=null,buf=null,srcNode=null,decoded=false,audioStarted=false;
+let musicVol=0.25,sfxVol=1.0,voiceVol=1.0,musicMuted=false,sfxMuted=false,voiceMuted=false;
+let autoSpeakEnabled=true;
+const bgm=document.getElementById('bgm'); bgm.volume=0.25;
+function ctx(){
+  if(!actx){try{
+    actx=new (window.AudioContext||window.webkitAudioContext)();
+    musicGain=actx.createGain(); musicGain.gain.value=musicVol; musicGain.connect(actx.destination);
+    sfxGain=actx.createGain();   sfxGain.gain.value=sfxVol;    sfxGain.connect(actx.destination);
+  }catch(e){}}return actx;
+}
+function setMusicVol(v){
+  musicVol=v;
+  try{bgm.volume=v;}catch(e){}
+  if(musicGain)musicGain.gain.value=musicMuted?0:v;
+  // sync slider if called from game toggle
+  const sl=document.getElementById('bgm-slider');if(sl)sl.value=v;
+}
+function setSfxVol(v){
+  sfxVol=v;
+  if(sfxGain)sfxGain.gain.value=sfxMuted?0:v;
+  const sl=document.getElementById('sfx-slider');if(sl)sl.value=v;
+}
+function setVoiceVol(v){voiceVol=v;}
+function setVol(v){setMusicVol(v);setSfxVol(v);}
+
+/* ── Title-screen audio panel ── */
+function toggleAudioPanel(){
+  const body=document.getElementById('audio-settings-body');
+  const chev=document.getElementById('audio-chevron');
+  const open=body.classList.toggle('open');
+  chev.classList.toggle('open',open);
+}
+function toggleMusicMuteSettings(){
+  musicMuted=!musicMuted;
+  if(musicGain)musicGain.gain.value=musicMuted?0:musicVol;
+  try{bgm.muted=musicMuted;}catch(e){}
+  const btn=document.getElementById('bgm-toggle-btn');
+  if(btn){btn.textContent=musicMuted?'🔇':'🎵';btn.classList.toggle('off',musicMuted);}
+  syncGameBgmBtn();
+}
+function toggleSfxMuteSettings(){
+  sfxMuted=!sfxMuted;
+  if(sfxGain)sfxGain.gain.value=sfxMuted?0:sfxVol;
+  const btn=document.getElementById('sfx-toggle-btn');
+  if(btn){btn.textContent=sfxMuted?'🔕':'🔔';btn.classList.toggle('off',sfxMuted);}
+}
+function toggleVoiceMuteSettings(){
+  voiceMuted=!voiceMuted;
+  // also hides the 🔊 button during gameplay when voice is off
+  updateWordAudioBtnVisibility();
+  const btn=document.getElementById('voice-toggle-btn');
+  if(btn){btn.textContent=voiceMuted?'🔇':'🔊';btn.classList.toggle('off',voiceMuted);}
+}
+function toggleAutoSpeak(){
+  autoSpeakEnabled=!autoSpeakEnabled;
+  const btn=document.getElementById('autospeak-toggle-btn');
+  if(btn){btn.textContent=autoSpeakEnabled?'ON':'OFF';btn.classList.toggle('off',!autoSpeakEnabled);}
+  syncGameSpeakBtn();
+}
+function updateWordAudioBtnVisibility(){
+  const btn=document.getElementById('word-audio-btn');
+  if(btn)btn.classList.toggle('hidden',voiceMuted);
+}
+
+/* ── In-game corner toggles ── */
+function syncGameBgmBtn(){
+  const btn=document.getElementById('game-bgm-btn');
+  if(btn)btn.classList.toggle('off',musicMuted);
+}
+function syncGameSpeakBtn(){
+  const btn=document.getElementById('game-speak-btn');
+  if(btn)btn.classList.toggle('off',!autoSpeakEnabled);
+}
+function toggleGameBgm(){
+  toggleMusicMuteSettings();
+  // brief visual feedback
+  const btn=document.getElementById('game-bgm-btn');
+  if(btn){btn.style.transform='scale(.88)';setTimeout(()=>btn.style.transform='',150);}
+}
+function toggleGameSpeak(){
+  toggleAutoSpeak();
+  const btn=document.getElementById('game-speak-btn');
+  if(btn){btn.style.transform='scale(.88)';setTimeout(()=>btn.style.transform='',150);}
+}
+
+/* ── Legacy HUD mute (still used by mute-btn in HUD) ── */
+function toggleMute(){
+  musicMuted=!musicMuted;sfxMuted=musicMuted;
+  document.getElementById('mute-btn').textContent=musicMuted?'🔇':'🔊';
+  if(musicGain)musicGain.gain.value=musicMuted?0:musicVol;
+  if(sfxGain)sfxGain.gain.value=sfxMuted?0:sfxVol;
+  try{bgm.muted=musicMuted;}catch(e){}
+  syncGameBgmBtn();
+  const b=document.getElementById('bgm-toggle-btn');
+  if(b){b.textContent=musicMuted?'🔇':'🎵';b.classList.toggle('off',musicMuted);}
+}
+function toggleMusicMute(){toggleMusicMuteSettings();}
+function toggleSfxMute(){toggleSfxMuteSettings();}
+
+document.addEventListener('pointerdown',function ul(){ctx();if(actx&&actx.state==='suspended')actx.resume();document.removeEventListener('pointerdown',ul);},{once:true});
+async function preloadAudio(){try{const r=await fetch('Lumi_Battle.mp3');if(!r.ok)throw 0;const ab=await r.arrayBuffer();buf=await ctx().decodeAudioData(ab);decoded=true;}catch(e){decoded=false;}}
+function unlockAudio(){const c=ctx();if(c&&c.state==='suspended')c.resume();try{bgm.volume=musicVol;bgm.play().then(()=>bgm.pause()).catch(()=>{});}catch(e){}}
+function startMusic(){if(audioStarted)return;audioStarted=true;const c=ctx();if(!c)return;if(decoded){try{srcNode=c.createBufferSource();srcNode.buffer=buf;srcNode.loop=true;srcNode.loopStart=0;srcNode.loopEnd=LOOP_END;srcNode.connect(musicGain||c.destination);srcNode.start();return;}catch(e){}}try{bgm.currentTime=0;bgm.loop=true;bgm.muted=musicMuted;bgm.volume=musicVol;bgm.play().catch(()=>{});}catch(e){}}
+function stopMusic(){try{srcNode&&srcNode.stop();}catch(e){}srcNode=null;try{bgm.pause();}catch(e){}audioStarted=false;}
+function tone(f,type,dur,vol,delay=0,f2=null){try{const c=ctx();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(sfxGain||c.destination);o.type=type;o.frequency.setValueAtTime(f,c.currentTime+delay);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+delay+dur);g.gain.setValueAtTime(0,c.currentTime+delay);g.gain.linearRampToValueAtTime(vol,c.currentTime+delay+.012);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+delay+dur);o.start(c.currentTime+delay);o.stop(c.currentTime+delay+dur+.05);}catch(e){}}
+const sfxTap=()=>tone(520,'sine',.06,.18);
+const sfxPerfect=()=>{tone(880,'sine',.1,.3);tone(1320,'sine',.12,.26,.06);tone(1760,'sine',.12,.2,.12);};
+const sfxGood=()=>{tone(660,'sine',.1,.25);tone(990,'sine',.1,.18,.05);};
+const sfxLate=()=>tone(500,'sine',.12,.2);
+const sfxWrong=()=>{tone(300,'sawtooth',.2,.28,0,150);tone(150,'triangle',.32,.22,.1);};
+const sfxMiss=()=>tone(200,'triangle',.18,.22,0,120);
+
+// ── Voice clips (play if files exist in audio/ folder, silently skip if not) ──
+const VOICES={};
+const VOICE_LOADED={};
+['audio/lumi_ready.mp3','audio/lumi_go.mp3'].forEach(url=>{
+  const a=new Audio(url); a.preload='auto';
+  VOICE_LOADED[url]=false;
+  a.addEventListener('canplaythrough',()=>{VOICE_LOADED[url]=true;},{once:true});
+  a.addEventListener('error',()=>{VOICE_LOADED[url]=false;},{once:true});
+  VOICES[url]=a;
+});
+function playVoice(url){
+  if(voiceMuted)return;
+  try{const a=VOICES[url];if(!a)return;a.volume=voiceVol;a.currentTime=0;a.play().catch(()=>{});}catch(e){}
+}
+function hasVoice(url){return VOICE_LOADED[url]===true;}
+
+// ── Word audio: TTS via Web Speech API ──
+let speechUtter=null;
+function speakWord(){
+  if(voiceMuted)return;
+  if(!cur)return;
+  const word=cur.ans;
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const btn=document.getElementById('word-audio-btn');
+  speechUtter=new SpeechSynthesisUtterance(word);
+  speechUtter.lang='ja-JP';speechUtter.rate=0.9;speechUtter.pitch=1;
+  speechUtter.volume=voiceVol;
+  speechUtter.onstart=()=>{if(btn)btn.classList.add('speaking');};
+  speechUtter.onend=speechUtter.onerror=()=>{if(btn)btn.classList.remove('speaking');};
+  window.speechSynthesis.speak(speechUtter);
+}
+function autoSpeakWord(){if(autoSpeakEnabled&&!voiceMuted)speakWord();}
+
+
+const sfxCombo5=()=>{[660,880,1100].forEach((f,i)=>tone(f,'sine',.16,.32,i*.08));};
+const sfxCombo10=()=>{[660,880,1100,1320].forEach((f,i)=>tone(f,'sine',.18,.36,i*.07));setTimeout(()=>tone(1320,'sine',.38,.3),320);};
+const sfxCombo20=()=>{[440,550,660,880,1100,1320,1760].forEach((f,i)=>tone(f,'triangle',.18,.34,i*.055));};
+const sfxComboMax=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,'square',.22,.3,i*.09));setTimeout(()=>tone(1047,'square',.55,.25),380);};
+function flashTimeBonus(){
+  const el=document.getElementById('time-bonus-flash');
+  if(!el)return;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),900);
+}
+function flashComboMilestone(txt,col){
+  const el=document.getElementById('combo-flash');
+  el.textContent=txt;el.style.color=col;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+}
+function screenPulse(color){
+  const o=document.createElement('div');
+  o.style.cssText=`position:fixed;inset:0;background:${color};z-index:10;pointer-events:none;animation:pulseFade .55s ease-out forwards;`;
+  document.body.appendChild(o);
+  setTimeout(()=>o.remove(),600);
+}
+function addTime(sec){clockStart=Math.min(clockStart+sec*1000,performance.now());flashTimeBonus();}
+function checkComboMilestone(combo){
+  const xt=diffKey==='extreme';
+  if(combo===5)     {sfxCombo5();   flashComboMilestone('5 COMBO! ✨','#f0d060');                                          addGauge(3);}
+  else if(combo===10){sfxCombo10(); flashComboMilestone('10 COMBO! 💜','#c8a0e0');screenPulse('rgba(104,64,160,.35)');     addGauge(6); if(xt)addTime(0.5);}
+  else if(combo===20){sfxCombo20(); flashComboMilestone('20 COMBO! 🔥','#ff8c00');screenPulse('rgba(200,80,0,.3)');        addGauge(10);if(xt)addTime(0.5);}
+  else if(combo>=30&&combo%10===0){sfxComboMax();flashComboMilestone('MAX POWER! 👑','#f0d060');screenPulse('rgba(200,160,0,.35)');addGauge(6);if(xt)addTime(0.5);}
+}
+const sfxFanfare=(s)=>{if(s===3){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.25,.28),i*120));setTimeout(()=>tone(1047,'sine',.5,.28),480);}else if(s===2){[440,554,659].forEach((f,i)=>setTimeout(()=>tone(f,'sine',.22,.25),i*110));}else{tone(330,'sine',.15,.18);setTimeout(()=>tone(294,'sine',.2,.18),150);}};
+
+/* ════ Scenario card — first line removed per user request ════ */
+const STORY=[
+  {en:"I'm Lumi! Before I let you save my world, I need to know you're ready. 💜",jp:"わたしはルミ！助けてもらう前に、まず実力を見せてもらわないとね！💜"},
+  {en:"I'll send my magic spells your way — answer each one to deflect it!",jp:"わたしの魔法をどんどん飛ばすよ！ちゃんとこたえて、はじき返してね！"},
+  {en:"Answer FAST — the quicker you tap, the more power you earn! ⚡",jp:"はやく答えてね！タップがはやいほど、もらえる力が大きくなるよ！⚡"},
+  {en:"Fill the Battle Gauge and prove yourself worthy. I'm rooting for you! 🌟",jp:"バトルゲージをいっぱいにして、本物の勇者さんだって証明して！応援してるよ！🌟"},
+];
+let scIdx=0,scDone=false;
+function initScenario(){scIdx=0;scDone=false;renderScenario();}
+function renderScenario(){const d=STORY[scIdx];document.getElementById('sc-en').textContent=d.en;document.getElementById('sc-jp').textContent=d.jp;const hint=document.getElementById('sc-hint');hint.innerHTML='<span class="sc-hint-tap">TAP!</span><span class="sc-hint-arr">➡️</span>';hint.className='sc-hint blink';}
+function advanceScenario(){sfxTap();if(scDone){scIdx=0;scDone=false;renderScenario();return;}scIdx++;if(scIdx>=STORY.length){scIdx=STORY.length-1;scDone=true;const hint=document.getElementById('sc-hint');hint.innerHTML='🔄';hint.className='sc-hint';}else renderScenario();}
+initScenario();
+
+/* ════ Mode toggle (ふつう ↔ Mini Quest) ════ */
+let miniQuestMode=false;
+const MINI_QUEST_COUNT=10;
+function toggleMode(){
+  miniQuestMode=!miniQuestMode;
+  const track=document.getElementById('mode-toggle-track');
+  const labelN=document.getElementById('mode-label-normal');
+  const labelM=document.getElementById('mode-label-mini');
+  const badge=document.getElementById('mode-badge');
+  track.classList.toggle('on',miniQuestMode);
+  labelN.classList.toggle('active',!miniQuestMode);
+  labelM.classList.toggle('active',miniQuestMode);
+  badge.style.opacity=miniQuestMode?'1':'0.45';
+  sfxTap();
+}
+
+/* ════ Diff select ════ */
+let levelSel='all';
+function selLevel(l){levelSel=l;document.querySelectorAll('.lvl-card').forEach(c=>c.classList.toggle('sel',c.dataset.lvl===l));try{sfxTap();}catch(e){}}
+let diffKey='normal';
+function selDiff(d){
+  diffKey=d;
+  document.querySelectorAll('.diff-card').forEach(b=>b.classList.toggle('sel',b.dataset.diff===d));
+  // Difficulty-select chime — soft rising triangle (740→1108 Hz); distinct from every other SFX
+  tone(740,'triangle',.07,.26);tone(1108,'triangle',.11,.22,.07);
+}
+
+/* ════ Game state ════ */
+let cfg,gauge=0,score=0,combo=0,maxCombo=0,qTotal=0,qRight=0,perfects=0,misses=0;
+let playing=false,accepting=false,locked=false;
+let clockStart=0,songTime=0,rafId=null;
+let pool=[],cur=null,qStart=0,qDeadline=0,lastBeat=-1;
+
+/* ════ Start ════ */
+function startGame(){
+  cfg=DIFF[diffKey];ctx();if(actx&&actx.state==='suspended')actx.resume();preloadAudio();
+  gauge=0;score=0;combo=0;maxCombo=0;qTotal=0;qRight=0;perfects=0;misses=0;
+  playing=false;accepting=false;locked=false;lastBeat=-1;
+  // Build weighted tier pool; blend questions added separately for Hard/Extreme
+  pool=buildWeightedPool(diffKey);
+  updateGauge();document.getElementById('hud-combo').textContent='';
+  document.getElementById('cracks').style.opacity='0.9';
+  // Mini Quest HUD: show word counter, hide timer
+  const timerEl=document.getElementById('hud-timer');
+  const wcountEl=document.getElementById('hud-wcount');
+  if(miniQuestMode){
+    timerEl.style.display='none';
+    wcountEl.style.display='';
+    wcountEl.textContent='1 / '+MINI_QUEST_COUNT;
+  }else{
+    timerEl.style.display='';
+    wcountEl.style.display='none';
+    timerEl.textContent=Math.floor(cfg.time/60)+':'+String(cfg.time%60).padStart(2,'0');
+  }
+  showScreen('screen-play');
+  // Sync in-game toggles with current settings
+  syncGameBgmBtn();syncGameSpeakBtn();updateWordAudioBtnVisibility();
+  unlockAudio();
+  const go=document.getElementById('go-overlay'),gt=document.getElementById('go-text'),gi=document.getElementById('go-instruction');
+  // Phase 1: instruction flash — clear any stale text first
+  gt.textContent='';gt.className='go-text';gt.style.opacity='';
+  const instrHTML=(diffKey==='hard'||diffKey==='extreme')
+    ?'🔍 Find the MISSING LETTER!<span class="jp">消えた文字をタップ！</span>'
+    :'👆 Tap the FIRST LETTER!<span class="jp">最初の文字をタップ！</span>';
+  gi.innerHTML=instrHTML;gi.classList.add('show');
+  go.style.display='flex';
+  tone(523,'sine',.18,.08);
+  // Phase 2: READY? (+500ms longer = 2000ms total instruction)
+  setTimeout(()=>{
+    gi.classList.remove('show');
+    setTimeout(()=>{
+      gt.textContent='READY?';gt.className='go-text pop';void gt.offsetWidth;gt.classList.add('pop');
+      if(!hasVoice('audio/lumi_ready.mp3')){tone(660,'square',.12,.13);tone(990,'square',.2,.13,.12);}playVoice('audio/lumi_ready.mp3');
+      // Phase 3: GO!
+      setTimeout(()=>{
+        gt.textContent='GO! ✨';gt.classList.remove('pop');void gt.offsetWidth;gt.classList.add('pop');
+        if(!hasVoice('audio/lumi_go.mp3')){tone(660,'square',.12,.13);tone(990,'square',.2,.13,.12);}playVoice('audio/lumi_go.mp3');
+        // Launch
+        setTimeout(()=>{go.style.display='none';launchPlay();},1000);
+      },1100);
+    },500);
+  },2000);
+}
+function launchPlay(){playing=true;clockStart=performance.now();startMusic();nextQuestion(cfg.lead);loopGame();}
+function confirmReset(){document.getElementById('reset-modal').classList.add('show');}
+function hideResetModal(){document.getElementById('reset-modal').classList.remove('show');}
+function doReset(){document.getElementById('reset-modal').classList.remove('show');playing=false;accepting=false;cancelAnimationFrame(rafId);stopMusic();goTitle();}
+function goTitle(){stopMusic();showScreen('screen-title');}
+
+/* ════ Loop ════ */
+function loopGame(){
+  if(!playing)return;
+  songTime=(performance.now()-clockStart)/1000;
+  if(!miniQuestMode){
+    const remain=Math.max(0,cfg.time-songTime);
+    document.getElementById('hud-timer').textContent=Math.floor(remain/60)+':'+String(Math.floor(remain%60)).padStart(2,'0');
+    document.getElementById('hud-timer').classList.toggle('low',remain<=15);
+  }
+  const b=Math.floor((songTime-FIRST_BEAT)/BEAT);
+  if(b!==lastBeat){lastBeat=b;pulseBeat();}
+  if(cur&&accepting){
+    const prog=(songTime-qStart)/(qDeadline-qStart);
+    const scale=Math.max(1,2.6-1.6*Math.min(prog,1));
+    const ar=document.getElementById('approach-ring');
+    ar.style.transform=`scale(${scale.toFixed(3)})`;
+    ar.style.opacity=(0.35+0.65*Math.min(prog,1)).toFixed(2);
+    if(prog>=1.05)timeoutMiss();
+  }
+  if(gauge>=WIN_GAUGE){endGame(true);return;}
+  if(!miniQuestMode&&songTime>=cfg.time){endGame(false);return;}
+  rafId=requestAnimationFrame(loopGame);
+}
+function pulseBeat(){const t=document.getElementById('target-ring');t.classList.remove('beat');void t.offsetWidth;t.classList.add('beat');const f=document.getElementById('beatflash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+
+/* ════ Questions ════ */
+function snapBeat(t){return FIRST_BEAT+Math.ceil((t-FIRST_BEAT)/BEAT)*BEAT;}
+function nextQuestion(leadBeats){
+  if(!playing)return;
+  if(pool.length===0) pool=buildWeightedPool(diffKey);
+  let q=pool.pop();
+  cur=q;
+  // Use fresh clock — not stale RAF songTime — so window is always truly in the future
+  const realNow=(performance.now()-clockStart)/1000;
+  qStart=Math.max(snapBeat(realNow+0.05),realNow+0.18);
+  qDeadline=qStart+(cfg.Wbeats+(leadBeats||0))*BEAT;
+  setQuestionMedia(q);
+  var qwEl=document.getElementById('q-word');qwEl.className='q-word kanji';qwEl.textContent=q.word;
+  document.getElementById('q-meta').innerHTML='<small>'+q.jp+'</small>';
+  const opts=shuffle(q.opts.slice());
+  const isBlend=q.blankLen>1;
+  const box=document.getElementById('q-opts');box.innerHTML='';
+  opts.forEach(o=>{
+    const el=document.createElement('div');
+    el.className='q-opt'+(isBlend?' is-blend':'');
+    el.textContent=o;el.onclick=()=>answer(el,o);
+    box.appendChild(el);
+  });
+  document.getElementById('approach-ring').style.cssText='transform:scale(2.6);opacity:.35;';
+  accepting=true;locked=false;qTotal++;
+  // Mini Quest: update word counter; end after MINI_QUEST_COUNT questions
+  if(miniQuestMode){
+    document.getElementById('hud-wcount').textContent=qTotal+' / '+MINI_QUEST_COUNT;
+    if(qTotal>MINI_QUEST_COUNT){endGame(true);return;}
+  }
+  // Reading is spoken AFTER answering (auto-speak at start would reveal the answer).
+}
+function answer(btn,chosen){
+  if(!accepting||locked)return;locked=true;accepting=false;
+  const correct=cur.ans,prog=(songTime-qStart)/(qDeadline-qStart);
+  if(chosen===correct){
+    qRight++;combo++;maxCombo=Math.max(maxCombo,combo);
+    let label,gain,pts;
+    const isLate=prog>GOOD_WIN;
+    if(prog<=cfg.perfWin){label='PERFECT! ✨';gain=cfg.gPerfect;pts=Math.round(120*(1+combo*0.03));perfects++;sfxPerfect();flashJudge(label,'#f0d060');}
+    else if(!isLate){label='GOOD!';gain=cfg.gGood;pts=Math.round(70*(1+combo*0.03));sfxGood();flashJudge(label,'#9fd0f0');}
+    else{label='LATE…';gain=cfg.gLate;pts=Math.round(30*(1+combo*0.02));sfxLate();flashJudge(label,'rgba(210,200,80,.95)');}
+    addGauge(gain);score+=pts;btn.classList.add('correct');blast();autoSpeakWord();
+    checkComboMilestone(combo);
+    updateCombo();setTimeout(()=>nextQuestion(0),340);
+  }else{
+    misses++;combo=0;addGauge(cfg.gWrong);sfxWrong();flashDanger();shake();flashJudge('MISS!','var(--mauve)');
+    btn.classList.add('wrong');
+    document.querySelectorAll('.q-opt').forEach(b=>{if(b.textContent===correct)b.classList.add('correct');else if(!b.classList.contains('wrong'))b.classList.add('dim');});
+    autoSpeakWord();updateCombo();setTimeout(()=>nextQuestion(0),900);
+  }
+}
+function timeoutMiss(){
+  if(!accepting||locked)return;locked=true;accepting=false;
+  misses++;combo=0;addGauge(cfg.gMiss);sfxMiss();flashDanger();flashJudge('TOO SLOW!','var(--mauve)');
+  document.querySelectorAll('.q-opt').forEach(b=>{if(b.textContent===cur.ans)b.classList.add('correct');else b.classList.add('dim');});
+  autoSpeakWord();updateCombo();setTimeout(()=>nextQuestion(0),850);
+}
+function blast(){const b=document.getElementById('battle');const e=document.createElement('div');e.className='blast';e.textContent=['✨','💜','⭐','🌟'][(Math.random()*4)|0];e.style.left='50%';e.style.top='45%';e.style.setProperty('--bx',(20+Math.random()*30)*(Math.random()>.5?1:-1)+'vw');e.style.setProperty('--by',-(10+Math.random()*25)+'vh');e.style.animation='blastFly .6s ease-out forwards';b.appendChild(e);setTimeout(()=>e.remove(),650);}
+function flashJudge(txt,col){const j=document.getElementById('judge');j.textContent=txt;j.style.color=col;j.classList.remove('show');void j.offsetWidth;j.classList.add('show');}
+function flashDanger(){const v=document.getElementById('vignette');v.style.boxShadow='inset 0 0 90px 18px rgba(200,40,40,.55)';setTimeout(()=>v.style.boxShadow='inset 0 0 90px 18px rgba(200,40,40,0)',200);}
+function shake(){const s=document.getElementById('screen-play');if(!s)return;s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake');}
+function updateCombo(){document.getElementById('hud-combo').textContent=combo>=3?combo+'x':'';}
+function addGauge(v){gauge=Math.max(0,Math.min(WIN_GAUGE,gauge+v));updateGauge();document.getElementById('cracks').style.opacity=(0.9*(1-gauge/WIN_GAUGE)+0.05).toFixed(2);}
+function updateGauge(){const f=document.getElementById('gauge-fill'),p=document.getElementById('gauge-pct');f.style.width=gauge+'%';if(gauge>=80)f.style.background='linear-gradient(90deg,#d97706,#fde68a)';else if(gauge>=50)f.style.background='linear-gradient(90deg,var(--purple),var(--gold-light))';else f.style.background='linear-gradient(90deg,var(--purple-dark),var(--purple-light))';p.textContent=Math.round(gauge)+'%';}
+
+/* ════ End ════ */
+function endGame(won){
+  playing=false;accepting=false;cancelAnimationFrame(rafId);stopMusic();
+  if(!miniQuestMode&&won)score+=Math.floor(Math.max(0,cfg.time-songTime))*15;
+  score+=Math.round(gauge*4);score=Math.max(0,Math.round(score));
+  const isBest=saveScore(diffKey+(miniQuestMode?'_mini':''),score);
+  const acc=qTotal>0?qRight/qTotal:0;
+  // Mini Quest: always "won" — stars purely by accuracy
+  const mqWon=miniQuestMode?true:won;
+  let stars,emoji,cls,title,sub;
+  if(mqWon&&acc>=0.8){stars=3;emoji='🏆';cls='great';title="VICTORY!\nかんぺき！";sub="Perfect kanji reading! Lumi is truly impressed. / かんぺきな漢字よみ！ルミもびっくり！";}
+  else if(mqWon&&acc>=0.6){stars=2;emoji='⚔️';cls='good';title="VICTORY!\nよくできました！";sub="You proved yourself worthy, hero! / 勇者さんの力、ちゃんと見たよ！";}
+  else if(mqWon){stars=2;emoji='⚔️';cls='good';title="VICTORY!\nギリギリ！";sub="A win is a win — but you can do better! / 勝ったけど、もっとできるよ！";}
+  else{stars=1;emoji='💪';cls='try';title="NOT YET…\nもうちょっと！";sub="I know you can do it — try again! / 絶対できるよ！もう一回！";}
+  document.getElementById('result-emoji').textContent=emoji;
+  const tEl=document.getElementById('result-title');tEl.className='result-title '+cls;tEl.textContent=title;
+  document.getElementById('result-sub').textContent=sub;
+  document.getElementById('result-score').textContent=score.toLocaleString();
+  document.getElementById('result-stats').innerHTML=`<span>✅ <b>${qRight}</b>/${qTotal}</span><span>🎯 <b>${perfects}</b></span><span>🔥 <b>${maxCombo}</b>x</span>`;
+  document.getElementById('result-newbest').style.display=isBest?'block':'none';
+  setResultLumi(stars);  // star-based Lumi image
+  sfxFanfare(stars);
+  for(let i=1;i<=3;i++){const s=document.getElementById('star'+i);s.className='star-icon';if(i<=stars)setTimeout(()=>s.classList.add('lit'),(i-1)*350);}
+  showScreen('screen-result');
+}
+
+/* ════ Scores ════ */
+function sKey(d){return 'kanjiQuest1_'+d;}
+function getScores(d){try{return JSON.parse(Store.get(sKey(d))||'[]');}catch(e){return[];}}
+function saveScore(d,sc){const l=getScores(d);l.push(sc);l.sort((a,b)=>b-a);const top=l.slice(0,5);Store.set(sKey(d),JSON.stringify(top));return sc>0&&top[0]===sc&&l.indexOf(sc)===0;}
+function showScores(){showScreen('screen-scores');showScoreList(diffKey);}
+function showScoreList(d){document.querySelectorAll('.score-tab').forEach(t=>t.classList.toggle('sel',t.dataset.st===d));const l=getScores(d),box=document.getElementById('score-list');if(!l.length){box.innerHTML='<div style="padding:22px;text-align:center;font-family:\'Zen Maru Gothic\',sans-serif;font-size:.84rem;color:var(--brown)">No scores yet!<br>まだスコアがないよ</div>';return;}box.innerHTML=l.map((sc,i)=>`<div class="score-item"><div class="score-rank ${i===0?'gold':''}">${i===0?'#1':'#'+(i+1)}</div><div class="score-val">${sc.toLocaleString()}</div></div>`).join('');sfxTap();}
+
+/* ════ Util ════ */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+</script>
+</body>
+</html>
